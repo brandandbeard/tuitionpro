@@ -1,0 +1,1883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>TuitionPro ✨</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<style>
+:root{--bg1:#0f0c29;--bg2:#302b63;--bg3:#24243e;--accent:#7c3aed;--accent2:#ec4899;--accent3:#06b6d4;--glass:rgba(255,255,255,.06);--glass-border:rgba(255,255,255,.12);--text:#f1f5f9;--muted:#94a3b8;--danger:#ef4444;--success:#10b981;--wa:#25D366}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;font-family:'Inter',sans-serif;color:var(--text);overflow-x:hidden;overscroll-behavior:none}
+body{background:linear-gradient(135deg,var(--bg1),var(--bg2),var(--bg3));background-size:400% 400%;animation:bgShift 20s ease infinite;min-height:100vh}
+@keyframes bgShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.orb{position:fixed;border-radius:50%;filter:blur(80px);opacity:.3;z-index:0;pointer-events:none}
+.orb1{width:400px;height:400px;background:#7c3aed;top:-100px;left:-100px;animation:float 15s infinite}
+.orb2{width:350px;height:350px;background:#ec4899;bottom:-80px;right:-80px;animation:float 18s infinite reverse}
+.orb3{width:300px;height:300px;background:#06b6d4;top:40%;left:50%;animation:float 22s infinite}
+@keyframes float{0%,100%{transform:translate(0,0)}50%{transform:translate(60px,-40px)}}
+.login-wrap{position:relative;z-index:1;min-height:100vh;display:grid;place-items:center;padding:20px}
+.login-card{background:var(--glass);backdrop-filter:blur(20px);border:1px solid var(--glass-border);border-radius:24px;padding:clamp(24px,5vw,40px);max-width:420px;width:100%;animation:pop .5s}
+@keyframes pop{from{transform:scale(.95);opacity:0}to{transform:scale(1);opacity:1}}
+.login-card h2{font-family:'Space Grotesk';font-size:clamp(22px,6vw,28px);margin-bottom:6px;text-align:center}
+.login-card h2 span{background:linear-gradient(135deg,var(--accent2),var(--accent3));-webkit-background-clip:text;background-clip:text;color:transparent}
+.login-card p{text-align:center;color:var(--muted);font-size:13px;margin-bottom:24px}
+.login-tabs{display:flex;background:rgba(0,0,0,.3);border-radius:12px;padding:4px;margin-bottom:20px}
+.login-tab{flex:1;padding:10px;border:none;background:transparent;color:var(--muted);cursor:pointer;font:600 13px 'Inter';border-radius:9px;transition:.2s}
+.login-tab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+.app{position:relative;z-index:1;min-height:100vh;display:none}
+.app.show{display:block}
+.sidebar{position:fixed;top:0;left:0;bottom:0;width:280px;max-width:85vw;transform:translateX(-100%);transition:transform .4s cubic-bezier(.4,0,.2,1);background:rgba(15,12,41,0.98);border-right:1px solid var(--glass-border);padding:70px 18px 18px 18px;display:flex;flex-direction:column;gap:6px;overflow-y:auto;overflow-x:hidden;z-index:240;box-shadow:8px 0 40px rgba(0,0,0,.5);-webkit-overflow-scrolling:touch}
+.sidebar.open{transform:translateX(0)}
+.menu-toggle{position:fixed;top:14px;left:14px;z-index:250;width:46px;height:46px;border-radius:12px;background:rgba(30,27,75,0.95);border:1px solid var(--glass-border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;font-size:22px;box-shadow:0 4px 16px rgba(0,0,0,.4);font-weight:700;transition:.3s;-webkit-user-select:none;user-select:none}
+.menu-toggle:hover{background:rgba(49,46,129,0.95)}
+.menu-toggle:active{transform:scale(.92)}
+.logo{display:flex;align-items:center;gap:10px;padding:8px 10px 22px;border-bottom:1px solid var(--glass-border);margin-bottom:14px}
+.logo-icon{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;font-size:22px;box-shadow:0 8px 24px rgba(124,58,237,.4);flex-shrink:0}
+.logo h1{font-family:'Space Grotesk';font-size:20px;font-weight:700;letter-spacing:-.5px;color:#fff}
+.logo h1 span{background:linear-gradient(135deg,var(--accent2),var(--accent3));-webkit-background-clip:text;background-clip:text;color:transparent}
+.nav-btn{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:12px;background:transparent;border:1px solid transparent;color:#e2e8f0;font:600 14px 'Inter';cursor:pointer;transition:.15s;text-align:left;width:100%;-webkit-user-select:none;user-select:none;min-height:48px}
+.nav-btn:hover{background:rgba(255,255,255,.08);color:#fff;border-color:rgba(255,255,255,.08)}
+.nav-btn:active{background:rgba(124,58,237,.3);transform:scale(.97)}
+.nav-btn.active{background:linear-gradient(135deg,rgba(124,58,237,.45),rgba(236,72,153,.35));color:#fff;border-color:rgba(236,72,153,.5);box-shadow:0 4px 12px rgba(124,58,237,.3)}
+.nav-btn .ic{font-size:18px}
+.user-box{margin-top:auto;padding:14px;background:rgba(255,255,255,.05);border-radius:12px;border:1px solid var(--glass-border);flex-shrink:0}
+.user-box .lbl{font-size:10px;color:#94a3b8;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+.user-box .mail{font-size:12px;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:10px;font-weight:500}
+.main{padding:clamp(16px,3vw,40px);padding-top:70px;overflow-y:auto;min-height:100vh}
+.page-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:clamp(16px,3vw,28px);flex-wrap:wrap;gap:12px}
+.page-head h2{font-family:'Space Grotesk';font-size:clamp(22px,5.5vw,30px);font-weight:700;letter-spacing:-.5px}
+.page-head h2 span{background:linear-gradient(135deg,var(--accent2),var(--accent3));-webkit-background-clip:text;background-clip:text;color:transparent}
+.page-head p{color:var(--muted);font-size:clamp(11px,3vw,13px);margin-top:4px}
+.btn{padding:clamp(9px,2.5vw,12px) clamp(14px,4vw,18px);border-radius:11px;border:none;cursor:pointer;font:600 clamp(11px,3vw,13px) 'Inter';transition:.2s;display:inline-flex;align-items:center;gap:8px;min-height:40px;justify-content:center;white-space:nowrap}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 6px 20px rgba(124,58,237,.4)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(124,58,237,.6)}
+.btn-ghost{background:var(--glass);color:var(--text);border:1px solid var(--glass-border)}
+.btn-ghost:hover{background:rgba(255,255,255,.12)}
+.btn-danger{background:rgba(239,68,68,.15);color:#fca5a5;border:1px solid rgba(239,68,68,.3)}
+.btn-danger:hover{background:rgba(239,68,68,.25)}
+.btn-success{background:rgba(16,185,129,.15);color:#6ee7b7;border:1px solid rgba(16,185,129,.3)}
+.btn-wa{background:rgba(37,211,102,.15);color:#25D366;border:1px solid rgba(37,211,102,.4)}
+.btn-wa:hover{background:rgba(37,211,102,.25)}
+.btn-sm{padding:8px 12px;font-size:11px;border-radius:8px;min-height:34px}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:clamp(10px,2vw,16px);margin-bottom:clamp(16px,3vw,28px)}
+.stat{background:var(--glass);backdrop-filter:blur(14px);border:1px solid var(--glass-border);border-radius:18px;padding:clamp(14px,3vw,20px);position:relative;overflow:hidden;transition:.3s}
+.stat:hover{transform:translateY(-4px);border-color:rgba(255,255,255,.2)}
+.stat::before{content:'';position:absolute;top:0;left:0;width:60px;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:0 0 3px 0}
+.stat .label{font-size:clamp(10px,2.5vw,12px);color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:600}
+.stat .val{font-family:'Space Grotesk';font-size:clamp(22px,5.5vw,30px);font-weight:700;margin-top:8px}
+.stat .sub{font-size:clamp(10px,2.5vw,12px);color:var(--muted);margin-top:4px}
+.card{background:var(--glass);backdrop-filter:blur(14px);border:1px solid var(--glass-border);border-radius:20px;padding:clamp(16px,3vw,24px);margin-bottom:clamp(14px,3vw,20px);overflow:visible}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:clamp(10px,2.5vw,14px)}
+.field label{display:block;font-size:clamp(10px,2.5vw,12px);color:var(--muted);margin-bottom:6px;font-weight:500;text-transform:uppercase;letter-spacing:.5px}
+.field input,.field select,.field textarea{width:100%;padding:clamp(10px,2.5vw,12px) 14px;border-radius:10px;background:rgba(0,0,0,.25);border:1px solid var(--glass-border);color:var(--text);font:400 clamp(13px,3.5vw,14px) 'Inter';transition:.2s;min-height:44px}
+.field input:focus,.field select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,58,237,.2)}
+.tbl-wrap{overflow-x:auto;border-radius:14px;margin:0 -4px;padding:0 4px}
+table{width:100%;border-collapse:collapse;font-size:clamp(11px,3vw,13px);min-width:600px}
+th{background:rgba(0,0,0,.3);padding:12px;text-align:left;font-weight:600;font-size:clamp(10px,2.5vw,11px);text-transform:uppercase;letter-spacing:1px;color:var(--muted);border-bottom:1px solid var(--glass-border)}
+td{padding:12px;border-bottom:1px solid rgba(255,255,255,.05);vertical-align:middle}
+tr:hover td{background:rgba(255,255,255,.03)}
+.photo{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;font-weight:700;color:#fff;font-size:14px;flex-shrink:0;cursor:pointer;transition:.2s}
+.photo:hover{transform:scale(1.1);box-shadow:0 4px 16px rgba(124,58,237,.4)}
+.photo.lg{width:70px;height:70px;font-size:24px}
+.photo img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+.badge{padding:3px 10px;border-radius:20px;font-size:clamp(9px,2.5vw,11px);font-weight:600;display:inline-block}
+.badge-ok{background:rgba(16,185,129,.15);color:#6ee7b7;border:1px solid rgba(16,185,129,.3)}
+.badge-due{background:rgba(239,68,68,.18);color:#fca5a5;border:1px solid rgba(239,68,68,.4);animation:pulse 2s infinite}
+.badge-partial{background:rgba(245,158,11,.18);color:#fbbf24;border:1px solid rgba(245,158,11,.4)}
+.badge-advance{background:rgba(59,130,246,.18);color:#93c5fd;border:1px solid rgba(59,130,246,.4)}
+.badge-class{background:rgba(6,182,212,.15);color:#67e8f9;border:1px solid rgba(6,182,212,.3)}
+.badge-tuition{background:linear-gradient(135deg,rgba(124,58,237,.25),rgba(236,72,153,.25));color:#e9d5ff;border:1px solid rgba(236,72,153,.4)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.7}}
+.due-cell{display:flex;flex-direction:column;gap:4px}
+.due-formula{font-size:clamp(9px,2.3vw,11px);color:var(--muted);font-family:'Courier New',monospace;background:rgba(0,0,0,.25);padding:3px 7px;border-radius:6px;word-break:break-word}
+.due-total{font-weight:700;color:#fca5a5;font-size:clamp(13px,3.5vw,15px)}
+.action-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.icon-btn{width:40px;height:40px;border-radius:10px;border:none;cursor:pointer;display:grid;place-items:center;transition:.2s;text-decoration:none;flex-shrink:0;background:rgba(255,255,255,.08)}
+.icon-btn:hover{transform:translateY(-2px) scale(1.05)}
+.icon-btn:active{transform:scale(.92)}
+.icon-btn svg{width:20px;height:20px;display:block}
+.icon-btn.wa{background:rgba(37,211,102,.15)}
+.icon-btn.wa svg{fill:#25D366}
+.icon-btn.sms{background:rgba(6,182,212,.15)}
+.icon-btn.sms svg{fill:#22d3ee}
+.icon-btn.call{background:rgba(124,58,237,.15)}
+.icon-btn.call svg{fill:#a78bfa}
+.icon-btn.ig{background:rgba(225,48,108,.15)}
+.icon-btn.ig svg{fill:#E1306C}
+.icon-btn.edit{background:rgba(124,58,237,.15)}
+.icon-btn.edit svg{fill:#a78bfa}
+.icon-btn.del{background:rgba(239,68,68,.15)}
+.icon-btn.del svg{fill:#fca5a5}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;z-index:2000;padding:20px}
+.modal-bg.show{display:flex;animation:fade .2s}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.modal{background:linear-gradient(135deg,#1e1b4b,#312e81);border:1px solid var(--glass-border);border-radius:22px;padding:clamp(20px,4vw,28px);max-width:720px;width:100%;max-height:85vh;overflow-y:auto;animation:slideUp .3s cubic-bezier(.34,1.2,.64,1);margin:auto}
+.modal.sm{max-width:480px}
+@keyframes slideUp{from{transform:translateY(50px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal h3{font-family:'Space Grotesk';margin-bottom:18px;font-size:clamp(18px,4.5vw,22px)}
+.modal-close{float:right;background:none;border:none;color:var(--muted);font-size:28px;cursor:pointer;line-height:1}
+.class-select-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:clamp(10px,2.5vw,14px);margin-bottom:24px}
+.class-pick-card{background:var(--glass);border:1px solid var(--glass-border);border-radius:16px;padding:clamp(14px,3vw,20px);cursor:pointer;transition:.25s;text-align:center;position:relative}
+.class-pick-card:hover{transform:translateY(-3px);border-color:var(--accent)}
+.class-pick-card.selected{background:linear-gradient(135deg,rgba(124,58,237,.25),rgba(236,72,153,.15));border-color:var(--accent);box-shadow:0 8px 24px rgba(124,58,237,.3)}
+.class-pick-card .nm{font-family:'Space Grotesk';font-size:clamp(15px,4vw,18px);font-weight:700;margin-bottom:4px}
+.class-pick-card .info{font-size:clamp(10px,2.5vw,11px);color:var(--muted);margin-top:2px}
+.class-pick-card .count{font-size:12px;color:#67e8f9;margin-top:6px}
+.tuition-day-banner{background:linear-gradient(135deg,rgba(124,58,237,.2),rgba(236,72,153,.2));border:1px solid rgba(236,72,153,.4);border-radius:14px;padding:clamp(12px,3vw,16px);margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.tuition-day-banner.off{background:rgba(0,0,0,.25);border:1px solid var(--glass-border)}
+.tuition-day-banner .txt{font-weight:600;display:flex;align-items:center;gap:10px;font-size:clamp(12px,3.2vw,14px)}
+.stu-att-row{background:rgba(0,0,0,.2);border:1px solid var(--glass-border);border-radius:14px;padding:clamp(10px,2.5vw,14px);margin-bottom:10px;display:flex;align-items:center;gap:clamp(10px,2.5vw,14px);flex-wrap:wrap;transition:.2s}
+.stu-att-row:hover{border-color:var(--accent)}
+.stu-att-row .info{flex:1;min-width:140px;cursor:pointer}
+.stu-att-row .info .nm{font-weight:600;font-size:clamp(13px,3.5vw,15px);margin-bottom:3px}
+.stu-att-row .info .sub{font-size:clamp(10px,2.5vw,11px);color:var(--muted)}
+.att-actions{display:flex;gap:4px}
+.att-btn{padding:8px 12px;border-radius:10px;border:none;cursor:pointer;font:600 clamp(10px,2.5vw,12px) 'Inter';transition:.2s;min-width:70px}
+.att-btn.present{background:rgba(16,185,129,.2);color:#6ee7b7;border:1px solid rgba(16,185,129,.4)}
+.att-btn.absent{background:rgba(239,68,68,.2);color:#fca5a5;border:1px solid rgba(239,68,68,.4)}
+.att-btn.none{background:rgba(255,255,255,.05);color:var(--muted);border:1px solid var(--glass-border)}
+.att-btn.active.present{background:#10b981;color:#fff;box-shadow:0 0 0 2px rgba(16,185,129,.5)}
+.att-btn.active.absent{background:#ef4444;color:#fff;box-shadow:0 0 0 2px rgba(239,68,68,.5)}
+.profile-header{display:flex;gap:18px;align-items:center;margin-bottom:18px;padding-bottom:18px;border-bottom:1px solid var(--glass-border);flex-wrap:wrap}
+.profile-header .info{flex:1;min-width:140px}
+.profile-header .info h3{margin-bottom:4px;font-size:clamp(18px,4.5vw,22px)}
+.profile-tabs{display:flex;gap:4px;background:rgba(0,0,0,.3);border-radius:12px;padding:4px;margin-bottom:18px;overflow-x:auto;scrollbar-width:none}
+.profile-tabs::-webkit-scrollbar{display:none}
+.profile-tab{flex-shrink:0;padding:10px 14px;border:none;background:transparent;color:var(--muted);cursor:pointer;font:600 clamp(11px,3vw,13px) 'Inter';border-radius:9px;transition:.2s;white-space:nowrap}
+.profile-tab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+.profile-pane{display:none}
+.profile-pane.active{display:block;animation:slideIn .3s}
+@keyframes slideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:clamp(8px,2vw,14px)}
+.info-item{background:rgba(0,0,0,.25);border-radius:10px;padding:clamp(10px,2.5vw,12px)}
+.info-item .lbl{font-size:clamp(9px,2.3vw,11px);color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.info-item .val{font-weight:600;font-size:clamp(12px,3.2vw,14px);word-break:break-word}
+.month-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;background:rgba(0,0,0,.25);border-radius:12px;padding:10px 14px;gap:8px}
+.month-nav button{background:rgba(255,255,255,.08);border:1px solid var(--glass-border);color:var(--text);padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:600;min-width:40px;min-height:40px}
+.month-nav button:hover{background:rgba(255,255,255,.15)}
+.month-nav .mn-label{font-family:'Space Grotesk';font-size:clamp(13px,3.5vw,16px);font-weight:700}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:clamp(4px,1vw,6px)}
+.cal-head{font-size:clamp(9px,2.3vw,10px);color:var(--muted);text-align:center;font-weight:700;text-transform:uppercase;padding:6px 0}
+.cal-day{aspect-ratio:1;border-radius:8px;display:grid;place-items:center;background:rgba(255,255,255,.04);font-size:clamp(10px,2.8vw,12px);cursor:pointer;transition:.2s;border:1px solid transparent;position:relative}
+.cal-day:hover{background:rgba(255,255,255,.1)}
+.cal-day.tuition{background:rgba(124,58,237,.15);border-color:rgba(124,58,237,.4)}
+.cal-day.present{background:rgba(16,185,129,.35);border-color:rgba(16,185,129,.6);color:#6ee7b7}
+.cal-day.absent{background:rgba(239,68,68,.3);border-color:rgba(239,68,68,.6);color:#fca5a5}
+.cal-day.fined::after{content:'₹';position:absolute;bottom:1px;right:2px;font-size:8px;color:#fca5a5;font-weight:700}
+.cal-day.empty{visibility:hidden}
+.cal-day.future{opacity:.4;cursor:not-allowed}
+.pay-month-row{background:rgba(0,0,0,.25);border-radius:12px;padding:clamp(10px,2.5vw,14px);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;border-left:4px solid var(--glass-border);transition:.2s}
+.pay-month-row:hover{background:rgba(0,0,0,.35)}
+.pay-month-row.status-paid{border-left-color:#10b981;background:rgba(16,185,129,.08)}
+.pay-month-row.status-partial{border-left-color:#f59e0b;background:rgba(245,158,11,.08)}
+.pay-month-row.status-unpaid{border-left-color:#ef4444;background:rgba(239,68,68,.08)}
+.pay-month-row .ym{font-weight:700;font-size:clamp(12px,3.2vw,14px);min-width:90px}
+.pay-month-row .amt{font-family:'Space Grotesk';font-weight:700;font-size:clamp(13px,3.5vw,15px)}
+.pay-month-row .status-info{flex:1;min-width:120px;font-size:11px;color:var(--muted)}
+.pay-month-row .status-info b{color:var(--text)}
+.pay-month-row .pay-date-tag{font-size:10px;color:#6ee7b7;display:block;margin-top:2px}
+.pay-month-row .pay-due-tag{font-size:10px;color:#fca5a5;display:block;margin-top:2px}
+.pay-month-row .month-actions{display:flex;gap:6px;align-items:center}
+.month-tick-btn{width:40px;height:40px;border-radius:10px;border:none;cursor:pointer;display:grid;place-items:center;transition:.2s;font-size:18px;background:rgba(255,255,255,.08)}
+.month-tick-btn:hover{transform:scale(1.1)}
+.month-tick-btn.paid{background:rgba(16,185,129,.3);color:#6ee7b7}
+.month-tick-btn.unpaid{background:rgba(239,68,68,.15);color:#fca5a5}
+.month-del-btn{width:32px;height:32px;border-radius:8px;border:none;cursor:pointer;display:grid;place-items:center;transition:.2s;font-size:14px;background:rgba(239,68,68,.1);color:#fca5a5}
+.month-del-btn:hover{background:rgba(239,68,68,.3);transform:scale(1.1)}
+.pay-history-item{background:rgba(0,0,0,.25);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;border:1px solid var(--glass-border);transition:.2s}
+.pay-history-item:hover{border-color:var(--accent);transform:translateX(2px)}
+.pay-history-item .pay-amt{font-family:'Space Grotesk';font-size:clamp(16px,4vw,20px);font-weight:700;color:#6ee7b7;min-width:80px}
+.pay-history-item .pay-info{flex:1;min-width:0}
+.pay-history-item .pay-info .pay-date{font-size:12px;color:var(--text);font-weight:600;margin-bottom:2px}
+.pay-history-item .pay-info .pay-note{font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pay-history-item .pay-del{width:32px;height:32px;border-radius:8px;background:rgba(239,68,68,.15);border:none;cursor:pointer;color:#fca5a5;display:grid;place-items:center;transition:.2s;flex-shrink:0}
+.pay-history-item .pay-del:hover{background:rgba(239,68,68,.3)}
+.advance-banner{background:linear-gradient(135deg,rgba(59,130,246,.15),rgba(6,182,212,.15));border:1px solid rgba(59,130,246,.4);border-radius:12px;padding:14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.advance-banner .adv-icon{font-size:24px}
+.advance-banner .adv-info{flex:1;min-width:120px}
+.advance-banner .adv-info .adv-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.advance-banner .adv-info .adv-amt{font-family:'Space Grotesk';font-size:clamp(18px,4.5vw,22px);font-weight:700;color:#93c5fd}
+.advance-banner .adv-info .adv-desc{font-size:11px;color:var(--muted);margin-top:2px}
+.payment-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:14px}
+.pay-sum-box{background:rgba(0,0,0,.25);border-radius:10px;padding:12px;text-align:center}
+.pay-sum-box .sum-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.pay-sum-box .sum-val{font-family:'Space Grotesk';font-size:clamp(16px,4vw,20px);font-weight:700}
+.pay-sum-box.due .sum-val{color:#fca5a5}
+.pay-sum-box.paid .sum-val{color:#6ee7b7}
+.pay-sum-box.advance .sum-val{color:#93c5fd}
+.pay-sum-box.fee .sum-val{color:var(--text)}
+.toggle{position:relative;width:44px;height:24px;background:rgba(255,255,255,.1);border-radius:12px;cursor:pointer;transition:.2s;display:inline-block;flex-shrink:0}
+.toggle.on{background:linear-gradient(135deg,var(--accent),var(--accent2))}
+.toggle::after{content:'';position:absolute;width:18px;height:18px;background:#fff;border-radius:50%;top:3px;left:3px;transition:.2s}
+.toggle.on::after{left:23px}
+.search-bar{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+.search-bar input,.search-bar select{padding:clamp(10px,2.5vw,12px) 14px;border-radius:10px;background:rgba(0,0,0,.25);border:1px solid var(--glass-border);color:var(--text);font:400 clamp(12px,3.2vw,13px) 'Inter';min-height:44px;flex:1;min-width:120px}
+.page{display:none;animation:slideIn .4s}
+.page.active{display:block}
+.empty-state{text-align:center;padding:clamp(30px,8vw,60px) 20px;color:var(--muted)}
+.empty-state .big{font-size:clamp(40px,12vw,60px);margin-bottom:14px;opacity:.3}
+.toast{position:fixed;bottom:40px;left:50%;transform:translateX(-50%);padding:12px 20px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:500;font-size:13px;z-index:2000;box-shadow:0 10px 30px rgba(0,0,0,.3);animation:toastIn .3s;display:none;max-width:90%;text-align:center}
+.toast.show{display:block}
+@keyframes toastIn{from{transform:translate(-50%,20px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
+.class-card{background:rgba(0,0,0,.2);border:1px solid var(--glass-border);border-radius:14px;padding:clamp(12px,3vw,16px);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.code-box{background:rgba(0,0,0,.35);border:1px solid var(--glass-border);border-radius:10px;padding:10px;font-family:'Courier New',monospace;font-size:clamp(10px,2.5vw,12px);color:#67e8f9;white-space:pre-wrap;word-break:break-all;margin:8px 0}
+.loading-screen{position:fixed;inset:0;background:linear-gradient(135deg,var(--bg1),var(--bg2),var(--bg3));display:grid;place-items:center;z-index:999}
+.spinner{width:50px;height:50px;border:3px solid rgba(255,255,255,.1);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.day-toggle{display:flex;flex-direction:column;gap:8px;margin-top:8px;width:100%}
+.day-item{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:10px;background:rgba(0,0,0,.25);border-radius:12px;border:1px solid var(--glass-border);transition:.2s}
+.day-item.active{background:linear-gradient(135deg,rgba(124,58,237,.2),rgba(236,72,153,.15));border-color:rgba(236,72,153,.4)}
+.day-chip{padding:8px 14px;border-radius:8px;background:rgba(255,255,255,.08);border:1px solid transparent;font-size:clamp(12px,3vw,13px);cursor:pointer;font-weight:600;transition:.2s;user-select:none;min-height:38px;display:grid;place-items:center;color:#94a3b8}
+.day-chip.on{background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:transparent;color:#fff;box-shadow:0 2px 8px rgba(124,58,237,.4)}
+.day-time-input{padding:8px 12px;border-radius:8px;background:rgba(0,0,0,.4);border:1px solid var(--glass-border);color:var(--text);font:500 13px 'Inter';min-height:38px;width:120px}
+.day-time-input:disabled{opacity:.4;cursor:not-allowed}
+.upi-box{background:linear-gradient(135deg,rgba(16,185,129,.15),rgba(6,182,212,.15));border:1px solid rgba(16,185,129,.3);border-radius:16px;padding:clamp(14px,3vw,20px);margin-top:18px}
+.upi-box h4{font-family:'Space Grotesk';margin-bottom:14px;display:flex;align-items:center;gap:10px;font-size:clamp(15px,4vw,17px)}
+.upi-details{display:grid;gap:clamp(12px,3vw,20px)}
+.upi-row{display:flex;justify-content:space-between;align-items:center;padding:10px;background:rgba(0,0,0,.25);border-radius:10px;margin-bottom:8px;gap:10px;flex-wrap:wrap}
+.upi-row .lbl{font-size:clamp(9px,2.3vw,11px);color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.upi-row .val{font-family:'Courier New';font-weight:700;font-size:clamp(11px,3vw,14px);color:#67e8f9;word-break:break-all}
+.upi-qr{text-align:center;background:#fff;padding:20px;border-radius:16px;margin:16px 0}
+.upi-qr img{display:block;width:220px;height:220px;margin:0 auto}
+.upi-qr-label{margin-top:10px;font-size:13px;color:#333;font-weight:600}
+.about-section{background:var(--glass);backdrop-filter:blur(14px);border:1px solid var(--glass-border);border-radius:24px;padding:clamp(20px,5vw,40px);text-align:center}
+.about-avatar{width:clamp(80px,20vw,120px);height:clamp(80px,20vw,120px);border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;margin:0 auto 20px;font-size:clamp(28px,8vw,40px);font-weight:700;box-shadow:0 8px 32px rgba(124,58,237,.4);overflow:hidden}
+.about-avatar img{width:100%;height:100%;object-fit:cover}
+.about-section h2{font-family:'Space Grotesk';font-size:clamp(20px,5.5vw,28px);margin-bottom:6px}
+.about-section .role{color:var(--muted);font-size:clamp(11px,3vw,13px);margin-bottom:16px}
+.about-section .desc{color:var(--text);font-size:clamp(13px,3.5vw,15px);line-height:1.7;margin-bottom:24px;max-width:600px;margin-left:auto;margin-right:auto}
+.about-contacts{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;max-width:700px;margin:0 auto}
+.about-contact{display:flex;align-items:center;gap:12px;padding:clamp(12px,3vw,14px) clamp(14px,3.5vw,18px);background:rgba(0,0,0,.3);border:1px solid var(--glass-border);border-radius:14px;text-decoration:none;color:var(--text);transition:.25s;font-size:clamp(11px,3vw,13px);justify-content:center;min-height:56px}
+.about-contact:hover{transform:translateY(-3px);border-color:var(--accent);background:rgba(0,0,0,.4)}
+.about-contact svg{flex-shrink:0;width:20px;height:20px}
+.backup-schedule{background:rgba(0,0,0,.2);border:1px solid var(--glass-border);border-radius:14px;padding:clamp(12px,3vw,18px);margin-top:14px}
+.schedule-row{display:flex;align-items:center;justify-content:space-between;padding:clamp(10px,2.5vw,14px);background:rgba(0,0,0,.2);border-radius:12px;margin-bottom:10px;flex-wrap:wrap;gap:12px}
+.schedule-row:last-child{margin-bottom:0}
+.schedule-row .lbl{font-weight:600;font-size:clamp(12px,3.2vw,14px);margin-bottom:2px}
+.schedule-row .sub{font-size:clamp(10px,2.5vw,11px);color:var(--muted)}
+.schedule-row select,.schedule-row input[type="time"]{padding:8px 12px;border-radius:8px;background:rgba(0,0,0,.3);border:1px solid var(--glass-border);color:var(--text);font:500 clamp(11px,3vw,13px) 'Inter';min-height:40px}
+.monthly-banner{background:linear-gradient(135deg,rgba(245,158,11,.2),rgba(236,72,153,.15));border:1px solid rgba(245,158,11,.4);border-radius:14px;padding:clamp(12px,3vw,18px);margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.monthly-banner h4{font-family:'Space Grotesk';margin-bottom:4px;font-size:clamp(13px,3.5vw,15px)}
+.monthly-banner p{font-size:clamp(10px,2.5vw,12px);color:var(--muted)}
+.routine-preview{background:linear-gradient(135deg,#1e1b4b,#312e81);border:1px solid var(--glass-border);border-radius:22px;padding:clamp(20px,4vw,28px);max-width:480px;width:100%;animation:pop .3s cubic-bezier(.34,1.56,.64,1)}
+.routine-preview h3{font-family:'Space Grotesk';margin-bottom:6px;font-size:clamp(18px,4.5vw,22px)}
+.routine-preview .class-sub{color:var(--muted);font-size:12px;margin-bottom:18px}
+.routine-info{background:rgba(0,0,0,.3);border:1px solid var(--glass-border);border-radius:14px;padding:16px;margin-bottom:14px}
+.routine-info .r-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.routine-info .r-fine{font-size:13px;color:var(--muted);margin-top:8px}
+.routine-info .r-fine b{color:#fca5a5}
+.routine-schedule-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.routine-day-row{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:rgba(0,0,0,.3);border-radius:10px;border:1px solid rgba(236,72,153,.3)}
+.routine-day-row .day-name{font-weight:600;font-size:14px;color:#e9d5ff}
+.routine-day-row .day-time{font-family:'Space Grotesk';font-weight:700;font-size:15px;color:#67e8f9}
+.routine-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.mobile-cards{display:block;padding-bottom:24px;overflow:visible}
+.mobile-cards .m-card{background:rgba(0,0,0,.25);border:1px solid var(--glass-border);border-radius:14px;padding:14px;margin-bottom:12px;display:flex;gap:12px;align-items:center;overflow:hidden}
+.mobile-cards .m-card .photo{width:44px;height:44px;font-size:16px;flex-shrink:0}
+.mobile-cards .m-card .body{flex:1;min-width:0;overflow:hidden}
+.mobile-cards .m-card .nm{font-weight:600;font-size:14px;margin-bottom:4px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mobile-cards .m-card .meta{font-size:11px;color:var(--muted);margin-bottom:8px;display:flex;flex-wrap:wrap;gap:6px}
+.mobile-cards .m-card .actions{display:flex;gap:4px;flex-wrap:nowrap;justify-content:flex-start;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.08)}
+@media (max-width: 768px) {
+.tbl-wrap{display:none}
+.mobile-cards{display:block;padding-bottom:20px;overflow:visible}
+.att-actions{flex:1;min-width:100%;justify-content:stretch}
+.att-btn{flex:1}
+.card{overflow-x:auto;padding:clamp(12px,3vw,20px)}
+.mobile-cards .m-card{padding:12px}
+.mobile-cards .m-card .body{min-width:0}
+.mobile-cards .m-card .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mobile-cards .m-card .meta{overflow:visible}
+.mobile-cards .m-card .actions{overflow:visible;gap:4px}
+.icon-btn{width:32px;height:32px;border-radius:8px}
+.icon-btn svg{width:16px;height:16px}
+.main{padding-bottom:100px}
+}
+@media (min-width: 769px) {
+.tbl-wrap{display:block}
+.mobile-cards{display:none}
+}
+@media (max-width: 380px) {
+.main{padding:12px;padding-top:60px}
+.stat{padding:12px}
+.stu-att-row{padding:10px;gap:8px}
+}
+.icon-btn.qr-btn{background:rgba(124,58,237,.15)}
+.icon-btn.qr-btn svg{fill:#a78bfa}
+.icon-btn.qr-btn:hover{background:rgba(124,58,237,.25)}
+</style>
+</head>
+<body>
+<div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
+<div class="loading-screen" id="loadingScreen">
+<div style="text-align:center"><div class="spinner"></div><p style="margin-top:20px;color:var(--muted)">Loading TuitionPro...</p></div>
+</div>
+<div class="login-wrap" id="loginScreen" style="display:none">
+<div class="login-card">
+<div style="text-align:center;font-size:48px;margin-bottom:10px">🎓</div>
+<h2>Tuition<span>Pro</span></h2>
+<p>Professional Tuition Management</p>
+<div class="login-tabs">
+<button class="login-tab active" onclick="switchTab('login')">Login</button>
+<button class="login-tab" onclick="switchTab('signup')">Sign Up</button>
+</div>
+<form onsubmit="handleAuth(event)">
+<div class="field"><label>Email</label><input type="email" id="authEmail" required placeholder="you@gmail.com"/></div>
+<div class="field"><label>Password (min 6 chars)</label><input type="password" id="authPass" required minlength="6" placeholder="••••••"/></div>
+<button type="submit" class="btn btn-primary" id="authBtn" style="width:100%">🔐 Login</button>
+</form>
+<p id="authError" style="color:#fca5a5;font-size:12px;text-align:center;margin-top:10px;display:none"></p>
+</div>
+</div>
+<button class="menu-toggle" id="menuToggle" style="display:none">☰</button>
+<div class="app" id="mainApp">
+<aside class="sidebar" id="sidebar">
+<div class="logo"><div class="logo-icon">🎓</div><h1>Tuition<span>Pro</span></h1></div>
+<button class="nav-btn active" data-page="dashboard"><span class="ic">📊</span> Dashboard</button>
+<button class="nav-btn" data-page="students"><span class="ic">👥</span> Students</button>
+<button class="nav-btn" data-page="attendance"><span class="ic">📅</span> Attendance</button>
+<button class="nav-btn" data-page="fees"><span class="ic">💰</span> Fees & Dues</button>
+<button class="nav-btn" data-page="classes"><span class="ic">🏫</span> Classes</button>
+<button class="nav-btn" data-page="backup"><span class="ic">💾</span> Backup</button>
+<button class="nav-btn" data-page="about"><span class="ic">ℹ️</span> About Us</button>
+<div class="user-box">
+<div class="lbl">Logged in as</div>
+<div class="mail" id="userEmail"></div>
+<button class="btn btn-danger btn-sm" style="width:100%" onclick="doLogout()">🚪 Logout</button>
+</div>
+</aside>
+<main class="main">
+<section class="page active" id="dashboard">
+<div class="page-head">
+<div><h2>Welcome back, <span>Teacher</span> 👋</h2><p id="todayDate"></p></div>
+<button class="btn btn-primary" onclick="openStudentModal()">➕ Add Student</button>
+</div>
+<div id="monthlyAlertBanner"></div>
+<div class="stats">
+<div class="stat"><div class="label">Students</div><div class="val" id="sTotal">0</div><div class="sub">All classes</div></div>
+<div class="stat"><div class="label">Total Dues</div><div class="val" id="sDues">₹0</div><div class="sub" id="sDuesSub">No pending fees</div></div>
+<div class="stat"><div class="label">Total Advance</div><div class="val" id="sAdvance">₹0</div><div class="sub" id="sAdvSub">Extra payments</div></div>
+<div class="stat"><div class="label">Today Att.</div><div class="val" id="sAtt">0%</div><div class="sub" id="sAttSub">Mark attendance</div></div>
+<div class="stat"><div class="label">Classes</div><div class="val" id="sClass">0</div><div class="sub">Active batches</div></div>
+</div>
+<div class="card">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+<h3 style="font-family:'Space Grotesk';font-size:clamp(15px,4vw,18px)">⚠️ Students with Pending Fees</h3>
+<button class="btn btn-wa btn-sm" id="bulkAlertBtn" onclick="sendBulkReminder()" style="display:none">📱 Send All Alerts</button>
+</div>
+<div class="tbl-wrap"><table id="dashDueTbl"><thead><tr><th>Student</th><th>Class</th><th>Due</th><th>Action</th></tr></thead><tbody></tbody></table></div>
+<div class="mobile-cards" id="dashDueCards"></div>
+<div id="dashDueEmpty" class="empty-state" style="display:none;padding:30px"><div class="big">🎉</div>All fees are paid!</div>
+</div>
+</section>
+<section class="page" id="students">
+<div class="page-head"><div><h2>My <span>Students</span></h2><p>Click name for profile</p></div><button class="btn btn-primary" onclick="openStudentModal()">➕ Add Student</button></div>
+<div class="search-bar">
+<input id="searchInput" placeholder="🔍 Search..." oninput="renderStudents()"/>
+<select id="classFilter" onchange="renderStudents()"><option value="">All Classes</option></select>
+<select id="sortBy" onchange="renderStudents()">
+<option value="name">Sort: Name</option><option value="class">Sort: Class</option>
+<option value="admission">Sort: Admission</option><option value="due">Sort: Due</option>
+</select>
+</div>
+<div class="card">
+<div class="tbl-wrap"><table id="studentsTbl"><thead><tr><th>Photo</th><th>Name</th><th>Class</th><th>Fee</th><th>Admission</th><th>Contact</th><th>Actions</th></tr></thead><tbody></tbody></table></div>
+<div class="mobile-cards" id="studentsCards"></div>
+<div id="stuEmpty" class="empty-state" style="display:none"><div class="big">👥</div>No students yet.</div>
+</div>
+</section>
+<section class="page" id="attendance">
+<div class="page-head"><div><h2>Smart <span>Attendance</span></h2><p>Tap a class to check routine, then start</p></div></div>
+<div id="attStep1"><div class="class-select-grid" id="attClassGrid"></div></div>
+<div id="attStep2" style="display:none">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+<div>
+<button class="btn btn-ghost btn-sm" onclick="backToClassSelect()">← Change</button>
+<span style="margin-left:8px;font-family:'Space Grotesk';font-size:clamp(15px,4vw,20px);font-weight:700" id="attClassName"></span>
+</div>
+<div style="display:flex;gap:8px;align-items:center">
+<input type="date" id="attDate" onchange="renderAttendanceDay()" style="padding:8px;border-radius:8px;background:rgba(0,0,0,.25);border:1px solid var(--glass-border);color:var(--text);min-height:40px"/>
+<button class="btn btn-ghost btn-sm" onclick="setAttToday()">Today</button>
+</div>
+</div>
+<div id="tuitionBanner"></div>
+<div class="card">
+<h3 style="margin-bottom:14px;font-family:'Space Grotesk';font-size:clamp(15px,4vw,18px);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+<span>👥 Students</span>
+<span style="font-size:11px;color:var(--muted);font-weight:500" id="attSummary"></span>
+</h3>
+<div id="attStudentsList"></div>
+<div id="attEmpty" class="empty-state" style="display:none;padding:30px"><div class="big">👥</div>No students in this class</div>
+</div>
+</div>
+</section>
+<section class="page" id="fees">
+<div class="page-head"><div><h2>Fees & <span>Dues</span></h2><p>Track payments</p></div></div>
+<div class="search-bar">
+<select id="feeClass" onchange="renderFees()"><option value="">All Classes</option></select>
+<select id="feeSort" onchange="renderFees()">
+<option value="">Sort: Default</option>
+<option value="due_high">Sort: Due (High to Low)</option>
+<option value="due_low">Sort: Due (Low to High)</option>
+<option value="name">Sort: Name (A-Z)</option>
+<option value="fee_high">Sort: Fee (High to Low)</option>
+</select>
+<button class="btn btn-danger" onclick="sendBulkReminder()">📨 Remind All</button>
+</div>
+<div class="card">
+<div class="tbl-wrap"><table id="feesTbl"><thead><tr><th>Student</th><th>Class</th><th>Fee</th><th>Status</th><th>Breakdown</th><th>Total</th><th>Alert</th></tr></thead><tbody></tbody></table></div>
+<div class="mobile-cards" id="feesCards"></div>
+</div>
+</section>
+<section class="page" id="classes">
+<div class="page-head"><div><h2>Classes & <span>Routine</span></h2><p>Set routine & fines per class</p></div><button class="btn btn-primary" onclick="openClassModal()">➕ Add Class</button></div>
+<div class="card" id="classesCard"></div>
+</section>
+<section class="page" id="backup">
+<div class="page-head"><div><h2>Backup & <span>Settings</span></h2></div></div>
+<div class="card">
+<h3 style="margin-bottom:12px;font-family:'Space Grotesk';font-size:clamp(15px,4vw,18px)">📊 Google Sheet Backup</h3>
+<p style="color:var(--muted);font-size:12px;margin-bottom:14px">Backup directly to your Google Sheet</p>
+<div class="form-grid">
+<div class="field" style="grid-column:1/-1">
+<label>Apps Script Web App URL</label>
+<input id="sheetBackupUrl" placeholder="https://script.google.com/macros/s/.../exec"/>
+</div>
+</div>
+<div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+<button class="btn btn-ghost" onclick="saveSheetUrl()">💾 Save URL</button>
+<button class="btn btn-primary" onclick="backupToSheet()">📊 Backup to Sheet</button>
+<button class="btn btn-ghost" onclick="testSheetConnection()">🔗 Test</button>
+<button class="btn btn-ghost" onclick="openSheetGuide()">📖 Setup Guide</button>
+</div>
+<p id="sheetStatus" style="color:var(--muted);font-size:11px;margin-top:12px"></p>
+</div>
+<div class="card">
+<h3 style="margin-bottom:6px;font-family:'Space Grotesk';font-size:clamp(15px,4vw,18px)">📧 Email Backup</h3>
+<p style="color:var(--muted);font-size:12px;margin-bottom:14px">Bind email for auto backups</p>
+<div class="form-grid">
+<div class="field"><label>Your Email</label><input id="emailTo" value="brandandbeard@gmail.com"/></div>
+<div class="field"><label>Service ID</label><input id="emailService" value="service_ebgbpyo"/></div>
+<div class="field"><label>Template ID</label><input id="emailTemplate" value="template_pc8c1xp"/></div>
+<div class="field"><label>Public Key</label><input id="emailKey" value="6ZyB3smC300Ho7HEc"/></div>
+</div>
+<div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+<button class="btn btn-ghost" onclick="saveEmailSettings()">💾 Save</button>
+<button class="btn btn-ghost" onclick="testEmail()">🧪 Test</button>
+<button class="btn btn-primary" onclick="emailBackup()">📧 Email Backup</button>
+<button class="btn btn-ghost" onclick="openEmailGuide()">📖 Email Guide</button>
+</div>
+</div>
+<div class="card">
+<h3 style="margin-bottom:12px;font-family:'Space Grotesk';font-size:clamp(15px,4vw,18px)">💾 Manual Backup</h3>
+<p style="color:var(--muted);font-size:12px;margin-bottom:14px">Download or restore your data</p>
+<div style="display:flex;gap:10px;flex-wrap:wrap">
+<button class="btn btn-primary" onclick="backupNow()">⬇️ JSON Download</button>
+<button class="btn btn-success" onclick="backupExcel()">📊 Excel Download</button>
+<label class="btn btn-ghost" style="cursor:pointer">⬆️ Restore<input type="file" accept=".json" onchange="restoreBackup(event)" style="display:none"/></label>
+<button class="btn btn-danger" onclick="openWipeModal()">🗑️ Wipe Data</button>
+</div>
+<p style="color:var(--muted);font-size:11px;margin-top:12px">Last backup: <b id="lastBackup">Never</b></p>
+</div>
+<div class="card">
+<h3 style="margin-bottom:12px;font-family:'Space Grotesk';font-size:clamp(15px,4vw,18px)">⏰ Auto Backup</h3>
+<div class="backup-schedule">
+<div class="schedule-row">
+<div><div class="lbl">Frequency</div><div class="sub">How often</div></div>
+<select id="backupFreq" onchange="saveBackupSettings()">
+<option value="daily">Every Day</option>
+<option value="weekly">Every Week</option>
+<option value="monthly">Every Month</option>
+<option value="off">Off</option>
+</select>
+</div>
+<div class="schedule-row">
+<div><div class="lbl">Backup Time</div><div class="sub">Default 00:00</div></div>
+<input type="time" id="backupTime" value="00:00" onchange="saveBackupSettings()"/>
+</div>
+<div class="schedule-row">
+<div><div class="lbl">Monthly Reminder</div><div class="sub">1st of every month</div></div>
+<span class="toggle on" id="monthlyReminder" onclick="toggleMonthlyReminder()"></span>
+</div>
+</div>
+</div>
+<div class="card">
+<h3 style="margin-bottom:12px;font-family:'Space Grotesk';font-size:clamp(15px,4vw,18px)">💳 UPI Settings</h3>
+<div class="form-grid">
+<div class="field"><label>UPI ID</label><input id="upiId" value="arho065-1@okicici"/></div>
+<div class="field"><label>UPI Phone</label><input id="upiPhone" value="9564385573"/></div>
+</div>
+<button class="btn btn-ghost" style="margin-top:10px" onclick="saveUPISettings()">💾 Save UPI</button>
+</div>
+</section>
+<section class="page" id="about">
+<div class="page-head"><div><h2>About <span>Us</span></h2></div></div>
+<div class="about-section">
+<div class="about-avatar"><img src="https://i.ibb.co/ycsPZbXS/arifforweb-jpg.jpg" alt="Arif Hussain" onerror="this.style.display='none';this.parentNode.textContent='AH'"/></div>
+<h2>Arif Hussain</h2>
+<p class="role">Creator & Developer — TuitionPro</p>
+<p class="desc">Based in Beldanga, Murshidabad. Dedicated to quality education for students.</p>
+<div class="about-contacts">
+<a href="https://t.me/beldanga1" target="_blank" class="about-contact">
+<svg viewBox="0 0 24 24" fill="#229ED9"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+<span><b>Telegram</b><br><small>@beldanga1</small></span>
+</a>
+<a href="https://instagram.com/arifhussain.x" target="_blank" class="about-contact">
+<svg viewBox="0 0 24 24" fill="#E1306C"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+<span><b>Instagram</b><br><small>@arifhussain.x</small></span>
+</a>
+<a href="mailto:arho065@gmail.com" class="about-contact">
+<svg viewBox="0 0 24 24" fill="#EA4335"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/></svg>
+<span><b>Email</b><br><small>arho065@gmail.com</small></span>
+</a>
+</div>
+</div>
+</section>
+</main>
+</div>
+<div class="modal-bg" id="studentModal">
+<div class="modal">
+<button class="modal-close" onclick="closeModal('studentModal')">×</button>
+<h3 id="stuModalTitle">➕ Add Student</h3>
+<form id="studentForm" onsubmit="saveStudent(event)">
+<input type="hidden" id="stuId"/>
+<div class="form-grid">
+<div class="field"><label>Full Name *</label><input id="stuName" required/></div>
+<div class="field"><label>Class *</label><select id="stuClass" required></select></div>
+<div class="field"><label>Monthly Fee (₹) *</label><input type="number" id="stuFee" min="0" required/></div>
+<div class="field"><label>Admission Date *</label><input type="date" id="stuAdm" required/></div>
+<div class="field"><label>Mobile</label><input id="stuMobile"/></div>
+<div class="field"><label>WhatsApp</label><input id="stuWa"/></div>
+<div class="field"><label>Instagram</label><input id="stuIg" placeholder="@username"/></div>
+<div class="field"><label>Photo</label><input type="file" id="stuPhoto" accept="image/*"/></div>
+</div>
+<div style="display:flex;gap:10px;margin-top:20px;justify-content:flex-end;flex-wrap:wrap">
+<button type="button" class="btn btn-ghost" onclick="closeModal('studentModal')">Cancel</button>
+<button type="submit" class="btn btn-primary">💾 Save</button>
+</div>
+</form>
+</div>
+</div>
+<div class="modal-bg" id="paymentModal">
+<div class="modal sm">
+<button class="modal-close" onclick="closeModal('paymentModal')">×</button>
+<h3>💰 Record Payment</h3>
+<input type="hidden" id="payStuId"/>
+<div id="payStuInfo" style="margin-bottom:14px;padding:12px;background:rgba(0,0,0,.25);border-radius:10px">
+<div style="font-weight:700;font-size:clamp(15px,4vw,18px)" id="payStuName"></div>
+<div style="font-size:12px;color:var(--muted)" id="payStuSub"></div>
+</div>
+<div class="field">
+<label>Amount Paid (₹) *</label>
+<input type="number" id="payAmount" min="1" required placeholder="Enter amount"/>
+</div>
+<div class="field" style="margin-top:10px">
+<label>Payment Date</label>
+<input type="date" id="payDate"/>
+</div>
+<div class="field" style="margin-top:10px">
+<label>Note (optional)</label>
+<input id="payNote" placeholder="e.g. Cash, PhonePe, etc."/>
+</div>
+<div id="payPreview" style="margin-top:14px;padding:12px;background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.2);border-radius:10px;font-size:12px;color:var(--muted);display:none"></div>
+<div style="display:flex;gap:10px;margin-top:20px;justify-content:flex-end;flex-wrap:wrap">
+<button class="btn btn-ghost" onclick="closeModal('paymentModal')">Cancel</button>
+<button class="btn btn-primary" onclick="confirmPayment()">💾 Save Payment</button>
+</div>
+</div>
+</div>
+<div class="modal-bg" id="deletePayModal">
+<div class="modal sm">
+<button class="modal-close" onclick="closeModal('deletePayModal')">×</button>
+<h3>⚠️ Delete Payment</h3>
+<p style="color:var(--muted);font-size:13px;margin-bottom:14px" id="deletePayMsg">Type <b>"delete"</b> below to confirm:</p>
+<div class="code-box" id="deletePayCode">delete</div>
+<input type="hidden" id="deletePayStuId"/>
+<input type="hidden" id="deletePayYm"/>
+<div class="field"><input id="deletePayInput" placeholder='Type: delete' autocomplete="off"/></div>
+<div style="display:flex;gap:10px;justify-content:flex-end;margin-top:18px">
+<button class="btn btn-ghost" onclick="closeModal('deletePayModal')">Cancel</button>
+<button class="btn btn-danger" id="deletePayConfirmBtn" onclick="confirmDeleteMonthPayment()" disabled>🗑️ Delete</button>
+</div>
+</div>
+</div>
+<div class="modal-bg" id="classModal">
+<div class="modal sm">
+<button class="modal-close" onclick="closeModal('classModal')">×</button>
+<h3 id="clsModalTitle">➕ Add Class</h3>
+<input type="hidden" id="clsOrigName"/>
+<div class="form-grid">
+<div class="field" style="grid-column:1/-1"><label>Class Name *</label><input id="clsName" required placeholder="e.g. Class 10 - Maths"/></div>
+<div class="field"><label>Fine/Day (₹)</label><input type="number" id="clsFine" min="0" value="10"/></div>
+</div>
+<div class="field" style="margin-top:14px">
+<label>📅 Tuition Days & Time</label>
+<div class="day-toggle" id="clsDays"></div>
+</div>
+<div class="field" style="margin-top:14px;display:flex;align-items:center;justify-content:space-between">
+<label style="margin:0">Enable Fine System</label>
+<span class="toggle" id="clsFineToggle" onclick="this.classList.toggle('on')"></span>
+</div>
+<div style="display:flex;gap:10px;margin-top:20px;justify-content:flex-end">
+<button class="btn btn-ghost" onclick="closeModal('classModal')">Cancel</button>
+<button class="btn btn-primary" onclick="saveClass()">💾 Save</button>
+</div>
+</div>
+</div>
+<div class="modal-bg" id="routineModal" style="align-items:center">
+<div class="routine-preview">
+<button class="modal-close" onclick="closeModal('routineModal')">×</button>
+<h3 id="routineClassName">Class Routine</h3>
+<p class="class-sub" id="routineStudentCount">0 students</p>
+<div class="routine-info">
+<div class="r-label">📅 Weekly Schedule</div>
+<div class="routine-schedule-list" id="routineScheduleList"></div>
+</div>
+<div class="routine-info">
+<div class="r-label">💰 Fine System</div>
+<div class="r-fine" id="routineFineDisplay"></div>
+</div>
+<div class="routine-actions">
+<button class="btn btn-primary" style="flex:1" onclick="startAttendanceFromRoutine()">▶️ Start Attendance</button>
+<button class="btn btn-ghost" style="flex:1" onclick="editRoutineClass()">✏️ Edit</button>
+</div>
+</div>
+</div>
+<div class="modal-bg" id="profileModal">
+<div class="modal">
+<button class="modal-close" onclick="closeModal('profileModal')">×</button>
+<div class="profile-header" id="profileHeader"></div>
+<div class="profile-tabs">
+<button class="profile-tab active" data-tab="info" onclick="switchProfileTab('info')">ℹ️ Info</button>
+<button class="profile-tab" data-tab="att" onclick="switchProfileTab('att')">📅 Att.</button>
+<button class="profile-tab" data-tab="pay" onclick="switchProfileTab('pay')">💰 Pay</button>
+</div>
+<div class="profile-pane active" id="pane-info"></div>
+<div class="profile-pane" id="pane-att"></div>
+<div class="profile-pane" id="pane-pay"></div>
+</div>
+</div>
+<!-- Delete Student Confirmation Modal -->
+<div class="modal-bg" id="deleteStuModal">
+<div class="modal sm">
+<button class="modal-close" onclick="closeModal('deleteStuModal')">×</button>
+<h3>⚠️ Delete Student</h3>
+<div style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:12px;padding:14px;margin-bottom:16px">
+<p style="font-size:13px;color:#fca5a5;line-height:1.6">
+তুমি কি সত্যিই <b id="delStuName" style="color:#fff"></b> কে delete করতে চাও?<br>
+<span style="font-size:11px;opacity:.8">এই কাজটা আর ফেরানো যাবে না!</span>
+</p>
+</div>
+<p style="color:var(--muted);font-size:13px;margin-bottom:10px">Confirm করতে নিচে <b>"delete"</b> লেখো:</p>
+<div class="code-box">delete</div>
+<input type="hidden" id="delStuId"/>
+<div class="field"><input id="delStuInput" placeholder='এখানে "delete" লেখো' autocomplete="off"/></div>
+<div style="display:flex;gap:10px;justify-content:flex-end;margin-top:18px">
+<button class="btn btn-ghost" onclick="closeModal('deleteStuModal')">Cancel</button>
+<button class="btn btn-danger" id="delStuConfirmBtn" onclick="confirmDeleteStudent()" disabled>🗑️ Delete</button>
+</div>
+</div>
+</div>
+<div class="modal-bg" id="wipeModal">
+<div class="modal sm">
+<button class="modal-close" onclick="closeModal('wipeModal')">×</button>
+<h3>⚠️ Wipe All Data</h3>
+<p style="color:var(--muted);font-size:13px;margin-bottom:14px">Type below exactly:</p>
+<div class="code-box">wipe out all data</div>
+<div class="field"><input id="wipeInput" placeholder='Type: wipe out all data' autocomplete="off"/></div>
+<div style="display:flex;gap:10px;justify-content:flex-end;margin-top:18px">
+<button class="btn btn-ghost" onclick="closeModal('wipeModal')">Cancel</button>
+<button class="btn btn-danger" id="wipeConfirmBtn" onclick="doWipe()" disabled>🗑️ Delete</button>
+</div>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+<symbol id="icon-wa" viewBox="0 0 24 24"><path fill="#25D366" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.297-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></symbol>
+<symbol id="icon-ig" viewBox="0 0 24 24"><path fill="#E1306C" d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></symbol>
+<symbol id="icon-sms" viewBox="0 0 24 24"><path fill="#22d3ee" d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM9 11H7V9h2v2zm4 0h-2V9h2v2zm4 0h-2V9h2v2z"/></symbol>
+<symbol id="icon-call" viewBox="0 0 24 24"><path fill="#a78bfa" d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 00-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"/></symbol>
+<symbol id="icon-edit" viewBox="0 0 24 24"><path fill="#a78bfa" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 000-1.41l-2.34-2.34a.996.996 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></symbol>
+<symbol id="icon-del" viewBox="0 0 24 24"><path fill="#fca5a5" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></symbol>
+<symbol id="icon-qr" viewBox="0 0 24 24">
+<path d="M3 11h8V3H3v8zm2-6h4v4H5V5zM3 21h8v-8H3v8zm2-6h4v4H5v-4zM13 3v8h8V3h-8zm6 6h-4V5h4v4zM13 13h2v2h-2zM15 15h2v2h-2zM13 17h2v2h-2zM17 13h2v2h-2zM19 15h2v2h-2zM15 19h2v2h-2zM17 17h2v2h-2zM19 19h2v2h-2z"/>
+</symbol>
+</svg>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig={apiKey:"AIzaSyBQzKo8mH7URnwjH91MfcvD6fPCL9uB-tk",authDomain:"tution-a56bc.firebaseapp.com",projectId:"tution-a56bc",storageBucket:"tution-a56bc.firebasestorage.app",messagingSenderId:"583011986186",appId:"1:583011986186:web:fb09fee46ca26a1e8fa8f3",measurementId:"G-6YP7HT7VEY"};
+firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth();const db=firebase.firestore();
+let currentUser=null;
+let DB={students:[],classes:{},settings:{backupFreq:'daily',backupTime:'00:00',lastBackup:null,monthlyReminder:true,email:{},upi:{id:'arho065-1@okicici',phone:'9564385573'},sheetBackupUrl:''}};
+let unsubscribe=null,savingTimer=null,isSaving=false;
+let currentAttClass=null,currentProfileId=null,profileMonth=new Date(),autoBackupInterval=null;
+let pendingRoutineClass=null;
+const DAY_NAMES=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const DAY_FULL=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const MONTH_NAMES=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const MONTH_SHORT=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const todayISO=()=>new Date().toISOString().slice(0,10);
+const todayYM=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`};
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600);}
+function closeModal(id){document.getElementById(id).classList.remove('show')}
+const sidebarEl=document.getElementById('sidebar');
+const menuToggleBtn=document.getElementById('menuToggle');
+menuToggleBtn.addEventListener('click',function(e){e.stopPropagation();sidebarEl.classList.toggle('open');});
+document.addEventListener('click',function(e){if(window.innerWidth<=768){if(!sidebarEl.contains(e.target)&&!menuToggleBtn.contains(e.target)){sidebarEl.classList.remove('open');}}});
+let authMode='login';
+function switchTab(mode){authMode=mode;document.querySelectorAll('.login-tab').forEach((t,i)=>t.classList.toggle('active',(mode==='login'?i===0:i===1)));document.getElementById('authBtn').textContent=mode==='login'?'🔐 Login':'✨ Create Account';document.getElementById('authError').style.display='none';}
+async function handleAuth(e){
+e.preventDefault();
+const email=document.getElementById('authEmail').value.trim();
+const pass=document.getElementById('authPass').value;
+const err=document.getElementById('authError');
+err.style.display='none';
+auth.languageCode='bn';
+try{
+if(authMode==='signup'){
+const cred=await auth.createUserWithEmailAndPassword(email,pass);
+await cred.user.sendEmailVerification();
+await auth.signOut();
+alert('✅ Account created!\n\nCheck your email ('+email+') for verification link.\n\n📧 Check Spam folder too!\n\nAfter clicking the link, Login again!');
+switchTab('login');
+return;
+}else{
+const cred=await auth.signInWithEmailAndPassword(email,pass);
+if(!cred.user.emailVerified){
+await auth.signOut();
+err.textContent='⚠️ Please verify email first! Check '+email+' (also Spam folder)';
+err.style.display='block';
+return;
+}
+}
+}catch(e){err.textContent=e.message.replace('Firebase: ','');err.style.display='block';}
+}
+function doLogout(){if(confirm('Logout?'))auth.signOut();}
+auth.onAuthStateChanged(async(user)=>{
+document.getElementById('loadingScreen').style.display='none';
+if(user){
+currentUser=user;
+document.getElementById('loginScreen').style.display='none';
+document.getElementById('mainApp').classList.add('show');
+document.getElementById('menuToggle').style.display='flex';
+document.getElementById('userEmail').textContent=user.email;
+startCloudSync();startAutoBackupTimer();checkMonthlyReminder();
+}else{
+currentUser=null;
+if(unsubscribe){unsubscribe();unsubscribe=null;}
+if(autoBackupInterval){clearInterval(autoBackupInterval);autoBackupInterval=null;}
+document.getElementById('loginScreen').style.display='grid';
+document.getElementById('mainApp').classList.remove('show');
+document.getElementById('menuToggle').style.display='none';
+}
+});
+function userDoc(){return db.collection('users').doc(currentUser.uid);}
+async function startCloudSync(){
+try{
+const doc=await userDoc().get();
+if(doc.exists){
+const data=doc.data();
+DB.students=data.students||[];DB.classes=data.classes||{};
+DB.settings=Object.assign({backupFreq:'daily',backupTime:'00:00',lastBackup:null,monthlyReminder:true,email:{},upi:{id:'arho065-1@okicici',phone:'9564385573'},sheetBackupUrl:''},data.settings||{});
+DB.settings.email=DB.settings.email||{};DB.settings.upi=DB.settings.upi||{id:'arho065-1@okicici',phone:'9564385573'};DB.settings.sheetBackupUrl=DB.settings.sheetBackupUrl||'';
+}else{
+DB.classes={'General':{days:[],times:{},fineEnabled:false,fineAmount:10}};
+await userDoc().set({students:[],classes:DB.classes,settings:DB.settings});
+}
+}catch(e){console.error(e);}
+unsubscribe=userDoc().onSnapshot((doc)=>{
+if(doc.exists&&!isSaving){
+const data=doc.data();
+DB.students=data.students||[];DB.classes=data.classes||DB.classes;
+DB.settings=Object.assign(DB.settings,data.settings||{});
+DB.settings.email=DB.settings.email||{};DB.settings.upi=DB.settings.upi||{id:'arho065-1@okicici',phone:'9564385573'};DB.settings.sheetBackupUrl=DB.settings.sheetBackupUrl||'';
+renderAll();
+}
+});
+renderAll();loadUPISettings();loadBackupSettings();loadSheetUrl();
+}
+function saveToCloud(){
+if(!currentUser)return;
+clearTimeout(savingTimer);
+savingTimer=setTimeout(async()=>{
+isSaving=true;
+try{await userDoc().set({students:DB.students,classes:DB.classes,settings:DB.settings});}
+catch(e){toast('⚠️ Cloud save failed');}
+isSaving=false;
+},500);
+}
+function setupNavigation(){
+document.querySelectorAll('.nav-btn').forEach(btn=>{
+btn.addEventListener('click',function(e){
+e.preventDefault();e.stopPropagation();
+const pageId=btn.getAttribute('data-page');
+if(!pageId)return;
+document.querySelectorAll('.nav-btn').forEach(x=>x.classList.remove('active'));
+btn.classList.add('active');
+document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+const pageEl=document.getElementById(pageId);
+if(pageEl)pageEl.classList.add('active');
+if(pageId==='attendance'){currentAttClass=null;document.getElementById('attStep1').style.display='';document.getElementById('attStep2').style.display='none';renderAttClassGrid();}
+sidebarEl.classList.remove('open');
+window.scrollTo({top:0,behavior:'smooth'});
+renderAll();
+});
+});
+}
+function loadSheetUrl(){
+const url=DB.settings.sheetBackupUrl||'';
+const el=document.getElementById('sheetBackupUrl');if(el)el.value=url;
+const status=document.getElementById('sheetStatus');if(!status)return;
+if(url){status.innerHTML='✅ URL saved. Click <b>Backup to Sheet</b>!';status.style.color='#6ee7b7';}
+else{status.innerHTML='⚠️ Please save your Apps Script URL first';status.style.color='#fca5a5';}
+}
+function saveSheetUrl(){
+const url=document.getElementById('sheetBackupUrl').value.trim();
+if(!url){toast('⚠️ Please enter URL!');return;}
+if(!url.includes('script.google.com')){toast('⚠️ Please enter a valid Apps Script URL!');return;}
+DB.settings.sheetBackupUrl=url;saveToCloud();toast('✅ URL saved!');loadSheetUrl();
+}
+async function testSheetConnection(){
+const url=DB.settings.sheetBackupUrl;
+if(!url){toast('⚠️ Save URL first!');return;}
+const status=document.getElementById('sheetStatus');
+status.innerHTML='🔗 Testing connection...';status.style.color='var(--muted)';
+try{
+const r=await fetch(url,{method:'GET'});const text=await r.text();
+if(text.includes('TuitionPro')||r.ok){status.innerHTML='✅ Connection successful! Sheet is ready.';status.style.color='#6ee7b7';toast('✅ Sheet Connected!');}
+else{throw new Error('Invalid response');}
+}catch(e){status.innerHTML='❌ Connection failed! Did you deploy Apps Script?';status.style.color='#fca5a5';toast('❌ Connection failed');}
+}
+async function backupToSheet(){
+const url=DB.settings.sheetBackupUrl;
+if(!url){toast('⚠️ Save Apps Script URL first!');return;}
+if(DB.students.length===0){toast('⚠️ No students yet!');return;}
+const status=document.getElementById('sheetStatus');
+status.innerHTML='📤 Sending to Sheet...';status.style.color='var(--muted)';
+const dues={};
+DB.students.forEach(s=>{const ps=getPaymentStatus(s);dues[s.id]={due:ps.totalDue,advance:ps.totalAdvance,totalPaid:ps.totalPaid};});
+const payload={students:DB.students.map(s=>({id:s.id,name:s.name,class:s.class,fee:s.fee,admission:s.admission,mobile:"'"+(s.mobile||''),wa:"'"+(s.wa||''),ig:s.ig||'',payments:(s.payments||[]).map(p=>({amount:p.amount,date:p.date,note:p.note||''}))})),classes:DB.classes,dues:dues,backupTime:new Date().toISOString()};
+try{
+await fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
+DB.settings.lastBackup=new Date().toISOString();saveToCloud();
+document.getElementById('lastBackup').textContent=new Date().toLocaleString('en-IN');
+status.innerHTML='✅ Success! <a href="https://docs.google.com/spreadsheets" target="_blank" style="color:#67e8f9;text-decoration:underline">Open Sheet →</a>';
+status.style.color='#6ee7b7';toast('✅ Backup sent to Google Sheet!');
+}catch(e){status.innerHTML='❌ Failed! '+e.message;status.style.color='#fca5a5';toast('❌ Backup failed');}
+}
+function openSheetGuide(){
+const guideHtml=`<div style="padding:20px;max-width:600px">
+<h3 style="font-family:'Space Grotesk';margin-bottom:16px">📊 Google Sheet সেটআপ গাইড</h3>
+<p style="color:var(--muted);font-size:13px;margin-bottom:20px">একবার সেটআপ করলেই প্রতিবার ব্যাকআপ নিতে পারবে!</p>
+
+<div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:12px;padding:16px;margin-bottom:14px">
+<h4 style="margin-bottom:8px;color:#a78bfa">🎯 ধাপ ১: নতুন শীট বানাও</h4>
+<p style="font-size:13px;color:var(--muted)">sheets.new এ গিয়ে একটা নতুন ফাঁকা শীট খোলো। শীটের নাম দাও "TuitionPro Backup"</p>
+</div>
+
+<div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:12px;padding:16px;margin-bottom:14px">
+<h4 style="margin-bottom:8px;color:#a78bfa">⚙️ ধাপ ২: অ্যাপস স্ক্রিপ্ট বানাও</h4>
+<p style="font-size:13px;color:var(--muted)">শীটে যাও → উপরে Extensions → Apps Script ক্লিক করো। সব কোড মুছে দিয়ে নিচের কোড পেস্ট করো:</p>
+<pre style="background:rgba(0,0,0,0.3);padding:10px;border-radius:8px;font-size:11px;color:#67e8f9;overflow-x:auto;margin-top:10px">function doPost(e){
+  try{
+    var data=JSON.parse(e.postData.contents);
+    var ss=SpreadsheetApp.getActiveSpreadsheet();
+    
+    // Sheet1 - Students
+    var sh1=ss.getSheets()[0];
+    sh1.clear();
+    sh1.appendRow(['SL','Name','Class','Fee','Admission','Mobile','WhatsApp','Instagram','Total Due','Advance','Total Paid']);
+    (data.students||[]).forEach(function(s,i){
+      var due=data.dues&&data.dues[s.id]?data.dues[s.id]:{due:0,advance:0,totalPaid:0};
+      sh1.appendRow([i+1,s.name,s.class,s.fee,s.admission,s.mobile,s.wa,s.ig,due.due||0,due.advance||0,due.totalPaid||0]);
+    });
+    
+    // Sheet2 - Classes
+    var sh2=ss.getSheetByName('Classes')||ss.insertSheet('Classes');
+    sh2.clear();
+    sh2.appendRow(['Class','Days','Fine/Day','Fine Enabled','Students']);
+    Object.keys(data.classes||{}).forEach(function(name){
+      var cfg=data.classes[name];
+      var days=(cfg.days||[]).map(function(d){return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d]}).join(', ');
+      var count=(data.students||[]).filter(function(s){return s.class===name}).length;
+      sh2.appendRow([name,days,cfg.fineAmount||0,cfg.fineEnabled?'Yes':'No',count]);
+    });
+    
+    // Sheet3 - Payments
+    var sh3=ss.getSheetByName('Payments')||ss.insertSheet('Payments');
+    sh3.clear();
+    sh3.appendRow(['Student','Class','Amount','Date','Note']);
+    (data.students||[]).forEach(function(s){
+      (s.payments||[]).forEach(function(p){
+        sh3.appendRow([s.name,s.class,p.amount,p.date,p.note||'']);
+      });
+    });
+    
+    return ContentService.createTextOutput(JSON.stringify({status:'success'})).setMimeType(ContentService.MimeType.JSON);
+  }catch(err){
+    return ContentService.createTextOutput(JSON.stringify({status:'error',msg:err.toString()})).setMimeType(ContentService.MimeType.JSON);
+  }
+}
+function doGet(e){
+  return ContentService.createTextOutput('TuitionPro Backup Active').setMimeType(ContentService.MimeType.TEXT);
+}</pre>
+<p style="font-size:12px;color:var(--muted);margin-top:8px">কোড পেস্ট করার পর 💾 Save করো</p>
+</div>
+
+<div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:12px;padding:16px;margin-bottom:14px">
+<h4 style="margin-bottom:8px;color:#a78bfa">🚀 ধাপ ৩: ডিপ্লয় করো</h4>
+<ol style="font-size:13px;color:var(--muted);padding-left:20px">
+<li>Deploy → New deployment ক্লিক করো</li>
+<li>Type: Web app সিলেক্ট করো</li>
+<li>Execute as: Me</li>
+<li>Who has access: Anyone</li>
+<li>Deploy বাটন চাপো</li>
+<li>Permission চাইলে "Advanced" → "Go to ... (unsafe)" → "Allow"</li>
+<li>একটা লম্বা URL পাবে — সেটা কপি করো</li>
+</ol>
+</div>
+
+<div style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:12px;padding:16px">
+<h4 style="margin-bottom:8px;color:#6ee7b7">✅ ধাপ ৪: TuitionPro-তে বসাও</h4>
+<p style="font-size:13px;color:var(--muted)">কপি করা URL-টা "Apps Script Web App URL" বক্সে পেস্ট করো → 💾 Save URL চাপো → 🔗 Test চাপো। সবুজ টিক এলে সব ঠিক আছে!</p>
+</div>
+</div>`;
+const modal=document.createElement('div');modal.className='modal-bg show';modal.style.alignItems='center';
+modal.innerHTML=`<div class="modal" style="max-height:85vh"><button class="modal-close" onclick="this.closest('.modal-bg').remove()">×</button>${guideHtml}</div>`;
+modal.addEventListener('click',function(e){if(e.target===modal)modal.remove();});
+document.body.appendChild(modal);
+}
+function openEmailGuide(){
+const guideHtml=`<div style="padding:20px;max-width:600px">
+<h3 style="font-family:'Space Grotesk';margin-bottom:16px">📧 ইমেইল ব্যাকআপ গাইড</h3>
+<p style="color:var(--muted);font-size:13px;margin-bottom:20px">EmailJS দিয়ে তোমার ইমেইলে অটোমেটিক ব্যাকআপ পাবে!</p>
+
+<div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:12px;padding:16px;margin-bottom:14px">
+<h4 style="margin-bottom:8px;color:#a78bfa">🎯 ধাপ ১: EmailJS অ্যাকাউন্ট</h4>
+<p style="font-size:13px;color:var(--muted)"><a href="https://www.emailjs.com" target="_blank" style="color:#67e8f9">emailjs.com</a> এ গিয়ে ফ্রি অ্যাকাউন্ট বানাও</p>
+</div>
+
+<div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:12px;padding:16px;margin-bottom:14px">
+<h4 style="margin-bottom:8px;color:#a78bfa">⚙️ ধাপ ২: ইমেইল সার্ভিস</h4>
+<ol style="font-size:13px;color:var(--muted);padding-left:20px">
+<li>Email Services → Add New Service ক্লিক করো</li>
+<li>Gmail সিলেক্ট করো → তোমার জিমেইল কানেক্ট করো</li>
+<li>একটা Service ID পাবে (service_abc123) — কপি করো</li>
+</ol>
+</div>
+
+<div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:12px;padding:16px;margin-bottom:14px">
+<h4 style="margin-bottom:8px;color:#a78bfa">📝 ধাপ ৩: ইমেইল টেমপ্লেট</h4>
+<ol style="font-size:13px;color:var(--muted);padding-left:20px">
+<li>Email Templates → Create New Template ক্লিক করো</li>
+<li>টেমপ্লেটে এই টেক্সট রাখো:</li>
+</ol>
+<pre style="background:rgba(0,0,0,0.3);padding:10px;border-radius:8px;font-size:11px;color:#67e8f9;margin-top:10px">Subject: {{subject}}
+To: {{to_email}}
+Content: {{message}}</pre>
+<p style="font-size:12px;color:var(--muted);margin-top:8px">Save করলে Template ID পাবে — কপি করো</p>
+</div>
+
+<div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:12px;padding:16px;margin-bottom:14px">
+<h4 style="margin-bottom:8px;color:#a78bfa">🔑 ধাপ ৪: পাবলিক কি</h4>
+<ol style="font-size:13px;color:var(--muted);padding-left:20px">
+<li>Account → General এ যাও</li>
+<li>Public Key পাবে — কপি করো</li>
+</ol>
+</div>
+
+<div style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:12px;padding:16px">
+<h4 style="margin-bottom:8px;color:#6ee7b7">✅ ধাপ ৫: TuitionPro-তে বসাও</h4>
+<p style="font-size:13px;color:var(--muted)">
+<b>Your Email</b> — তোমার জিমেইল<br>
+<b>Service ID</b> — service_...<br>
+<b>Template ID</b> — template_...<br>
+<b>Public Key</b> — ধাপ ৪ থেকে পাওয়া কি<br><br>
+তারপর 💾 Save → 🧪 Test চাপো। সবুজ টিক এলে সব ঠিক!
+</p>
+</div>
+</div>`;
+const modal=document.createElement('div');modal.className='modal-bg show';modal.style.alignItems='center';
+modal.innerHTML=`<div class="modal" style="max-height:85vh"><button class="modal-close" onclick="this.closest('.modal-bg').remove()">×</button>${guideHtml}</div>`;
+modal.addEventListener('click',function(e){if(e.target===modal)modal.remove();});
+document.body.appendChild(modal);
+}
+function startAutoBackupTimer(){
+if(autoBackupInterval)clearInterval(autoBackupInterval);
+autoBackupInterval=setInterval(()=>{
+if(!currentUser)return;
+const freq=DB.settings.backupFreq;const time=DB.settings.backupTime||'00:00';
+if(freq==='off')return;
+const now=new Date();const[hh,mm]=time.split(':').map(Number);
+const last=DB.settings.lastBackup?new Date(DB.settings.lastBackup):null;
+if(now.getHours()===hh&&now.getMinutes()===mm){
+if(last){const diffH=(now-last)/(1000*60*60);
+if(freq==='daily'&&diffH<23)return;if(freq==='weekly'&&diffH<7*24-1)return;if(freq==='monthly'&&diffH<30*24-1)return;}
+doAutoBackup();}
+},60000);
+}
+async function doAutoBackup(){
+if(!emailReady())return;
+try{const c=DB.settings.email;emailjs.init({publicKey:c.publicKey});
+const slim=JSON.parse(JSON.stringify(DB));slim.students.forEach(s=>s.photo='');
+await emailjs.send(c.serviceId,c.templateId,{to_email:c.toEmail,subject:'🤖 Auto Backup - '+new Date().toLocaleString('en-IN'),message:JSON.stringify(slim,null,2)});
+DB.settings.lastBackup=new Date().toISOString();saveToCloud();toast('🤖 Auto backup sent');
+}catch(e){console.error(e);}
+}
+function checkMonthlyReminder(){
+if(!DB.settings.monthlyReminder)return;
+const now=new Date();const key=`monthly_${now.getFullYear()}_${now.getMonth()}`;
+const lastAlert=localStorage.getItem('lastMonthlyAlert');
+if(lastAlert===key)return;
+if(now.getDate()<=3){localStorage.setItem('lastMonthlyAlert',key);setTimeout(()=>{renderMonthlyBanner();},1500);}
+}
+function renderMonthlyBanner(){
+const now=new Date();
+document.getElementById('monthlyAlertBanner').innerHTML=`<div class="monthly-banner"><div><h4>📅 New Month — ${MONTH_NAMES[now.getMonth()]} ${now.getFullYear()}</h4><p>Time to collect fees and backup!</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-primary btn-sm" onclick="backupNow()">💾 Backup</button><button class="btn btn-ghost btn-sm" onclick="this.closest('.monthly-banner').remove()">✕</button></div></div>`;
+}
+function toggleMonthlyReminder(){const t=document.getElementById('monthlyReminder');t.classList.toggle('on');DB.settings.monthlyReminder=t.classList.contains('on');saveBackupSettings();}
+function loadBackupSettings(){
+document.getElementById('backupFreq').value=DB.settings.backupFreq||'daily';
+document.getElementById('backupTime').value=DB.settings.backupTime||'00:00';
+document.getElementById('monthlyReminder').classList.toggle('on',DB.settings.monthlyReminder!==false);
+if(DB.settings.lastBackup)document.getElementById('lastBackup').textContent=new Date(DB.settings.lastBackup).toLocaleString('en-IN');
+}
+function saveBackupSettings(){
+DB.settings.backupFreq=document.getElementById('backupFreq').value;
+DB.settings.backupTime=document.getElementById('backupTime').value;
+DB.settings.monthlyReminder=document.getElementById('monthlyReminder').classList.contains('on');
+saveToCloud();startAutoBackupTimer();toast('✅ Saved');
+}
+function loadUPISettings(){
+document.getElementById('upiId').value=DB.settings.upi?.id||'arho065-1@okicici';
+document.getElementById('upiPhone').value=DB.settings.upi?.phone||'9564385573';
+}
+function saveUPISettings(){DB.settings.upi={id:document.getElementById('upiId').value.trim(),phone:document.getElementById('upiPhone').value.trim()};saveToCloud();toast('✅ UPI saved');}
+function getUPIQRLink(amount){
+const u=DB.settings.upi||{};if(!u.id)return'';
+let upiString=`upi://pay?pa=${u.id}&pn=${encodeURIComponent('Tuition Fees')}&cu=INR`;
+if(amount)upiString+=`&am=${amount}`;
+return`https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=10&data=${encodeURIComponent(upiString)}`;
+}
+function isTuitionDay(dateISO,className){const cls=DB.classes[className];if(!cls||!cls.days||cls.days.length===0)return true;return cls.days.includes(new Date(dateISO).getDay());}
+function getDayTime(className,dayIndex){const cls=DB.classes[className];if(!cls)return'';if(cls.times&&cls.times[String(dayIndex)])return cls.times[String(dayIndex)];return cls.time||'';}
+function formatDateShort(iso){if(!iso)return'';const d=new Date(iso);return `${d.getDate()} ${MONTH_SHORT[d.getMonth()]} ${d.getFullYear()}`;}
+function formatTime12(t){if(!t)return'';const[h,m]=t.split(':').map(Number);const ampm=h>=12?'PM':'AM';const h12=h%12||12;return `${h12}:${String(m).padStart(2,'0')} ${ampm}`;}
+function openWipeModal(){document.getElementById('wipeInput').value='';document.getElementById('wipeConfirmBtn').disabled=true;document.getElementById('wipeModal').classList.add('show');}
+document.getElementById('wipeInput').addEventListener('input',e=>{document.getElementById('wipeConfirmBtn').disabled=e.target.value.trim().toLowerCase()!=='wipe out all data';});
+function doWipe(){
+const keepEmail=DB.settings.email,keepFreq=DB.settings.backupFreq,keepTime=DB.settings.backupTime,keepUPI=DB.settings.upi,keepMR=DB.settings.monthlyReminder,keepSheet=DB.settings.sheetBackupUrl;
+DB={students:[],classes:{'General':{days:[],times:{},fineEnabled:false,fineAmount:10}},settings:{backupFreq:keepFreq,backupTime:keepTime,lastBackup:null,monthlyReminder:keepMR,email:keepEmail,upi:keepUPI,sheetBackupUrl:keepSheet}};
+saveToCloud();renderAll();closeModal('wipeModal');toast('🗑️ Wiped');
+}
+function openStudentModal(id=null){
+if(Object.keys(DB.classes).length===0){DB.classes['General']={days:[],times:{},fineEnabled:false,fineAmount:10};saveToCloud();}
+const sel=document.getElementById('stuClass');
+sel.innerHTML=Object.keys(DB.classes).map(c=>`<option>${c}</option>`).join('');
+document.getElementById('stuId').value='';document.getElementById('studentForm').reset();
+document.getElementById('stuAdm').value=todayISO();
+document.getElementById('stuModalTitle').textContent=id?'✏️ Edit Student':'➕ Add Student';
+if(id){const s=DB.students.find(x=>x.id===id);if(s){
+document.getElementById('stuId').value=s.id;document.getElementById('stuName').value=s.name;
+document.getElementById('stuClass').value=s.class;document.getElementById('stuFee').value=s.fee;
+document.getElementById('stuAdm').value=s.admission;document.getElementById('stuMobile').value=s.mobile||'';
+document.getElementById('stuWa').value=s.wa||'';document.getElementById('stuIg').value=s.ig||'';}}
+document.getElementById('studentModal').classList.add('show');
+}
+function saveStudent(e){
+e.preventDefault();
+const id=document.getElementById('stuId').value||uid();
+const photoInput=document.getElementById('stuPhoto');
+const existing=DB.students.find(x=>x.id===id);
+const finalize=(photo)=>{
+const stu={id,name:document.getElementById('stuName').value.trim(),class:document.getElementById('stuClass').value,
+fee:+document.getElementById('stuFee').value,admission:document.getElementById('stuAdm').value,
+mobile:document.getElementById('stuMobile').value.trim(),wa:document.getElementById('stuWa').value.trim(),
+ig:document.getElementById('stuIg').value.trim().replace('@',''),photo:photo||(existing?.photo||''),
+payments:existing?.payments||[],attendance:existing?.attendance||{}};
+if(existing){DB.students=DB.students.map(x=>x.id===id?stu:x);toast('✅ Updated');}
+else{DB.students.push(stu);toast('🎉 Added');}
+saveToCloud();closeModal('studentModal');renderAll();};
+if(photoInput.files[0]){const r=new FileReader();r.onload=ev=>finalize(ev.target.result);r.readAsDataURL(photoInput.files[0]);}
+else finalize(null);
+}
+function openDeleteConfirm(id){
+const s=DB.students.find(x=>x.id===id);
+if(!s)return;
+document.getElementById('delStuId').value=id;
+document.getElementById('delStuName').textContent=s.name;
+document.getElementById('delStuInput').value='';
+document.getElementById('delStuConfirmBtn').disabled=true;
+document.getElementById('deleteStuModal').classList.add('show');
+}
+document.getElementById('delStuInput').addEventListener('input',function(e){
+document.getElementById('delStuConfirmBtn').disabled=e.target.value.trim().toLowerCase()!=='delete';
+});
+function confirmDeleteStudent(){
+const id=document.getElementById('delStuId').value;
+const s=DB.students.find(x=>x.id===id);
+if(!s)return;
+const name=s.name;
+DB.students=DB.students.filter(x=>x.id!==id);
+saveToCloud();
+closeModal('deleteStuModal');
+closeModal('profileModal');
+renderAll();
+toast('🗑️ '+name+' deleted!');
+}
+function editStudentFromProfile(id){
+closeModal('profileModal');
+openStudentModal(id);
+}
+function renderDayToggles(){
+const wrap=document.getElementById('clsDays');
+wrap.innerHTML=DAY_NAMES.map((d,i)=>{
+const active=editingClassDays.includes(i);const time=editingClassTimes[String(i)]||'';
+return`<div class="day-item ${active?'active':''}"><span class="day-chip ${active?'on':''}" onclick="toggleDayChip(${i})">${d}</span><input type="time" class="day-time-input" data-day="${i}" value="${time}" ${active?'':'disabled'} onchange="setDayTime(${i},this.value)" onclick="event.stopPropagation()"/></div>`;
+}).join('');
+}
+function toggleDayChip(i){
+if(editingClassDays.includes(i)){editingClassDays=editingClassDays.filter(x=>x!==i);delete editingClassTimes[String(i)];}
+else{editingClassDays.push(i);if(!editingClassTimes[String(i)])editingClassTimes[String(i)]='18:00';}
+renderDayToggles();
+}
+function setDayTime(dayIndex,value){if(value)editingClassTimes[String(dayIndex)]=value;else delete editingClassTimes[String(dayIndex)];}
+function saveClass(){
+const name=document.getElementById('clsName').value.trim();
+if(!name){toast('⚠️ Name required');return;}
+const orig=document.getElementById('clsOrigName').value;
+if(orig&&orig!==name){delete DB.classes[orig];DB.students.forEach(s=>{if(s.class===orig)s.class=name;});}
+const times={};editingClassDays.forEach(d=>{if(editingClassTimes[String(d)])times[String(d)]=editingClassTimes[String(d)];});
+DB.classes[name]={days:[...editingClassDays].sort((a,b)=>a-b),times:times,fineEnabled:document.getElementById('clsFineToggle').classList.contains('on'),fineAmount:+document.getElementById('clsFine').value||10};
+saveToCloud();closeModal('classModal');renderAll();toast('✅ Saved');
+if(afterClassSaveCallback){afterClassSaveCallback(name);afterClassSaveCallback=null;}
+}
+function deleteClass(name){if(!confirm(`Delete "${name}"?`))return;delete DB.classes[name];saveToCloud();renderAll();}
+function getAllMonths(stu){
+const adm=new Date(stu.admission);const now=new Date();let months=[];
+let cur=new Date(adm.getFullYear(),adm.getMonth(),1);const end=new Date(now.getFullYear(),now.getMonth(),1);
+while(cur<=end){
+const ym=`${cur.getFullYear()}-${String(cur.getMonth()+1).padStart(2,'0')}`;
+months.push({ym:ym,m:cur.getMonth(),y:cur.getFullYear(),label:`${MONTH_SHORT[cur.getMonth()]} ${cur.getFullYear()}`,fullLabel:`${MONTH_NAMES[cur.getMonth()]} ${cur.getFullYear()}`});
+cur.setMonth(cur.getMonth()+1);}
+return months;
+}
+function buildPaymentDistribution(stu){
+const months=getAllMonths(stu);
+const payments=(stu.payments||[]).slice().sort((a,b)=>new Date(a.date)-new Date(b.date));
+const monthDetails=months.map(mo=>({ym:mo.ym,m:mo.m,y:mo.y,label:mo.label,fullLabel:mo.fullLabel,fee:stu.fee,paid:0,due:stu.fee,status:'unpaid',contributions:[]}));
+let leftover=0;let advance=0;
+payments.forEach(pay=>{
+let remaining=pay.amount+leftover;leftover=0;
+for(let i=0;i<monthDetails.length&&remaining>0;i++){
+const mo=monthDetails[i];
+if(mo.paid>=mo.fee)continue;
+const needed=mo.fee-mo.paid;
+const applied=Math.min(needed,remaining);
+mo.paid+=applied;
+mo.contributions.push({amount:applied,date:pay.date,payId:pay.id,note:pay.note||''});
+remaining-=applied;
+}
+if(remaining>0){leftover=remaining;}
+});
+monthDetails.forEach(mo=>{mo.due=mo.fee-mo.paid;if(mo.paid>=mo.fee)mo.status='paid';else if(mo.paid>0)mo.status='partial';else mo.status='unpaid';});
+const totalPaid=payments.reduce((s,p)=>s+(p.amount||0),0);
+const totalFeeDue=months.length*stu.fee;
+advance=Math.max(0,leftover);
+const feeDue=Math.max(0,totalFeeDue-totalPaid);
+const fine=getFineTotal(stu);
+return{months:monthDetails,totalFeeDue,totalPaid,feeDue,fine,totalDue:feeDue+fine,totalAdvance:advance,paidMonths:monthDetails.filter(m=>m.status==='paid').length,partialMonths:monthDetails.filter(m=>m.status==='partial').length,unpaidMonths:monthDetails.filter(m=>m.status==='unpaid').length};
+}
+function getPaymentStatus(stu){return buildPaymentDistribution(stu);}
+function getDueMonths(stu){const ps=getPaymentStatus(stu);return ps.months.filter(m=>m.status!=='paid').map(m=>m.ym);}
+function getFineTotal(stu){
+const cls=DB.classes[stu.class];if(!cls||!cls.fineEnabled)return 0;
+const now=new Date();const ym=todayYM();let absent=0;
+for(let d=1;d<=now.getDate();d++){
+const key=`${ym}-${String(d).padStart(2,'0')}`;
+if(stu.attendance&&stu.attendance[key]===false&&isTuitionDay(key,stu.class))absent++;
+}
+return absent*cls.fineAmount;
+}
+function openPaymentModal(sid){
+const s=DB.students.find(x=>x.id===sid);if(!s)return;
+document.getElementById('payStuId').value=sid;
+document.getElementById('payStuName').textContent=s.name;
+const ps=getPaymentStatus(s);
+let sub=`₹${s.fee}/mo • ${ps.months.length} months • `;
+if(ps.totalDue>0)sub+=`Due: ₹${ps.totalDue}`;
+else if(ps.totalAdvance>0)sub+=`Advance: ₹${ps.totalAdvance}`;
+else sub+=`All Clear ✅`;
+document.getElementById('payStuSub').textContent=sub;
+document.getElementById('payAmount').value='';
+document.getElementById('payDate').value=todayISO();
+document.getElementById('payNote').value='';
+document.getElementById('payPreview').style.display='none';
+document.getElementById('paymentModal').classList.add('show');
+setTimeout(()=>{const modal=document.querySelector('#paymentModal .modal');if(modal)modal.scrollTop=0;},100);
+document.getElementById('payAmount').oninput=function(){
+const amt=+this.value||0;const preview=document.getElementById('payPreview');
+if(amt<=0){preview.style.display='none';return;}
+const simStu=JSON.parse(JSON.stringify(s));
+if(!simStu.payments)simStu.payments=[];
+simStu.payments.push({id:uid(),amount:amt,date:todayISO(),note:''});
+const ps2=getPaymentStatus(simStu);
+let html='<b>💡 Payment Preview:</b><br>';
+const newlyPaid=ps2.months.filter(m=>m.status==='paid'&&!ps.months.find(pm=>pm.ym===m.ym&&pm.status==='paid'));
+const newlyPartial=ps2.months.filter(m=>m.status==='partial'&&ps.months.find(pm=>pm.ym===m.ym&&pm.paid!==m.paid));
+if(newlyPaid.length>0){html+=`✅ Fully paid: ${newlyPaid.map(m=>m.label).join(', ')}<br>`;}
+if(newlyPartial.length>0){newlyPartial.forEach(m=>{const old=ps.months.find(pm=>pm.ym===m.ym);const added=m.paid-(old?old.paid:0);html+=`⚠️ ${m.label}: +₹${added} (now ₹${m.paid}/₹${m.fee})<br>`;});}
+if(ps2.totalAdvance>0){html+=`💰 <b>Advance balance: ₹${ps2.totalAdvance}</b>`;}
+preview.innerHTML=html;preview.style.display='block';
+};
+}
+function confirmPayment(){
+const sid=document.getElementById('payStuId').value;
+const amount=+document.getElementById('payAmount').value;
+const date=document.getElementById('payDate').value||todayISO();
+const note=document.getElementById('payNote').value.trim();
+if(!amount||amount<=0){toast('⚠️ Enter valid amount!');return;}
+const s=DB.students.find(x=>x.id===sid);if(!s)return;
+if(!s.payments)s.payments=[];
+s.payments.push({id:uid(),amount,date,note});
+saveToCloud();closeModal('paymentModal');
+toast(`💰 ₹${amount} payment recorded!`);
+renderAll();
+if(document.getElementById('profileModal').classList.contains('show')){renderProfilePay();}
+}
+function deletePayment(sid,payId){
+if(!confirm('Delete this payment record?'))return;
+const s=DB.students.find(x=>x.id===sid);if(!s)return;
+s.payments=(s.payments||[]).filter(p=>p.id!==payId);
+saveToCloud();toast('🗑️ Payment deleted');renderAll();
+if(document.getElementById('profileModal').classList.contains('show')){renderProfilePay();}
+}
+function quickMarkMonthPaid(sid,ym){
+const s=DB.students.find(x=>x.id===sid);if(!s)return;
+const ps=getPaymentStatus(s);
+const monthInfo=ps.months.find(m=>m.ym===ym);if(!monthInfo)return;
+if(monthInfo.status==='paid'){openDeleteMonthPayment(sid,ym);return;}
+const needed=monthInfo.fee-monthInfo.paid;
+if(!s.payments)s.payments=[];
+s.payments.push({id:uid(),amount:needed,date:todayISO(),note:`Quick pay: ${monthInfo.label}`});
+saveToCloud();toast(`✅ ${monthInfo.label} marked as paid!`);renderAll();
+if(document.getElementById('profileModal').classList.contains('show')){renderProfilePay();}
+}
+function openDeleteMonthPayment(sid,ym){
+const s=DB.students.find(x=>x.id===sid);if(!s)return;
+const ps=getPaymentStatus(s);
+const monthInfo=ps.months.find(m=>m.ym===ym);if(!monthInfo)return;
+document.getElementById('deletePayStuId').value=sid;
+document.getElementById('deletePayYm').value=ym;
+document.getElementById('deletePayInput').value='';
+document.getElementById('deletePayConfirmBtn').disabled=true;
+document.getElementById('deletePayMsg').innerHTML=`<b>${monthInfo.fullLabel}</b> এর payment remove করতে চাও?<br>নিচে <b>"delete"</b> type করো confirm করতে:`;
+document.getElementById('deletePayModal').classList.add('show');
+}
+document.getElementById('deletePayInput').addEventListener('input',function(e){
+document.getElementById('deletePayConfirmBtn').disabled=e.target.value.trim().toLowerCase()!=='delete';
+});
+function confirmDeleteMonthPayment(){
+const sid=document.getElementById('deletePayStuId').value;
+const ym=document.getElementById('deletePayYm').value;
+const s=DB.students.find(x=>x.id===sid);if(!s)return;
+const ps=getPaymentStatus(s);
+const monthInfo=ps.months.find(m=>m.ym===ym);if(!monthInfo)return;
+const payIdsToRemove=new Set(monthInfo.contributions.map(c=>c.payId));
+const newPayments=[];
+(s.payments||[]).forEach(pay=>{
+if(!payIdsToRemove.has(pay.id)){newPayments.push(pay);return;}
+const contributionToThisMonth=monthInfo.contributions.filter(c=>c.payId===pay.id).reduce((s,c)=>s+c.amount,0);
+const remainingAmount=pay.amount-contributionToThisMonth;
+if(remainingAmount>0){newPayments.push({...pay,amount:remainingAmount,note:(pay.note||'')+' (adjusted)'});}
+});
+s.payments=newPayments;
+saveToCloud();closeModal('deletePayModal');
+toast(`🗑️ ${monthInfo.label} payment removed!`);
+renderAll();
+if(document.getElementById('profileModal').classList.contains('show')){renderProfilePay();}
+}
+function feeMessage(s){
+const ps=getPaymentStatus(s);
+const total=ps.totalDue;
+const upi=DB.settings.upi||{};
+const upiId=upi.id||'';
+let msg="*নমস্কার।*\n\n";
+msg+="আপনার সন্তানের টিউশন ফি বাকি আছে। অনুগ্রহ করে দ্রুত বাকি টাকা জমা দিয়ে দিন।\n\n";
+msg+="*নাম:* "+s.name+"\n";
+msg+="*Class:* "+s.class+"\n";
+msg+="*নেট বাকি:* ₹"+total+"\n\n";
+msg+="📊 *মাস-অনুযায়ী হিসাব: (মাসিক ফি: ₹"+s.fee+")*\n";
+msg+="━━━━━━━━━━━━━━━━━━\n";
+const unpaidMonths=ps.months.filter(m=>m.status!=='paid');
+if(unpaidMonths.length===0){
+msg+="✅ সব মাস পরিশোধিত।\n";
+}else{
+unpaidMonths.forEach(m=>{
+let statusIcon='';
+if(m.status==='partial')statusIcon='⚠️';
+else statusIcon='❌';
+let line=`${statusIcon} *${m.label}*: `;
+if(m.status==='partial'){
+line+=`₹${m.paid} paid, *₹${m.due} বাকি*`;
+}else{
+line+=`*₹${m.fee} বাকি*`;
+}
+msg+=line+'\n';
+});
+}
+msg+="━━━━━━━━━━━━━━━━━━\n\n";
+msg+=`*Total Fee Due:* ₹${ps.totalFeeDue}\n`;
+msg+=`*Total Paid:* ₹${ps.totalPaid}\n`;
+if(ps.fine>0){
+msg+=`*Fine (Attendance):* ₹${ps.fine}\n`;
+}
+if(ps.totalAdvance>0){
+msg+=`\n💰 *Advance Balance:* ₹${ps.totalAdvance}\n`;
+msg+=`(এই টাকা পরের মাসের ফি-তে অ্যাডজাস্ট হবে)\n`;
+}else if(ps.feeDue>0){
+msg+=`\n❗ *Net Due:* ₹${ps.feeDue}`;
+if(ps.fine>0)msg+=` + Fine ₹${ps.fine} = *₹${total}*`;
+msg+='\n';
+}
+if(upiId&&total>0){
+msg+="\n-------------------------\n";
+msg+="*💳 পেমেন্ট করার জন্য:*\n\n";
+msg+="📱 *UPI ID:* "+upiId+"\n";
+if(upi.phone)msg+="📞 *Phone:* "+upi.phone+"\n";
+msg+="💰 *Amount:* ₹"+total+"\n\n";
+msg+="🔹 PhonePe / Google Pay / Paytm যেকোনো অ্যাপে\n";
+msg+="   UPI ID কপি করে পেমেন্ট করুন\n";
+msg+="-------------------------\n";
+}
+msg+="\nধন্যবাদ।";
+return msg;
+}
+function photoHTML(s,lg=false,clickable=true){
+const clickAttr=clickable?`onclick="openProfile('${s.id}')"`:'';
+if(s.photo)return `<div class="photo ${lg?'lg':''}" ${clickAttr}><img src="${s.photo}"/></div>`;
+return `<div class="photo ${lg?'lg':''}" ${clickAttr}>${s.name.charAt(0).toUpperCase()}</div>`;
+}
+function alertButtons(s){
+const msg=feeMessage(s);
+const waNum=(s.wa||s.mobile||'').replace(/\D/g,'');
+const waLink=waNum?`https://wa.me/${waNum}?text=${encodeURIComponent(msg)}`:'#';
+const smsLink=s.mobile?`sms:${s.mobile}?body=${encodeURIComponent(msg)}`:'#';
+const callLink=s.mobile?`tel:${s.mobile}`:'#';
+const igLink=s.ig?`https://instagram.com/${s.ig}`:'#';
+let html='<div class="action-row">';
+if(waNum)html+=`<a class="icon-btn wa" href="${waLink}" target="_blank" title="WhatsApp Alert"><svg viewBox="0 0 24 24"><use href="#icon-wa"/></svg></a>`;
+if(s.mobile)html+=`<a class="icon-btn sms" href="${smsLink}" title="SMS"><svg viewBox="0 0 24 24"><use href="#icon-sms"/></svg></a>`;
+if(s.mobile)html+=`<a class="icon-btn call" href="${callLink}" title="Call"><svg viewBox="0 0 24 24"><use href="#icon-call"/></svg></a>`;
+if(s.ig)html+=`<a class="icon-btn ig" href="${igLink}" target="_blank" title="Instagram"><svg viewBox="0 0 24 24"><use href="#icon-ig"/></svg></a>`;
+html+=`<button class="icon-btn qr-btn" onclick="sendQRViaWhatsApp('${s.id}')" title="Send QR Code"><svg viewBox="0 0 24 24"><use href="#icon-qr"/></svg></button>`;
+html+='</div>';
+return html;
+}
+async function sendQRViaWhatsApp(sid){
+const s=DB.students.find(x=>x.id===sid);
+if(!s)return;
+const waNum=(s.wa||s.mobile||'').replace(/\D/g,'');
+if(!waNum){toast('⚠️ No WhatsApp number!');return;}
+const ps=getPaymentStatus(s);
+const upi=DB.settings.upi||{};
+const upiId=upi.id||'';
+const upiPhone=upi.phone||'';
+if(!upiId){toast('⚠️ UPI ID not set!');return;}
+toast('📱 QR তৈরি হচ্ছে...');
+const qrUrl=getUPIQRLink(ps.totalDue);
+try{
+const img=new Image();
+img.crossOrigin='anonymous';
+img.src=qrUrl;
+await new Promise((res,rej)=>{img.onload=res;img.onerror=rej;});
+const canvas=document.createElement('canvas');
+const W=420;
+const headerH=110;
+const footerH=50;
+canvas.width=W;
+canvas.height=headerH+img.height+footerH;
+const ctx=canvas.getContext('2d');
+ctx.fillStyle='#ffffff';
+ctx.fillRect(0,0,W,canvas.height);
+ctx.fillStyle='#7c3aed';
+ctx.fillRect(0,0,W,headerH);
+ctx.fillStyle='#ffffff';
+ctx.textAlign='center';
+ctx.font='bold 20px Arial, sans-serif';
+ctx.fillText('Scan & Pay ₹'+ps.totalDue,W/2,30);
+ctx.font='bold 15px Arial, sans-serif';
+ctx.fillText('UPI: '+upiId,W/2,58);
+if(upiPhone){
+ctx.font='14px Arial, sans-serif';
+ctx.fillText('Ph: '+upiPhone,W/2,82);
+}
+ctx.font='12px Arial, sans-serif';
+ctx.fillText('PhonePe / GPay / Paytm',W/2,102);
+ctx.drawImage(img,(W-img.width)/2,headerH);
+ctx.fillStyle='#f5f5f5';
+ctx.fillRect(0,headerH+img.height,W,footerH);
+ctx.fillStyle='#666666';
+ctx.font='12px Arial, sans-serif';
+ctx.fillText('TuitionPro • '+s.name,W/2,headerH+img.height+30);
+canvas.toBlob(async(blob)=>{
+const file=new File([blob],s.name+'_QR.png',{type:'image/png'});
+if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
+try{
+await navigator.share({files:[file],title:s.name+' QR'});
+toast('✅ QR পাঠানো হয়েছে!');
+return;
+}catch(e){}
+}
+qrFallback(blob,s,waNum,ps,upiId,upiPhone);
+},'image/png');
+}catch(e){
+toast('❌ QR তৈরি ব্যর্থ!');
+}
+}
+function qrFallback(blob,s,waNum,ps,upiId,upiPhone){
+const url=URL.createObjectURL(blob);
+const a=document.createElement('a');
+a.href=url;
+a.download=s.name+'_QR.png';
+a.click();
+URL.revokeObjectURL(url);
+let msg='📱 *'+s.name+' Payment QR*\n\n';
+msg+='UPI: '+upiId+'\n';
+if(upiPhone)msg+='Ph: '+upiPhone+'\n';
+msg+='Amount: ₹'+ps.totalDue+'\n\n';
+msg+='👆 QR image download হয়েছে।\nWhatsApp-এ attach করে পাঠান।';
+setTimeout(()=>{
+window.open('https://wa.me/'+waNum+'?text='+encodeURIComponent(msg),'_blank');
+},500);
+toast('📥 QR Downloaded! WhatsApp-এ attach করুন');
+}
+function renderAll(){
+renderDashboard();renderStudents();renderAttClassGrid();renderFees();renderClasses();loadEmailSettings();loadSheetUrl();
+const classes=Object.keys(DB.classes);
+['classFilter','feeClass'].forEach(id=>{const el=document.getElementById(id);if(!el)return;const cur=el.value;
+el.innerHTML='<option value="">All Classes</option>'+classes.map(c=>`<option ${cur===c?'selected':''}>${c}</option>`).join('');});
+if(document.getElementById('attStep2').style.display!=='none'&&currentAttClass)renderAttendanceDay();
+}
+function renderDashboard(){
+document.getElementById('todayDate').textContent=new Date().toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+document.getElementById('sTotal').textContent=DB.students.length;
+document.getElementById('sClass').textContent=new Set(DB.students.map(s=>s.class)).size;
+let totalDue=0,totalAdvance=0,dueStudents=[];
+DB.students.forEach(s=>{
+const ps=getPaymentStatus(s);
+if(ps.totalDue>0){totalDue+=ps.totalDue;dueStudents.push({s,ps});}
+if(ps.totalAdvance>0)totalAdvance+=ps.totalAdvance;
+});
+document.getElementById('sDues').textContent='₹'+totalDue.toLocaleString('en-IN');
+document.getElementById('sDuesSub').textContent=dueStudents.length+' pending';
+document.getElementById('sAdvance').textContent='₹'+totalAdvance.toLocaleString('en-IN');
+document.getElementById('sAdvSub').textContent=DB.students.filter(s=>getPaymentStatus(s).totalAdvance>0).length+' students';
+const t=todayISO();let present=0,marked=0;
+DB.students.forEach(s=>{if(s.attendance[t]!==undefined&&isTuitionDay(t,s.class)){marked++;if(s.attendance[t])present++;}});
+document.getElementById('sAtt').textContent=(marked?Math.round(present/marked*100):0)+'%';
+document.getElementById('sAttSub').textContent=marked?`${present}/${marked} present`:'Not marked';
+const tbody=document.querySelector('#dashDueTbl tbody');tbody.innerHTML='';
+dueStudents.sort((a,b)=>b.ps.totalDue-a.ps.totalDue).slice(0,10).forEach(({s,ps})=>{
+tbody.innerHTML+=`<tr><td><div style="display:flex;align-items:center;gap:10px">${photoHTML(s)}<b style="cursor:pointer" onclick="openProfile('${s.id}')">${s.name}</b></div></td><td><span class="badge badge-class">${s.class}</span></td><td><span class="badge badge-due">₹${ps.totalDue.toLocaleString('en-IN')}</span>${ps.fine>0?`<div style="font-size:10px;color:var(--muted);margin-top:2px">incl. ₹${ps.fine} fine</div>`:''}</td><td>${alertButtons(s)}</td></tr>`;});
+const cards=document.getElementById('dashDueCards');
+cards.innerHTML=dueStudents.sort((a,b)=>b.ps.totalDue-a.ps.totalDue).slice(0,10).map(({s,ps})=>`<div class="m-card">${photoHTML(s)}<div class="body"><div class="nm" onclick="openProfile('${s.id}')">${s.name}</div><div class="meta"><span class="badge badge-class">${s.class}</span><span class="badge badge-due">₹${ps.totalDue.toLocaleString('en-IN')} due</span></div><div class="actions">${alertButtons(s)}</div></div></div>`).join('');
+const bulkBtn=document.getElementById('bulkAlertBtn');
+bulkBtn.style.display=dueStudents.length>0?'inline-flex':'none';
+document.getElementById('dashDueEmpty').style.display=dueStudents.length?'none':'block';
+document.getElementById('dashDueTbl').style.display=dueStudents.length?'':'none';
+}
+function renderStudents(){
+if(Object.keys(DB.classes).length===0){DB.classes['General']={days:[],times:{},fineEnabled:false,fineAmount:10};saveToCloud();}
+const q=(document.getElementById('searchInput')?.value||'').toLowerCase();
+const cf=document.getElementById('classFilter')?.value||'';
+const sort=document.getElementById('sortBy')?.value||'name';
+let list=DB.students.filter(s=>(!q||s.name.toLowerCase().includes(q))&&(!cf||s.class===cf));
+if(sort==='name')list.sort((a,b)=>a.name.localeCompare(b.name));
+if(sort==='class')list.sort((a,b)=>a.class.localeCompare(b.class));
+if(sort==='admission')list.sort((a,b)=>new Date(a.admission)-new Date(b.admission));
+if(sort==='due')list.sort((a,b)=>getPaymentStatus(b).totalDue-getPaymentStatus(a).totalDue);
+const tbody=document.querySelector('#studentsTbl tbody');
+tbody.innerHTML=list.map(s=>`<tr>
+<td>${photoHTML(s,false,true)}</td>
+<td><b style="cursor:pointer;text-decoration:underline;text-decoration-color:rgba(236,72,153,.5)" onclick="openProfile('${s.id}')">${s.name}</b></td>
+<td><span class="badge badge-class">${s.class}</span></td>
+<td>₹${s.fee}</td>
+<td>${formatDateShort(s.admission)}</td>
+<td style="font-size:11px;color:var(--muted)">${s.mobile||'—'}</td>
+<td><div class="action-row">
+${alertButtons(s)}
+</div></td></tr>`).join('');
+const cards=document.getElementById('studentsCards');
+cards.innerHTML=list.map(s=>`<div class="m-card">${photoHTML(s,false,true)}<div class="body"><div class="nm" onclick="openProfile('${s.id}')">${s.name}</div><div class="meta"><span class="badge badge-class">${s.class}</span><span>₹${s.fee}/mo</span><span>${formatDateShort(s.admission)}</span></div><div class="actions">${alertButtons(s)}</div></div></div>`).join('');
+document.getElementById('stuEmpty').style.display=list.length?'none':'block';
+}
+function renderAttClassGrid(){
+const grid=document.getElementById('attClassGrid');const classes=Object.keys(DB.classes);
+if(!classes.length){grid.innerHTML='<div class="empty-state"><div class="big">🏫</div>No classes yet!</div>';return;}
+grid.innerHTML=classes.map(name=>{
+const c=DB.classes[name];const count=DB.students.filter(s=>s.class===name).length;
+const daysText=c.days&&c.days.length?c.days.map(d=>{const t=getDayTime(name,d);return DAY_NAMES[d]+(t?' '+formatTime12(t):'');}).join(', '):'No routine';
+return`<div class="class-pick-card" onclick="showRoutinePreview('${name.replace(/'/g,"\\'")}')"><div class="nm">${name}</div><div class="info">📅 ${daysText}</div><div class="count">👥 ${count} student(s)</div></div>`;
+}).join('');
+}
+function showRoutinePreview(name){
+pendingRoutineClass=name;const c=DB.classes[name];
+const count=DB.students.filter(s=>s.class===name).length;
+document.getElementById('routineClassName').textContent=name;
+document.getElementById('routineStudentCount').textContent=`${count} student(s)`;
+const list=document.getElementById('routineScheduleList');
+if(c.days&&c.days.length){list.innerHTML=c.days.map(d=>{const t=getDayTime(name,d);return`<div class="routine-day-row"><span class="day-name">📅 ${DAY_FULL[d]}</span><span class="day-time">${t?'🕐 '+formatTime12(t):'🕐 —'}</span></div>`;}).join('');}
+else{list.innerHTML='<div style="color:var(--muted);font-size:13px;padding:10px;text-align:center">Every day (no routine set)</div>';}
+document.getElementById('routineFineDisplay').innerHTML=c.fineEnabled?`Fine enabled: <b>₹${c.fineAmount}</b> per absent tuition day`:`Fine system: <b style="color:#94a3b8">Disabled</b>`;
+document.getElementById('routineModal').classList.add('show');
+}
+function startAttendanceFromRoutine(){
+if(!pendingRoutineClass)return;closeModal('routineModal');
+currentAttClass=pendingRoutineClass;
+document.getElementById('attStep1').style.display='none';document.getElementById('attStep2').style.display='';
+document.getElementById('attClassName').textContent=currentAttClass;
+document.getElementById('attDate').value=todayISO();renderAttendanceDay();
+}
+function editRoutineClass(){
+if(!pendingRoutineClass)return;closeModal('routineModal');
+openClassModal(pendingRoutineClass,(savedName)=>{setTimeout(()=>showRoutinePreview(savedName),300);});
+}
+function backToClassSelect(){currentAttClass=null;document.getElementById('attStep1').style.display='';document.getElementById('attStep2').style.display='none';renderAttClassGrid();}
+function setAttToday(){document.getElementById('attDate').value=todayISO();renderAttendanceDay();}
+function renderAttendanceDay(){
+const dateISO=document.getElementById('attDate').value;
+if(!dateISO||!currentAttClass)return;
+const isTuition=isTuitionDay(dateISO,currentAttClass);
+const d=new Date(dateISO);const dayName=DAY_FULL[d.getDay()];
+const dayTime=getDayTime(currentAttClass,d.getDay());
+const banner=document.getElementById('tuitionBanner');
+if(isTuition){banner.innerHTML=`<div class="tuition-day-banner"><div class="txt">📚 <b>TUITION DAY</b> — ${dayName}${dayTime?' • 🕐 '+formatTime12(dayTime):''} • ${formatDateShort(dateISO)}</div><span class="badge badge-tuition">Active</span></div>`;}
+else{banner.innerHTML=`<div class="tuition-day-banner off"><div class="txt">😴 <b>No class</b> — ${dayName}</div><span class="badge">Holiday</span></div>`;}
+const list=DB.students.filter(s=>s.class===currentAttClass);
+const wrap=document.getElementById('attStudentsList');
+if(!list.length){wrap.innerHTML='';document.getElementById('attEmpty').style.display='block';document.getElementById('attSummary').textContent='';return;}
+document.getElementById('attEmpty').style.display='none';
+let present=0,absent=0,unmarked=0;
+wrap.innerHTML=list.map(s=>{
+const st=s.attendance?.[dateISO];const status=st===true?'present':st===false?'absent':'none';
+if(st===true)present++;else if(st===false)absent++;else unmarked++;
+return`<div class="stu-att-row">${photoHTML(s,false,true)}<div class="info" onclick="openProfile('${s.id}','att')"><div class="nm">${s.name}</div><div class="sub">₹${s.fee}/mo • ${st===true?'✅ Present':st===false?'❌ Absent':'Not marked'}</div></div><div class="att-actions"><button class="att-btn present ${status==='present'?'active':''}" onclick="setAtt('${s.id}','${dateISO}',true)">✓</button><button class="att-btn absent ${status==='absent'?'active':''}" onclick="setAtt('${s.id}','${dateISO}',false)">✗</button><button class="att-btn none ${status==='none'?'active':''}" onclick="setAtt('${s.id}','${dateISO}',null)">—</button></div></div>`;
+}).join('');
+document.getElementById('attSummary').textContent=`${present} ✓ • ${absent} ✗ • ${unmarked} ?`;
+}
+function setAtt(sid,date,val){
+const s=DB.students.find(x=>x.id===sid);if(!s)return;
+if(!s.attendance)s.attendance={};
+if(val===null)delete s.attendance[date];else s.attendance[date]=val;
+saveToCloud();renderAttendanceDay();renderDashboard();
+}
+function openProfile(id,tab='info'){
+currentProfileId=id;profileMonth=new Date();
+renderProfile();switchProfileTab(tab);
+document.getElementById('profileModal').classList.add('show');
+}
+function openProfileAndRecordPayment(id){
+currentProfileId=id;profileMonth=new Date();
+renderProfile();switchProfileTab('pay');
+document.getElementById('profileModal').classList.add('show');
+setTimeout(()=>{openPaymentModal(id);},300);
+}
+function switchProfileTab(tab){
+document.querySelectorAll('.profile-tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));
+document.querySelectorAll('.profile-pane').forEach(p=>p.classList.remove('active'));
+document.getElementById('pane-'+tab).classList.add('active');
+if(tab==='att')renderProfileAtt();
+if(tab==='pay')renderProfilePay();
+if(tab==='info')renderProfileInfo();
+}
+function renderProfile(){
+const s=DB.students.find(x=>x.id===currentProfileId);if(!s)return;
+document.getElementById('profileHeader').innerHTML=`
+${photoHTML(s,true,true)}
+<div class="info"><h3>${s.name}</h3><div style="color:var(--muted);font-size:12px"><span class="badge badge-class">${s.class}</span> • ₹${s.fee}/mo</div></div>
+<div style="display:flex;gap:8px;flex-wrap:wrap">
+<button class="btn btn-ghost btn-sm" onclick="editStudentFromProfile('${s.id}')">✏️ Edit</button>
+<button class="btn btn-danger btn-sm" onclick="openDeleteConfirm('${s.id}')">🗑️ Delete</button>
+</div>`;
+renderProfileInfo();
+}
+function renderProfileInfo(){
+const s=DB.students.find(x=>x.id===currentProfileId);if(!s)return;
+const ps=getPaymentStatus(s);const cls=DB.classes[s.class]||{};const upi=DB.settings.upi||{};
+const qrUrl=getUPIQRLink(ps.totalDue);
+let daysText='Every day';
+if(cls.days&&cls.days.length){daysText=cls.days.map(d=>{const t=getDayTime(s.class,d);return DAY_FULL[d]+(t?' • '+formatTime12(t):'');}).join('<br>');}
+document.getElementById('pane-info').innerHTML=`
+<div class="info-grid">
+<div class="info-item"><div class="lbl">Name</div><div class="val">${s.name}</div></div>
+<div class="info-item"><div class="lbl">Class</div><div class="val">${s.class}</div></div>
+<div class="info-item"><div class="lbl">Fee</div><div class="val">₹${s.fee}</div></div>
+<div class="info-item"><div class="lbl">Admission</div><div class="val">${formatDateShort(s.admission)}</div></div>
+<div class="info-item" style="grid-column:1/-1"><div class="lbl">Routine</div><div class="val" style="line-height:1.6">${daysText}</div></div>
+<div class="info-item"><div class="lbl">Mobile</div><div class="val">${s.mobile||'—'}</div></div>
+<div class="info-item"><div class="lbl">WhatsApp</div><div class="val">${s.wa||'—'}</div></div>
+<div class="info-item"><div class="lbl">Instagram</div><div class="val">${s.ig?'@'+s.ig:'—'}</div></div>
+</div>
+<div style="margin-top:18px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.3);border-radius:12px;padding:14px">
+<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+<div>
+<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">Total Due</div>
+<div style="font-family:'Space Grotesk';font-size:clamp(20px,5.5vw,24px);font-weight:700;color:#fca5a5">₹${ps.totalDue.toLocaleString('en-IN')}</div>
+<div style="font-size:11px;color:var(--muted);margin-top:2px">Fee: ₹${ps.feeDue}${ps.fine>0?` + Fine: ₹${ps.fine}`:''}</div>
+${ps.totalAdvance>0?`<div style="font-size:11px;color:#93c5fd;margin-top:2px">💰 Advance: ₹${ps.totalAdvance}</div>`:''}
+</div>
+<button class="btn btn-danger" onclick="alertParents('${s.id}')">📨 Remind</button>
+</div>
+</div>
+${upi.id?`<div class="upi-box"><h4>💳 Payment Details</h4><p style="font-size:11px;color:var(--muted);margin-bottom:14px">📱 Scan QR to pay</p>
+<div class="upi-qr"><img src="${qrUrl}" alt="UPI QR"/><div class="upi-qr-label">₹${ps.totalDue.toLocaleString('en-IN')} — Scan QR</div></div>
+<div class="upi-row"><div class="lbl">UPI ID</div><div class="val">${upi.id}</div></div>
+${upi.phone?`<div class="upi-row"><div class="lbl">Phone</div><div class="val">${upi.phone}</div></div>`:''}
+<div class="upi-row"><div class="lbl">Amount</div><div class="val" style="color:#fca5a5">₹${ps.totalDue.toLocaleString('en-IN')}</div></div>
+</div>`:''}
+<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center">${alertButtons(s)}</div>`;
+}
+function alertParents(sid){
+const s=DB.students.find(x=>x.id===sid);if(!s)return;
+const waNum=(s.wa||s.mobile||'').replace(/\D/g,'');
+if(waNum)window.open(`https://wa.me/${waNum}?text=${encodeURIComponent(feeMessage(s))}`,'_blank');
+else toast('⚠️ No WhatsApp/Mobile saved');
+}
+function renderProfileAtt(){
+const s=DB.students.find(x=>x.id===currentProfileId);if(!s)return;
+const y=profileMonth.getFullYear();const m=profileMonth.getMonth();
+const ym=`${y}-${String(m+1).padStart(2,'0')}`;
+const daysInMonth=new Date(y,m+1,0).getDate();const firstDay=new Date(y,m,1).getDay();
+const today=new Date();today.setHours(0,0,0,0);
+const fineOn=DB.classes[s.class]?.fineEnabled;
+let present=0,absent=0;
+let calHTML=DAY_NAMES.map(d=>`<div class="cal-head">${d}</div>`).join('');
+for(let i=0;i<firstDay;i++)calHTML+=`<div class="cal-day empty"></div>`;
+for(let d=1;d<=daysInMonth;d++){
+const key=`${ym}-${String(d).padStart(2,'0')}`;const dateObj=new Date(y,m,d);
+const isFuture=dateObj>today;const st=s.attendance?.[key];
+const isTuition=isTuitionDay(key,s.class);const fined=st===false&&fineOn&&isTuition;
+if(st===true)present++;else if(st===false&&isTuition)absent++;
+calHTML+=`<div class="cal-day ${isTuition?'tuition':''} ${st===true?'present':''} ${st===false?'absent':''} ${fined?'fined':''} ${isFuture?'future':''}" onclick="${isFuture?'':`toggleProfileAtt('${key}')`}">${d}</div>`;}
+const total=getFineTotal(s);
+document.getElementById('pane-att').innerHTML=`
+<div class="month-nav"><button onclick="shiftProfileMonth(-1)">←</button><div class="mn-label">${MONTH_NAMES[m]} ${y}</div><button onclick="shiftProfileMonth(1)">→</button></div>
+<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;font-size:10px;color:var(--muted)"><span>🟣 Tuition</span><span>🟢 Present</span><span>🔴 Absent</span></div>
+<div class="cal-grid">${calHTML}</div>
+<div style="margin-top:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px">
+<div class="info-item"><div class="lbl">Present</div><div class="val" style="color:#6ee7b7">${present}</div></div>
+<div class="info-item"><div class="lbl">Absent</div><div class="val" style="color:#fca5a5">${absent}</div></div>
+<div class="info-item"><div class="lbl">Fine</div><div class="val">₹${total}</div></div></div>`;
+}
+function shiftProfileMonth(delta){profileMonth.setMonth(profileMonth.getMonth()+delta);renderProfileAtt();}
+function toggleProfileAtt(key){
+const s=DB.students.find(x=>x.id===currentProfileId);if(!s)return;
+if(!s.attendance)s.attendance={};
+const cur=s.attendance[key];
+if(cur===undefined)s.attendance[key]=true;
+else if(cur===true)s.attendance[key]=false;
+else delete s.attendance[key];
+saveToCloud();renderProfileAtt();renderDashboard();
+if(document.getElementById('attStep2').style.display!=='none')renderAttendanceDay();
+}
+function renderProfilePay(){
+const s=DB.students.find(x=>x.id===currentProfileId);if(!s)return;
+const ps=getPaymentStatus(s);
+let html=`
+<div class="payment-summary">
+<div class="pay-sum-box fee"><div class="sum-label">Monthly Fee</div><div class="sum-val">₹${s.fee}</div></div>
+<div class="pay-sum-box paid"><div class="sum-label">Total Paid</div><div class="sum-val">₹${ps.totalPaid.toLocaleString('en-IN')}</div></div>
+<div class="pay-sum-box due"><div class="sum-label">Total Due</div><div class="sum-val">₹${ps.totalDue.toLocaleString('en-IN')}</div></div>
+${ps.totalAdvance>0?`<div class="pay-sum-box advance"><div class="sum-label">Advance</div><div class="sum-val">₹${ps.totalAdvance.toLocaleString('en-IN')}</div></div>`:''}
+</div>
+<button class="btn btn-primary" style="width:100%;margin-bottom:18px" onclick="openPaymentModal('${s.id}')">💰 Record New Payment</button>
+`;
+if(ps.totalAdvance>0){
+html+=`<div class="advance-banner"><div class="adv-icon">💰</div><div class="adv-info"><div class="adv-label">Advance Balance</div><div class="adv-amt">₹${ps.totalAdvance.toLocaleString('en-IN')}</div><div class="adv-desc">Will auto-apply to next month's fee</div></div></div>`;
+}
+html+=`<h4 style="font-family:'Space Grotesk';margin:14px 0 10px;font-size:15px">📅 Month-by-Month Status</h4>
+<p style="font-size:11px;color:var(--muted);margin-bottom:12px">💡 Click tick ✓ to mark as paid, click trash 🗑️ to remove payment</p>`;
+const monthsReversed=[...ps.months].reverse();
+monthsReversed.forEach(m=>{
+let statusClass='status-'+m.status;
+let statusInfo='';let tickClass='unpaid';let tickIcon='○';
+if(m.status==='paid'){
+const payDate=m.contributions.length>0?formatDateShort(m.contributions[0].date):'';
+statusInfo=`<span class="badge badge-ok">✅ ₹${m.fee} PAID</span>${payDate?`<span class="pay-date-tag">📅 ${payDate}</span>`:''}`;
+tickClass='paid';tickIcon='✓';
+}else if(m.status==='partial'){
+statusInfo=`<span class="badge badge-partial">⚠️ ₹${m.paid}/₹${m.fee}</span><span class="pay-due-tag">₹${m.due} বাকি</span>`;
+tickClass='unpaid';tickIcon='○';
+}else{
+statusInfo=`<span class="badge badge-due">❌ ₹${m.fee} বাকি</span>`;
+tickClass='unpaid';tickIcon='○';
+}
+const delBtn=m.status!=='unpaid'?
+`<button class="month-del-btn" onclick="event.stopPropagation();openDeleteMonthPayment('${s.id}','${m.ym}')" title="Delete payment">🗑️</button>`:'';
+html+=`<div class="pay-month-row ${statusClass}" onclick="quickMarkMonthPaid('${s.id}','${m.ym}')" style="cursor:pointer">
+<div class="ym">${m.label}</div>
+<div class="status-info">${statusInfo}</div>
+<div class="month-actions">
+<button class="month-tick-btn ${tickClass}" onclick="event.stopPropagation();quickMarkMonthPaid('${s.id}','${m.ym}')" title="${m.status==='paid'?'Click to delete':'Click to mark paid'}">${tickIcon}</button>
+${delBtn}
+</div>
+</div>`;
+});
+const payments=(s.payments||[]).slice().reverse();
+if(payments.length>0){
+html+=`<h4 style="font-family:'Space Grotesk';margin:20px 0 10px;font-size:15px">💳 Payment History (${payments.length})</h4>`;
+payments.forEach(p=>{
+html+=`<div class="pay-history-item">
+<div class="pay-amt">₹${p.amount.toLocaleString('en-IN')}</div>
+<div class="pay-info">
+<div class="pay-date">📅 ${formatDateShort(p.date)}</div>
+<div class="pay-note">${p.note?'📝 '+p.note:'—'}</div>
+</div>
+<button class="pay-del" onclick="deletePayment('${s.id}','${p.id}')" title="Delete">
+<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><use href="#icon-del"/></svg>
+</button>
+</div>`;
+});
+}else{
+html+=`<div style="text-align:center;padding:20px;color:var(--muted);font-size:12px;margin-top:20px">💳 No payments recorded yet</div>`;
+}
+document.getElementById('pane-pay').innerHTML=html;
+}
+function renderFees(){
+if(Object.keys(DB.classes).length===0){DB.classes['General']={days:[],times:{},fineEnabled:false,fineAmount:10};saveToCloud();}
+const cls=document.getElementById('feeClass')?.value||'';
+const sortOpt=document.getElementById('feeSort')?.value||'';
+let list=DB.students.filter(s=>!cls||s.class===cls);
+if(sortOpt==='due_high'){list.sort((a,b)=>getPaymentStatus(b).totalDue-getPaymentStatus(a).totalDue);}
+else if(sortOpt==='due_low'){list.sort((a,b)=>getPaymentStatus(a).totalDue-getPaymentStatus(b).totalDue);}
+else if(sortOpt==='name'){list.sort((a,b)=>a.name.localeCompare(b.name));}
+else if(sortOpt==='fee_high'){list.sort((a,b)=>b.fee-a.fee);}
+const tbody=document.querySelector('#feesTbl tbody');
+tbody.innerHTML=list.map(s=>{
+const ps=getPaymentStatus(s);const isDue=ps.totalDue>0;const hasAdvance=ps.totalAdvance>0;
+let statusBadge='';
+if(hasAdvance)statusBadge=`<span class="badge badge-advance">💰 ₹${ps.totalAdvance} adv</span>`;
+else if(ps.unpaidMonths>0)statusBadge=`<span class="badge badge-due">${ps.unpaidMonths} mo due</span>`;
+else if(ps.partialMonths>0)statusBadge=`<span class="badge badge-partial">${ps.partialMonths} partial</span>`;
+else statusBadge=`<span class="badge badge-ok">✅ Clear</span>`;
+let breakdown=`${ps.paidMonths} paid`;
+if(ps.partialMonths>0)breakdown+=` • ${ps.partialMonths} partial`;
+if(ps.unpaidMonths>0)breakdown+=` • ${ps.unpaidMonths} due`;
+return`<tr>
+<td><div style="display:flex;align-items:center;gap:10px">${photoHTML(s,false,true)}<b style="cursor:pointer" onclick="openProfileAndRecordPayment('${s.id}')">${s.name}</b></div></td>
+<td><span class="badge badge-class">${s.class}</span></td>
+<td>₹${s.fee}</td>
+<td>${statusBadge}</td>
+<td class="due-cell"><span class="due-formula">${breakdown}${ps.fine>0?` • Fine ₹${ps.fine}`:''}</span></td>
+<td><span class="due-total" style="color:${isDue?'#fca5a5':'#6ee7b7'}">₹${ps.totalDue.toLocaleString('en-IN')}</span></td>
+<td>${alertButtons(s)}</td></tr>`;}).join('');
+const cards=document.getElementById('feesCards');
+cards.innerHTML=list.map(s=>{
+const ps=getPaymentStatus(s);const isDue=ps.totalDue>0;const hasAdvance=ps.totalAdvance>0;
+let statusBadge='';
+if(hasAdvance)statusBadge=`<span class="badge badge-advance">💰 ₹${ps.totalAdvance} adv</span>`;
+else if(ps.unpaidMonths>0)statusBadge=`<span class="badge badge-due">${ps.unpaidMonths} mo due</span>`;
+else if(ps.partialMonths>0)statusBadge=`<span class="badge badge-partial">${ps.partialMonths} partial</span>`;
+else statusBadge=`<span class="badge badge-ok">✅ Clear</span>`;
+return`<div class="m-card">${photoHTML(s,false,true)}<div class="body" style="flex:1"><div class="nm" onclick="openProfileAndRecordPayment('${s.id}')">${s.name}</div><div class="meta"><span class="badge badge-class">${s.class}</span>${statusBadge}</div><div style="margin:8px 0;font-size:11px;color:var(--muted)">Paid: ${ps.paidMonths} • Partial: ${ps.partialMonths} • Due: ${ps.unpaidMonths}${ps.fine>0?` • Fine ₹${ps.fine}`:''}</div><div style="font-family:'Space Grotesk';font-weight:700;font-size:18px;color:${isDue?'#fca5a5':'#6ee7b7'}">₹${ps.totalDue.toLocaleString('en-IN')}</div><div class="actions" style="margin-top:8px">${alertButtons(s)}</div></div></div>`;}).join('');
+}
+function sendBulkReminder(){
+const dueStudents=DB.students.filter(s=>{const ps=getPaymentStatus(s);return ps.totalDue>0;});
+if(dueStudents.length===0){toast('🎉 No pending dues!');return;}
+if(!confirm(`Send WhatsApp reminder to ${dueStudents.length} student(s) with dues?`))return;
+let count=0;
+dueStudents.forEach(s=>{const waNum=(s.wa||s.mobile||'').replace(/\D/g,'');
+if(waNum){setTimeout(()=>window.open(`https://wa.me/${waNum}?text=${encodeURIComponent(feeMessage(s))}`,'_blank'),count*600);count++;}});
+toast(`📨 Opening ${count} WhatsApp reminder(s)`);
+}
+function renderClasses(){
+if(Object.keys(DB.classes).length===0){DB.classes['General']={days:[],times:{},fineEnabled:false,fineAmount:10};saveToCloud();}
+const card=document.getElementById('classesCard');const entries=Object.entries(DB.classes);
+card.innerHTML=entries.map(([name,cfg])=>{const count=DB.students.filter(s=>s.class===name).length;
+const daysText=cfg.days&&cfg.days.length?cfg.days.map(d=>{const t=getDayTime(name,d);return DAY_NAMES[d]+(t?' '+formatTime12(t):'');}).join(', '):'No routine';
+return`<div class="class-card"><div style="flex:1;min-width:200px"><h4 style="font-family:'Space Grotesk';font-size:clamp(14px,4vw,17px)">${name}</h4><div style="font-size:11px;color:var(--muted);margin-top:4px">👥 ${count} students</div><div style="font-size:11px;color:var(--muted);margin-top:2px">📅 ${daysText}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">💰 ₹${cfg.fineAmount}/day ${cfg.fineEnabled?'<span style="color:#6ee7b7">ON</span>':'<span style="color:#94a3b8">OFF</span>'}</div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-sm btn-ghost" onclick="openClassModal('${name.replace(/'/g,"\\'")}')">✏️</button><button class="btn btn-sm btn-danger" onclick="deleteClass('${name.replace(/'/g,"\\'")}')">🗑️</button></div></div>`;}).join('')
++(entries.length===0?'<div class="empty-state"><div class="big">🏫</div>Add a class</div>':'');
+}
+function backupNow(){
+DB.settings.lastBackup=new Date().toISOString();saveToCloud();
+const blob=new Blob([JSON.stringify(DB,null,2)],{type:'application/json'});
+const url=URL.createObjectURL(blob);const a=document.createElement('a');
+a.href=url;a.download=`TuitionPro_Backup_${todayISO()}.json`;a.click();URL.revokeObjectURL(url);
+document.getElementById('lastBackup').textContent=new Date().toLocaleString('en-IN');toast('💾 Downloaded');
+}
+function backupExcel(){
+if(!DB.students.length){toast('⚠️ No students yet!');return;}
+let csv='\uFEFF';
+csv+='SL,Name,Class,Monthly Fee,Admission Date,Mobile,WhatsApp,Instagram,Total Fee Due,Total Paid,Fee Due,Advance,Fine,Total Due\n';
+DB.students.forEach((s,i)=>{const ps=getPaymentStatus(s);
+const name='"'+s.name.replace(/"/g,'""')+'"';const cls='"'+s.class.replace(/"/g,'""')+'"';
+const mob='"'+(s.mobile||'')+'"';const wa='"'+(s.wa||'')+'"';const ig='"'+(s.ig||'')+'"';
+csv+=`${i+1},${name},${cls},${s.fee},"${s.admission}",${mob},${wa},${ig},${ps.totalFeeDue},${ps.totalPaid},${ps.feeDue},${ps.totalAdvance},${ps.fine},${ps.totalDue}\n`;});
+csv+='\n\n=== CLASSES ===\nClass Name,Days,Fine Per Day,Fine Enabled\n';
+Object.entries(DB.classes).forEach(([name,cfg])=>{const days=(cfg.days||[]).map(d=>DAY_NAMES[d]).join(' ');
+csv+=`"${name}","${days}",${cfg.fineAmount||0},${cfg.fineEnabled?'Yes':'No'}\n`;});
+csv+='\n\n=== PAYMENT HISTORY ===\nStudent,Class,Amount,Date,Note\n';
+DB.students.forEach(s=>{(s.payments||[]).forEach(p=>{csv+=`"${s.name}","${s.class}",${p.amount},"${p.date}","${(p.note||'').replace(/"/g,'""')}"\n`;});});
+const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+const url=URL.createObjectURL(blob);const a=document.createElement('a');
+a.href=url;a.download=`TuitionPro_Excel_${todayISO()}.csv`;a.click();URL.revokeObjectURL(url);
+toast('📊 Excel Downloaded!');
+}
+function restoreBackup(e){
+const f=e.target.files[0];if(!f)return;const r=new FileReader();
+r.onload=ev=>{try{const data=JSON.parse(ev.target.result);if(!data.students)throw 0;
+if(!confirm('Replace all data?'))return;
+DB=data;DB.settings.email=DB.settings.email||{};DB.settings.upi=DB.settings.upi||{id:'arho065-1@okicici',phone:'9564385573'};DB.settings.sheetBackupUrl=DB.settings.sheetBackupUrl||'';
+DB.students.forEach(s=>{
+if(Array.isArray(s.payments)){
+s.payments=s.payments.map(p=>{
+if(p.ym&&!p.amount){return{id:uid(),amount:s.fee,date:p.date||todayISO(),note:'Migrated: '+p.ym};}
+if(!p.id)p.id=uid();return p;});
+}else{s.payments=[];}
+});
+saveToCloud();renderAll();loadUPISettings();loadBackupSettings();loadSheetUrl();toast('✅ Restored');
+}catch{toast('❌ Invalid')}};r.readAsText(f);
+}
+function loadEmailSettings(){const c=DB.settings.email||{};
+document.getElementById('emailTo').value=c.toEmail||'brandandbeard@gmail.com';
+document.getElementById('emailService').value=c.serviceId||'service_ebgbpyo';
+document.getElementById('emailTemplate').value=c.templateId||'template_pc8c1xp';
+document.getElementById('emailKey').value=c.publicKey||'6ZyB3smC300Ho7HEc';}
+function saveEmailSettings(){DB.settings.email={toEmail:document.getElementById('emailTo').value.trim(),serviceId:document.getElementById('emailService').value.trim(),templateId:document.getElementById('emailTemplate').value.trim(),publicKey:document.getElementById('emailKey').value.trim()};saveToCloud();toast('✅ Saved');}
+function emailReady(){const c=DB.settings.email;return c&&c.publicKey&&c.serviceId&&c.templateId&&c.toEmail;}
+async function testEmail(){saveEmailSettings();if(!emailReady()){toast('⚠️ Fill all 4 fields');return;}
+toast('📧 Sending...');const c=DB.settings.email;
+try{emailjs.init({publicKey:c.publicKey});
+await emailjs.send(c.serviceId,c.templateId,{to_email:c.toEmail,subject:'Test',message:'OK! 🎉'});
+toast('✅ Sent!');}catch(e){toast('❌ '+(e.text||'Failed'));}}
+async function emailBackup(){
+saveEmailSettings();if(!emailReady()){toast('⚠️ Bind email first');return;}
+toast('📧 Preparing...');const c=DB.settings.email;
+const slim=JSON.parse(JSON.stringify(DB));slim.students.forEach(s=>s.photo='');
+let msg='═══════════════════════════\n📊 TUITION PRO - BACKUP REPORT\n═══════════════════════════\n\n';
+msg+='📅 Date: '+new Date().toLocaleString('en-IN')+'\n👥 Total Students: '+DB.students.length+'\n🏫 Total Classes: '+Object.keys(DB.classes).length+'\n\n';
+msg+='━━━━━━━━━━━━━━━━━━━━━━━━━━━\n👥 STUDENTS LIST\n━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+DB.students.forEach((s,i)=>{const ps=getPaymentStatus(s);
+msg+=`${i+1}. ${s.name}\n   📚 Class: ${s.class}\n   💰 Fee: ₹${s.fee}/month\n   📅 Admission: ${s.admission}\n   📱 Mobile: ${s.mobile||'—'}\n   💬 WhatsApp: ${s.wa||'—'}\n   💳 Total Paid: ₹${ps.totalPaid}\n   ⚠️ Due: ₹${ps.totalDue}\n`;
+if(ps.totalAdvance>0)msg+=`   💰 Advance: ₹${ps.totalAdvance}\n`;
+msg+='   ─────────────────────\n';});
+msg+='\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━\n🔧 RAW DATA (JSON)\n━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+msg+=JSON.stringify(slim,null,2);
+try{emailjs.init({publicKey:c.publicKey});
+await emailjs.send(c.serviceId,c.templateId,{to_email:c.toEmail,subject:'📊 TuitionPro Backup - '+new Date().toLocaleDateString('en-IN'),message:msg});
+DB.settings.lastBackup=new Date().toISOString();saveToCloud();
+document.getElementById('lastBackup').textContent=new Date().toLocaleString('en-IN');toast('✅ Emailed!');
+}catch(e){toast('❌ '+(e.text||'Failed'));}
+}
+document.addEventListener('DOMContentLoaded',function(){setupNavigation();});
+</script>
+</body>
+</html>
