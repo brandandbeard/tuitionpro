@@ -315,8 +315,7 @@ tr:hover td{background:rgba(255,255,255,.03)}
 .icon-btn.qr-btn:hover{background:rgba(124,58,237,.25)}
 #paymentModal.modal-bg{z-index:3000}
 #paymentModal .modal{max-height:92vh}
-#deletePayModal.modal-bg{z-index:3100}
-#deleteStuModal.modal-bg{z-index:3100}
+#deletePayModal.modal-bg,#confirmModal.modal-bg,#alertModal.modal-bg,#deleteStuModal.modal-bg{z-index:3100}
 </style>
 </head>
 <body>
@@ -703,6 +702,7 @@ tr:hover td{background:rgba(255,255,255,.03)}
 </div>
 </div>
 </div>
+<!-- Delete Student Confirmation Modal -->
 <div class="modal-bg" id="deleteStuModal">
 <div class="modal sm">
 <button class="modal-close" onclick="closeModal('deleteStuModal')">×</button>
@@ -736,6 +736,31 @@ tr:hover td{background:rgba(255,255,255,.03)}
 </div>
 </div>
 </div>
+<!-- NEW: Custom Confirm Modal (Replaces browser confirm()) -->
+<div class="modal-bg" id="confirmModal">
+<div class="modal sm">
+<button class="modal-close" onclick="closeModal('confirmModal')">×</button>
+<h3 id="confirmTitle">⚠️ Confirm</h3>
+<p style="color:var(--muted);font-size:13px;margin-bottom:14px;line-height:1.6" id="confirmMsg"></p>
+<div class="code-box">delete</div>
+<div class="field"><input id="confirmInput" placeholder='Type: delete' autocomplete="off"/></div>
+<div style="display:flex;gap:10px;justify-content:flex-end;margin-top:18px">
+<button class="btn btn-ghost" onclick="closeModal('confirmModal')">Cancel</button>
+<button class="btn btn-danger" id="confirmBtn" disabled>🗑️ Confirm</button>
+</div>
+</div>
+</div>
+<!-- NEW: Custom Alert Modal (Replaces browser alert()) -->
+<div class="modal-bg" id="alertModal">
+<div class="modal sm">
+<button class="modal-close" onclick="closeModal('alertModal')">×</button>
+<h3 id="alertTitle">ℹ️ Info</h3>
+<p style="color:var(--text);font-size:14px;line-height:1.7;margin:14px 0" id="alertMsg"></p>
+<div style="display:flex;gap:10px;justify-content:flex-end;margin-top:18px">
+<button class="btn btn-primary" onclick="closeModal('alertModal')">OK</button>
+</div>
+</div>
+</div>
 <div class="toast" id="toast"></div>
 <svg style="display:none" xmlns="http://www.w3.org/2000/svg">
 <symbol id="icon-wa" viewBox="0 0 24 24"><path fill="#25D366" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.297-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></symbol>
@@ -763,6 +788,7 @@ let pendingRoutineClass=null;
 let editingClassDays=[];
 let editingClassTimes={};
 let afterClassSaveCallback=null;
+let confirmCallback=null;
 const DAY_NAMES=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const DAY_FULL=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 const MONTH_NAMES=['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -772,6 +798,38 @@ const todayYM=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getM
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600);}
 function closeModal(id){document.getElementById(id).classList.remove('show')}
+
+// ===== NEW: Custom Confirm & Alert Functions (No more browser dialogs!) =====
+function showConfirm(title, msg, callback){
+  confirmCallback = callback;
+  document.getElementById('confirmTitle').innerHTML = title;
+  document.getElementById('confirmMsg').innerHTML = msg;
+  document.getElementById('confirmInput').value = '';
+  document.getElementById('confirmBtn').disabled = true;
+  document.getElementById('confirmModal').classList.add('show');
+  setTimeout(() => document.getElementById('confirmInput').focus(), 100);
+}
+
+document.getElementById('confirmInput').addEventListener('input', function(e){
+  document.getElementById('confirmBtn').disabled = e.target.value.trim().toLowerCase() !== 'delete';
+});
+
+document.getElementById('confirmBtn').addEventListener('click', function(){
+  closeModal('confirmModal');
+  if(confirmCallback){
+    const cb = confirmCallback;
+    confirmCallback = null;
+    cb();
+  }
+});
+
+function showAlert(title, msg){
+  document.getElementById('alertTitle').innerHTML = title;
+  document.getElementById('alertMsg').innerHTML = msg;
+  document.getElementById('alertModal').classList.add('show');
+}
+// ===== END NEW =====
+
 const sidebarEl=document.getElementById('sidebar');
 const menuToggleBtn=document.getElementById('menuToggle');
 menuToggleBtn.addEventListener('click',function(e){e.stopPropagation();sidebarEl.classList.toggle('open');});
@@ -790,7 +848,9 @@ if(authMode==='signup'){
 const cred=await auth.createUserWithEmailAndPassword(email,pass);
 await cred.user.sendEmailVerification();
 await auth.signOut();
-alert('✅ Account created!\n\nCheck your email ('+email+') for verification link.\n\n📧 Check Spam folder too!\n\nAfter clicking the link, Login again!');
+// ✅ CHANGED: Custom alert instead of browser alert()
+showAlert('✅ Account Created!', 
+  'তোমার account তৈরি হয়েছে!<br><br>📧 <b>'+email+'</b> এ একটা verification link পাঠানো হয়েছে।<br><br>⚠️ <b>Spam folder</b> চেক করো!<br><br>Link-এ click করার পর আবার Login করো!');
 switchTab('login');
 return;
 }else{
@@ -804,7 +864,13 @@ return;
 }
 }catch(e){err.textContent=e.message.replace('Firebase: ','');err.style.display='block';}
 }
-function doLogout(){if(confirm('Logout?'))auth.signOut();}
+// ✅ CHANGED: Custom confirm instead of browser confirm()
+function doLogout(){
+  showConfirm('🚪 Logout', 
+    'তুমি কি সত্যিই logout করতে চাও?<br><span style="font-size:11px;opacity:.8">তোমার সব ডাটা safe থাকবে</span>', 
+    () => { auth.signOut(); }
+  );
+}
 auth.onAuthStateChanged(async(user)=>{
 document.getElementById('loadingScreen').style.display='none';
 if(user){
@@ -922,12 +988,10 @@ function openSheetGuide(){
 const guideHtml=`<div style="padding:20px;max-width:600px">
 <h3 style="font-family:'Space Grotesk';margin-bottom:16px">📊 Google Sheet সেটআপ গাইড</h3>
 <p style="color:var(--muted);font-size:13px;margin-bottom:20px">একবার সেটআপ করলেই প্রতিবার ব্যাকআপ নিতে পারবে!</p>
-
 <div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:12px;padding:16px;margin-bottom:14px">
 <h4 style="margin-bottom:8px;color:#a78bfa">🎯 ধাপ ১: নতুন শীট বানাও</h4>
 <p style="font-size:13px;color:var(--muted)">sheets.new এ গিয়ে একটা নতুন ফাঁকা শীট খোলো। শীটের নাম দাও "TuitionPro Backup"</p>
 </div>
-
 <div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:12px;padding:16px;margin-bottom:14px">
 <h4 style="margin-bottom:8px;color:#a78bfa">⚙️ ধাপ ২: অ্যাপস স্ক্রিপ্ট বানাও</h4>
 <p style="font-size:13px;color:var(--muted)">শীটে যাও → উপরে Extensions → Apps Script ক্লিক করো। সব কোড মুছে দিয়ে নিচের কোড পেস্ট করো:</p>
@@ -935,8 +999,6 @@ const guideHtml=`<div style="padding:20px;max-width:600px">
   try{
     var data=JSON.parse(e.postData.contents);
     var ss=SpreadsheetApp.getActiveSpreadsheet();
-    
-    // Sheet1 - Students
     var sh1=ss.getSheets()[0];
     sh1.clear();
     sh1.appendRow(['SL','Name','Class','Fee','Admission','Mobile','WhatsApp','Instagram','Total Due','Advance','Total Paid']);
@@ -944,8 +1006,6 @@ const guideHtml=`<div style="padding:20px;max-width:600px">
       var due=data.dues&&data.dues[s.id]?data.dues[s.id]:{due:0,advance:0,totalPaid:0};
       sh1.appendRow([i+1,s.name,s.class,s.fee,s.admission,s.mobile,s.wa,s.ig,due.due||0,due.advance||0,due.totalPaid||0]);
     });
-    
-    // Sheet2 - Classes
     var sh2=ss.getSheetByName('Classes')||ss.insertSheet('Classes');
     sh2.clear();
     sh2.appendRow(['Class','Days','Fine/Day','Fine Enabled','Students']);
@@ -955,8 +1015,6 @@ const guideHtml=`<div style="padding:20px;max-width:600px">
       var count=(data.students||[]).filter(function(s){return s.class===name}).length;
       sh2.appendRow([name,days,cfg.fineAmount||0,cfg.fineEnabled?'Yes':'No',count]);
     });
-    
-    // Sheet3 - Payments
     var sh3=ss.getSheetByName('Payments')||ss.insertSheet('Payments');
     sh3.clear();
     sh3.appendRow(['Student','Class','Amount','Date','Note']);
@@ -965,7 +1023,6 @@ const guideHtml=`<div style="padding:20px;max-width:600px">
         sh3.appendRow([s.name,s.class,p.amount,p.date,p.note||'']);
       });
     });
-    
     return ContentService.createTextOutput(JSON.stringify({status:'success'})).setMimeType(ContentService.MimeType.JSON);
   }catch(err){
     return ContentService.createTextOutput(JSON.stringify({status:'error',msg:err.toString()})).setMimeType(ContentService.MimeType.JSON);
@@ -976,7 +1033,6 @@ function doGet(e){
 }</pre>
 <p style="font-size:12px;color:var(--muted);margin-top:8px">কোড পেস্ট করার পর 💾 Save করো</p>
 </div>
-
 <div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:12px;padding:16px;margin-bottom:14px">
 <h4 style="margin-bottom:8px;color:#a78bfa">🚀 ধাপ ৩: ডিপ্লয় করো</h4>
 <ol style="font-size:13px;color:var(--muted);padding-left:20px">
@@ -989,7 +1045,6 @@ function doGet(e){
 <li>একটা লম্বা URL পাবে — সেটা কপি করো</li>
 </ol>
 </div>
-
 <div style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:12px;padding:16px">
 <h4 style="margin-bottom:8px;color:#6ee7b7">✅ ধাপ ৪: TuitionPro-তে বসাও</h4>
 <p style="font-size:13px;color:var(--muted)">কপি করা URL-টা "Apps Script Web App URL" বক্সে পেস্ট করো → 💾 Save URL চাপো → 🔗 Test চাপো। সবুজ টিক এলে সব ঠিক আছে!</p>
@@ -1004,12 +1059,10 @@ function openEmailGuide(){
 const guideHtml=`<div style="padding:20px;max-width:600px">
 <h3 style="font-family:'Space Grotesk';margin-bottom:16px">📧 ইমেইল ব্যাকআপ গাইড</h3>
 <p style="color:var(--muted);font-size:13px;margin-bottom:20px">EmailJS দিয়ে তোমার ইমেইলে অটোমেটিক ব্যাকআপ পাবে!</p>
-
 <div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:12px;padding:16px;margin-bottom:14px">
 <h4 style="margin-bottom:8px;color:#a78bfa">🎯 ধাপ ১: EmailJS অ্যাকাউন্ট</h4>
 <p style="font-size:13px;color:var(--muted)"><a href="https://www.emailjs.com" target="_blank" style="color:#67e8f9">emailjs.com</a> এ গিয়ে ফ্রি অ্যাকাউন্ট বানাও</p>
 </div>
-
 <div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:12px;padding:16px;margin-bottom:14px">
 <h4 style="margin-bottom:8px;color:#a78bfa">⚙️ ধাপ ২: ইমেইল সার্ভিস</h4>
 <ol style="font-size:13px;color:var(--muted);padding-left:20px">
@@ -1018,7 +1071,6 @@ const guideHtml=`<div style="padding:20px;max-width:600px">
 <li>একটা Service ID পাবে (service_abc123) — কপি করো</li>
 </ol>
 </div>
-
 <div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:12px;padding:16px;margin-bottom:14px">
 <h4 style="margin-bottom:8px;color:#a78bfa">📝 ধাপ ৩: ইমেইল টেমপ্লেট</h4>
 <ol style="font-size:13px;color:var(--muted);padding-left:20px">
@@ -1030,7 +1082,6 @@ To: {{to_email}}
 Content: {{message}}</pre>
 <p style="font-size:12px;color:var(--muted);margin-top:8px">Save করলে Template ID পাবে — কপি করো</p>
 </div>
-
 <div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:12px;padding:16px;margin-bottom:14px">
 <h4 style="margin-bottom:8px;color:#a78bfa">🔑 ধাপ ৪: পাবলিক কি</h4>
 <ol style="font-size:13px;color:var(--muted);padding-left:20px">
@@ -1038,7 +1089,6 @@ Content: {{message}}</pre>
 <li>Public Key পাবে — কপি করো</li>
 </ol>
 </div>
-
 <div style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:12px;padding:16px">
 <h4 style="margin-bottom:8px;color:#6ee7b7">✅ ধাপ ৫: TuitionPro-তে বসাও</h4>
 <p style="font-size:13px;color:var(--muted)">
@@ -1176,6 +1226,8 @@ saveToCloud();
 closeModal('deleteStuModal');
 document.getElementById('profilePage').classList.remove('active');
 document.getElementById('students').classList.add('active');
+document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+document.querySelector('.nav-btn[data-page="students"]').classList.add('active');
 renderAll();
 toast('🗑️ '+name+' deleted!');
 }
@@ -1228,11 +1280,30 @@ DB.classes[name]={days:[...editingClassDays].sort((a,b)=>a-b),times:times,fineEn
 saveToCloud();closeModal('classModal');renderAll();toast('✅ Saved');
 if(afterClassSaveCallback){afterClassSaveCallback(name);afterClassSaveCallback=null;}
 }
-function deleteClass(name){if(!confirm(`Delete "${name}"?`))return;delete DB.classes[name];saveToCloud();renderAll();}
+// ✅ CHANGED: Custom confirm instead of browser confirm()
+function deleteClass(name){
+  showConfirm('🗑️ Delete Class', 
+    `তুমি কি সত্যিই <b>"${name}"</b> class টা delete করতে চাও?<br><br>
+    <div style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:12px;padding:14px">
+    ⚠️ এই class-এর routine delete হয়ে যাবে!<br>
+    <span style="font-size:11px;opacity:.8">Students-দের class "General" হয়ে যাবে।</span>
+    </div>`,
+    () => {
+      delete DB.classes[name];
+      DB.students.forEach(s => { if(s.class === name) s.class = 'General'; });
+      saveToCloud();
+      renderAll();
+      toast('🗑️ Class deleted');
+    }
+  );
+}
+// ✅ FIX 1: Only completed months (current month excluded)
 function getAllMonths(stu){
 const adm=new Date(stu.admission);const now=new Date();let months=[];
-let cur=new Date(adm.getFullYear(),adm.getMonth(),1);const end=new Date(now.getFullYear(),now.getMonth(),1);
-while(cur<=end){
+let cur=new Date(adm.getFullYear(),adm.getMonth(),1);
+const end=new Date(now.getFullYear(),now.getMonth(),1); // First day of CURRENT month
+// ✅ Changed from <= to < so current month is NOT included
+while(cur<end){
 const ym=`${cur.getFullYear()}-${String(cur.getMonth()+1).padStart(2,'0')}`;
 months.push({ym:ym,m:cur.getMonth(),y:cur.getFullYear(),label:`${MONTH_SHORT[cur.getMonth()]} ${cur.getFullYear()}`,fullLabel:`${MONTH_NAMES[cur.getMonth()]} ${cur.getFullYear()}`});
 cur.setMonth(cur.getMonth()+1);}
@@ -1321,12 +1392,33 @@ toast(`💰 ₹${amount} payment recorded!`);
 renderAll();
 if(document.getElementById('profilePage').classList.contains('active')){renderProfilePay();}
 }
+// ✅ CHANGED: Custom confirm instead of browser confirm()
 function deletePayment(sid,payId){
-if(!confirm('Delete this payment record?'))return;
-const s=DB.students.find(x=>x.id===sid);if(!s)return;
-s.payments=(s.payments||[]).filter(p=>p.id!==payId);
-saveToCloud();toast('🗑️ Payment deleted');renderAll();
-if(document.getElementById('profilePage').classList.contains('active')){renderProfilePay();}
+  const s = DB.students.find(x => x.id === sid);
+  if(!s) return;
+  const p = (s.payments || []).find(x => x.id === payId);
+  if(!p) return;
+  
+  showConfirm('🗑️ Delete Payment', 
+    `তুমি কি সত্যিই এই payment টা delete করতে চাও?<br><br>
+    <div style="background:rgba(0,0,0,.3);padding:12px;border-radius:10px;margin:8px 0;border-left:3px solid var(--accent)">
+    <div style="font-family:'Space Grotesk';font-size:18px;font-weight:700;color:#6ee7b7">₹${p.amount}</div>
+    <div style="font-size:12px;color:var(--text);margin-top:4px">📅 ${formatDateShort(p.date)}</div>
+    ${p.note ? `<div style="font-size:11px;color:var(--muted);margin-top:4px">📝 ${p.note}</div>` : ''}
+    </div>
+    <div style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:10px;margin-top:10px">
+    <span style="font-size:12px;color:#fca5a5">⚠️ Fee calculation পরিবর্তন হবে!</span>
+    </div>`,
+    () => {
+      s.payments = (s.payments || []).filter(p => p.id !== payId);
+      saveToCloud();
+      toast('🗑️ Payment deleted');
+      renderAll();
+      if(document.getElementById('profilePage').classList.contains('active')){
+        renderProfilePay();
+      }
+    }
+  );
 }
 function quickMarkMonthPaid(sid,ym){
 const s=DB.students.find(x=>x.id===sid);if(!s)return;
@@ -1910,20 +2002,53 @@ const url=URL.createObjectURL(blob);const a=document.createElement('a');
 a.href=url;a.download=`TuitionPro_Excel_${todayISO()}.csv`;a.click();URL.revokeObjectURL(url);
 toast('📊 Excel Downloaded!');
 }
+// ✅ CHANGED: Custom confirm instead of browser confirm()
 function restoreBackup(e){
-const f=e.target.files[0];if(!f)return;const r=new FileReader();
-r.onload=ev=>{try{const data=JSON.parse(ev.target.result);if(!data.students)throw 0;
-if(!confirm('Replace all data?'))return;
-DB=data;DB.settings.email=DB.settings.email||{};DB.settings.upi=DB.settings.upi||{id:'arho065-1@okicici',phone:'9564385573'};DB.settings.sheetBackupUrl=DB.settings.sheetBackupUrl||'';
-DB.students.forEach(s=>{
-if(Array.isArray(s.payments)){
-s.payments=s.payments.map(p=>{
-if(p.ym&&!p.amount){return{id:uid(),amount:s.fee,date:p.date||todayISO(),note:'Migrated: '+p.ym};}
-if(!p.id)p.id=uid();return p;});
-}else{s.payments=[];}
-});
-saveToCloud();renderAll();loadUPISettings();loadBackupSettings();loadSheetUrl();toast('✅ Restored');
-}catch{toast('❌ Invalid')}};r.readAsText(f);
+  const f = e.target.files[0];
+  if(!f) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    try{
+      const data = JSON.parse(ev.target.result);
+      if(!data.students) throw 0;
+      
+      showConfirm('⬆️ Restore Backup',
+        `তুমি কি সত্যিই এই backup ফাইল থেকে ডাটা restore করতে চাও?<br><br>
+        <div style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:12px;padding:14px">
+        ⚠️ <b>তোমার বর্তমান সব ডাটা মুছে যাবে!</b><br>
+        <span style="font-size:11px;opacity:.8">এই কাজটা আর ফেরানো যাবে না!</span>
+        </div>`,
+        () => {
+          DB = data;
+          DB.settings.email = DB.settings.email || {};
+          DB.settings.upi = DB.settings.upi || {id:'arho065-1@okicici', phone:'9564385573'};
+          DB.settings.sheetBackupUrl = DB.settings.sheetBackupUrl || '';
+          DB.students.forEach(s => {
+            if(Array.isArray(s.payments)){
+              s.payments = s.payments.map(p => {
+                if(p.ym && !p.amount){
+                  return {id: uid(), amount: s.fee, date: p.date || todayISO(), note: 'Migrated: ' + p.ym};
+                }
+                if(!p.id) p.id = uid();
+                return p;
+              });
+            } else {
+              s.payments = [];
+            }
+          });
+          saveToCloud();
+          renderAll();
+          loadUPISettings();
+          loadBackupSettings();
+          loadSheetUrl();
+          toast('✅ Restored successfully');
+        }
+      );
+    } catch {
+      toast('❌ Invalid backup file');
+    }
+  };
+  r.readAsText(f);
 }
 function restoreFromExcel(e){
 const f=e.target.files[0];if(!f)return;
@@ -1936,7 +2061,6 @@ if(!emailReady()){
 toast('⚠️ আগে Email সেটআপ করো!');
 return;
 }
-if(!confirm('⚠️ Email থেকে ডাটা restore করবে?\n\nবর্তমান ডাটা মুছে যাবে!\nশুধু JSON file থাকলে সেটা ব্যবহার করো।'))return;
 toast('📧 এই feature এখনো তৈরি হয়নি!');
 toast('💡 JSON file থেকে restore করো — সবচেয়ে reliable');
 }
@@ -1946,7 +2070,6 @@ if(!url){
 toast('⚠️ আগে Sheet URL সেভ করো!');
 return;
 }
-if(!confirm('⚠️ Google Sheet থেকে ডাটা restore করবে?\n\nবর্তমান ডাটা মুছে যাবে!\nশুধু JSON file থাকলে সেটা ব্যবহার করো।'))return;
 toast('📋 এই feature এখনো তৈরি হয়নি!');
 toast('💡 JSON file থেকে restore করো — সবচেয়ে reliable');
 }
