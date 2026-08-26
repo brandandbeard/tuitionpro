@@ -219,7 +219,7 @@ tr:hover td{background:rgba(255,255,255,.03)}
 .page.active{display:block}
 .empty-state{text-align:center;padding:clamp(30px,8vw,60px) 20px;color:var(--muted)}
 .empty-state .big{font-size:clamp(40px,12vw,60px);margin-bottom:14px;opacity:.3}
-.toast{position:fixed;bottom:40px;left:50%;transform:translateX(-50%);padding:12px 20px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:500;font-size:13px;z-index:2000;box-shadow:0 10px 30px rgba(0,0,0,.3);animation:toastIn .3s;display:none;max-width:90%;text-align:center}
+.toast{position:fixed;bottom:40px;left:50%;transform:translateX(-50%);padding:12px 20px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:500;font-size:13px;z-index:4000;box-shadow:0 10px 30px rgba(0,0,0,.3);animation:toastIn .3s;display:none;max-width:90%;text-align:center}
 .toast.show{display:block}
 @keyframes toastIn{from{transform:translate(-50%,20px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
 .class-card{background:rgba(0,0,0,.2);border:1px solid var(--glass-border);border-radius:14px;padding:clamp(12px,3vw,16px);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
@@ -308,6 +308,10 @@ tr:hover td{background:rgba(255,255,255,.03)}
 .icon-btn.qr-btn{background:rgba(124,58,237,.15)}
 .icon-btn.qr-btn svg{fill:#a78bfa}
 .icon-btn.qr-btn:hover{background:rgba(124,58,237,.25)}
+#paymentModal.modal-bg{z-index:3000}
+#paymentModal .modal{max-height:92vh}
+#deletePayModal.modal-bg{z-index:3100}
+#deleteStuModal.modal-bg{z-index:3100}
 </style>
 </head>
 <body>
@@ -472,13 +476,35 @@ tr:hover td{background:rgba(255,255,255,.03)}
 </div>
 </div>
 <div class="card">
-<h3 style="margin-bottom:12px;font-family:'Space Grotesk';font-size:clamp(15px,4vw,18px)">💾 Manual Backup</h3>
+<h3 style="margin-bottom:12px;font-family:'Space Grotesk';font-size:clamp(15px,4vw,18px)">💾 Manual Backup & Restore</h3>
 <p style="color:var(--muted);font-size:12px;margin-bottom:14px">Download or restore your data</p>
+<div style="margin-bottom:14px">
+<div style="font-size:12px;color:var(--muted);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:1px">📥 Download</div>
 <div style="display:flex;gap:10px;flex-wrap:wrap">
 <button class="btn btn-primary" onclick="backupNow()">⬇️ JSON Download</button>
 <button class="btn btn-success" onclick="backupExcel()">📊 Excel Download</button>
-<label class="btn btn-ghost" style="cursor:pointer">⬆️ Restore<input type="file" accept=".json" onchange="restoreBackup(event)" style="display:none"/></label>
 <button class="btn btn-danger" onclick="openWipeModal()">🗑️ Wipe Data</button>
+</div>
+</div>
+<div>
+<div style="font-size:12px;color:var(--muted);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:1px">📤 Restore / Upload</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px">
+<label class="btn btn-ghost" style="cursor:pointer;justify-content:flex-start">
+📄 Restore JSON
+<input type="file" accept=".json" onchange="restoreBackup(event)" style="display:none"/>
+</label>
+<label class="btn btn-ghost" style="cursor:pointer;justify-content:flex-start">
+📊 Restore Excel
+<input type="file" accept=".csv,.xlsx,.xls" onchange="restoreFromExcel(event)" style="display:none"/>
+</label>
+<button class="btn btn-ghost" onclick="restoreFromEmail()" style="justify-content:flex-start">
+📧 From Email
+</button>
+<button class="btn btn-ghost" onclick="restoreFromSheet()" style="justify-content:flex-start">
+📋 From Sheet
+</button>
+</div>
+<p style="color:var(--muted);font-size:11px;margin-top:10px">💡 <b>JSON</b> সবচেয়ে reliable restore method</p>
 </div>
 <p style="color:var(--muted);font-size:11px;margin-top:12px">Last backup: <b id="lastBackup">Never</b></p>
 </div>
@@ -534,6 +560,32 @@ tr:hover td{background:rgba(255,255,255,.03)}
 <span><b>Email</b><br><small>arho065@gmail.com</small></span>
 </a>
 </div>
+</div>
+</section>
+<section class="page" id="profilePage">
+<div class="page-head">
+<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+<button class="btn btn-ghost btn-sm" onclick="closeProfilePage()">← Back</button>
+<div>
+<h2 id="profilePageTitle">Student <span>Profile</span></h2>
+<p id="profilePageSub">View details</p>
+</div>
+</div>
+<div style="display:flex;gap:8px;flex-wrap:wrap">
+<button class="btn btn-ghost btn-sm" onclick="editStudentFromProfile(currentProfileId)">✏️ Edit</button>
+<button class="btn btn-danger btn-sm" onclick="openDeleteConfirm(currentProfileId)">🗑️ Delete</button>
+</div>
+</div>
+<div class="card">
+<div class="profile-header" id="profileHeader"></div>
+<div class="profile-tabs">
+<button class="profile-tab active" data-tab="info" onclick="switchProfileTab('info')">ℹ️ Info</button>
+<button class="profile-tab" data-tab="att" onclick="switchProfileTab('att')">📅 Att.</button>
+<button class="profile-tab" data-tab="pay" onclick="switchProfileTab('pay')">💰 Pay</button>
+</div>
+<div class="profile-pane active" id="pane-info"></div>
+<div class="profile-pane" id="pane-att"></div>
+<div class="profile-pane" id="pane-pay"></div>
 </div>
 </section>
 </main>
@@ -646,21 +698,6 @@ tr:hover td{background:rgba(255,255,255,.03)}
 </div>
 </div>
 </div>
-<div class="modal-bg" id="profileModal">
-<div class="modal">
-<button class="modal-close" onclick="closeModal('profileModal')">×</button>
-<div class="profile-header" id="profileHeader"></div>
-<div class="profile-tabs">
-<button class="profile-tab active" data-tab="info" onclick="switchProfileTab('info')">ℹ️ Info</button>
-<button class="profile-tab" data-tab="att" onclick="switchProfileTab('att')">📅 Att.</button>
-<button class="profile-tab" data-tab="pay" onclick="switchProfileTab('pay')">💰 Pay</button>
-</div>
-<div class="profile-pane active" id="pane-info"></div>
-<div class="profile-pane" id="pane-att"></div>
-<div class="profile-pane" id="pane-pay"></div>
-</div>
-</div>
-<!-- Delete Student Confirmation Modal -->
 <div class="modal-bg" id="deleteStuModal">
 <div class="modal sm">
 <button class="modal-close" onclick="closeModal('deleteStuModal')">×</button>
@@ -718,6 +755,9 @@ let DB={students:[],classes:{},settings:{backupFreq:'daily',backupTime:'00:00',l
 let unsubscribe=null,savingTimer=null,isSaving=false;
 let currentAttClass=null,currentProfileId=null,profileMonth=new Date(),autoBackupInterval=null;
 let pendingRoutineClass=null;
+let editingClassDays=[];
+let editingClassTimes={};
+let afterClassSaveCallback=null;
 const DAY_NAMES=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const DAY_FULL=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 const MONTH_NAMES=['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -819,6 +859,7 @@ btn.addEventListener('click',function(e){
 e.preventDefault();e.stopPropagation();
 const pageId=btn.getAttribute('data-page');
 if(!pageId)return;
+document.getElementById('profilePage').classList.remove('active');
 document.querySelectorAll('.nav-btn').forEach(x=>x.classList.remove('active'));
 btn.classList.add('active');
 document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
@@ -863,7 +904,7 @@ const status=document.getElementById('sheetStatus');
 status.innerHTML='📤 Sending to Sheet...';status.style.color='var(--muted)';
 const dues={};
 DB.students.forEach(s=>{const ps=getPaymentStatus(s);dues[s.id]={due:ps.totalDue,advance:ps.totalAdvance,totalPaid:ps.totalPaid};});
-const payload={students:DB.students.map(s=>({id:s.id,name:s.name,class:s.class,fee:s.fee,admission:s.admission,mobile:"'"+(s.mobile||''),wa:"'"+(s.wa||''),ig:s.ig||'',payments:(s.payments||[]).map(p=>({amount:p.amount,date:p.date,note:p.note||''}))})),classes:DB.classes,dues:dues,backupTime:new Date().toISOString()};
+const payload={students:DB.students.map(s=>({id:s.id,name:s.name,class:s.class,fee:s.fee,admission:"'"+s.admission,mobile:"'"+(s.mobile||''),wa:"'"+(s.wa||''),ig:s.ig||'',payments:(s.payments||[]).map(p=>({amount:p.amount,date:"'"+p.date,note:p.note||''}))})),classes:DB.classes,dues:dues,backupTime:new Date().toISOString()};
 try{
 await fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
 DB.settings.lastBackup=new Date().toISOString();saveToCloud();
@@ -1128,12 +1169,13 @@ const name=s.name;
 DB.students=DB.students.filter(x=>x.id!==id);
 saveToCloud();
 closeModal('deleteStuModal');
-closeModal('profileModal');
+document.getElementById('profilePage').classList.remove('active');
+document.getElementById('students').classList.add('active');
 renderAll();
 toast('🗑️ '+name+' deleted!');
 }
 function editStudentFromProfile(id){
-closeModal('profileModal');
+document.getElementById('profilePage').classList.remove('active');
 openStudentModal(id);
 }
 function renderDayToggles(){
@@ -1149,6 +1191,28 @@ else{editingClassDays.push(i);if(!editingClassTimes[String(i)])editingClassTimes
 renderDayToggles();
 }
 function setDayTime(dayIndex,value){if(value)editingClassTimes[String(dayIndex)]=value;else delete editingClassTimes[String(dayIndex)];}
+function openClassModal(name=null,callback=null){
+afterClassSaveCallback=callback;
+editingClassDays=[];
+editingClassTimes={};
+document.getElementById('clsOrigName').value='';
+document.getElementById('clsName').value='';
+document.getElementById('clsFine').value='10';
+document.getElementById('clsFineToggle').classList.remove('on');
+document.getElementById('clsModalTitle').textContent='➕ Add Class';
+if(name&&DB.classes[name]){
+const c=DB.classes[name];
+document.getElementById('clsOrigName').value=name;
+document.getElementById('clsName').value=name;
+document.getElementById('clsFine').value=c.fineAmount||10;
+document.getElementById('clsFineToggle').classList.toggle('on',c.fineEnabled);
+editingClassDays=[...(c.days||[])];
+editingClassTimes={...(c.times||{})};
+document.getElementById('clsModalTitle').textContent='✏️ Edit Class';
+}
+renderDayToggles();
+document.getElementById('classModal').classList.add('show');
+}
 function saveClass(){
 const name=document.getElementById('clsName').value.trim();
 if(!name){toast('⚠️ Name required');return;}
@@ -1250,14 +1314,14 @@ s.payments.push({id:uid(),amount,date,note});
 saveToCloud();closeModal('paymentModal');
 toast(`💰 ₹${amount} payment recorded!`);
 renderAll();
-if(document.getElementById('profileModal').classList.contains('show')){renderProfilePay();}
+if(document.getElementById('profilePage').classList.contains('active')){renderProfilePay();}
 }
 function deletePayment(sid,payId){
 if(!confirm('Delete this payment record?'))return;
 const s=DB.students.find(x=>x.id===sid);if(!s)return;
 s.payments=(s.payments||[]).filter(p=>p.id!==payId);
 saveToCloud();toast('🗑️ Payment deleted');renderAll();
-if(document.getElementById('profileModal').classList.contains('show')){renderProfilePay();}
+if(document.getElementById('profilePage').classList.contains('active')){renderProfilePay();}
 }
 function quickMarkMonthPaid(sid,ym){
 const s=DB.students.find(x=>x.id===sid);if(!s)return;
@@ -1268,7 +1332,7 @@ const needed=monthInfo.fee-monthInfo.paid;
 if(!s.payments)s.payments=[];
 s.payments.push({id:uid(),amount:needed,date:todayISO(),note:`Quick pay: ${monthInfo.label}`});
 saveToCloud();toast(`✅ ${monthInfo.label} marked as paid!`);renderAll();
-if(document.getElementById('profileModal').classList.contains('show')){renderProfilePay();}
+if(document.getElementById('profilePage').classList.contains('active')){renderProfilePay();}
 }
 function openDeleteMonthPayment(sid,ym){
 const s=DB.students.find(x=>x.id===sid);if(!s)return;
@@ -1302,7 +1366,7 @@ s.payments=newPayments;
 saveToCloud();closeModal('deletePayModal');
 toast(`🗑️ ${monthInfo.label} payment removed!`);
 renderAll();
-if(document.getElementById('profileModal').classList.contains('show')){renderProfilePay();}
+if(document.getElementById('profilePage').classList.contains('active')){renderProfilePay();}
 }
 function feeMessage(s){
 const ps=getPaymentStatus(s);
@@ -1581,14 +1645,28 @@ saveToCloud();renderAttendanceDay();renderDashboard();
 }
 function openProfile(id,tab='info'){
 currentProfileId=id;profileMonth=new Date();
+document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+document.getElementById('profilePage').classList.add('active');
+document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+const s=DB.students.find(x=>x.id===id);
+if(s){
+document.getElementById('profilePageTitle').innerHTML=s.name.split(' ')[0]+' <span>Profile</span>';
+document.getElementById('profilePageSub').textContent=s.class+' • ₹'+s.fee+'/mo';
+}
 renderProfile();switchProfileTab(tab);
-document.getElementById('profileModal').classList.add('show');
+window.scrollTo({top:0,behavior:'smooth'});
 }
 function openProfileAndRecordPayment(id){
-currentProfileId=id;profileMonth=new Date();
-renderProfile();switchProfileTab('pay');
-document.getElementById('profileModal').classList.add('show');
+openProfile(id,'pay');
 setTimeout(()=>{openPaymentModal(id);},300);
+}
+function closeProfilePage(){
+document.getElementById('profilePage').classList.remove('active');
+document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+document.getElementById('students').classList.add('active');
+document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+document.querySelector('.nav-btn[data-page="students"]').classList.add('active');
+window.scrollTo({top:0,behavior:'smooth'});
 }
 function switchProfileTab(tab){
 document.querySelectorAll('.profile-tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));
@@ -1601,12 +1679,8 @@ if(tab==='info')renderProfileInfo();
 function renderProfile(){
 const s=DB.students.find(x=>x.id===currentProfileId);if(!s)return;
 document.getElementById('profileHeader').innerHTML=`
-${photoHTML(s,true,true)}
-<div class="info"><h3>${s.name}</h3><div style="color:var(--muted);font-size:12px"><span class="badge badge-class">${s.class}</span> • ₹${s.fee}/mo</div></div>
-<div style="display:flex;gap:8px;flex-wrap:wrap">
-<button class="btn btn-ghost btn-sm" onclick="editStudentFromProfile('${s.id}')">✏️ Edit</button>
-<button class="btn btn-danger btn-sm" onclick="openDeleteConfirm('${s.id}')">🗑️ Delete</button>
-</div>`;
+${photoHTML(s,true,false)}
+<div class="info"><h3>${s.name}</h3><div style="color:var(--muted);font-size:12px"><span class="badge badge-class">${s.class}</span> • ₹${s.fee}/mo</div></div>`;
 renderProfileInfo();
 }
 function renderProfileInfo(){
@@ -1845,6 +1919,31 @@ if(!p.id)p.id=uid();return p;});
 });
 saveToCloud();renderAll();loadUPISettings();loadBackupSettings();loadSheetUrl();toast('✅ Restored');
 }catch{toast('❌ Invalid')}};r.readAsText(f);
+}
+function restoreFromExcel(e){
+const f=e.target.files[0];if(!f)return;
+toast('⚠️ Excel restore এখনো তৈরি হয়নি!');
+toast('💡 JSON backup ব্যবহার করো — সবচেয়ে reliable');
+e.target.value='';
+}
+async function restoreFromEmail(){
+if(!emailReady()){
+toast('⚠️ আগে Email সেটআপ করো!');
+return;
+}
+if(!confirm('⚠️ Email থেকে ডাটা restore করবে?\n\nবর্তমান ডাটা মুছে যাবে!\nশুধু JSON file থাকলে সেটা ব্যবহার করো।'))return;
+toast('📧 এই feature এখনো তৈরি হয়নি!');
+toast('💡 JSON file থেকে restore করো — সবচেয়ে reliable');
+}
+async function restoreFromSheet(){
+const url=DB.settings.sheetBackupUrl;
+if(!url){
+toast('⚠️ আগে Sheet URL সেভ করো!');
+return;
+}
+if(!confirm('⚠️ Google Sheet থেকে ডাটা restore করবে?\n\nবর্তমান ডাটা মুছে যাবে!\nশুধু JSON file থাকলে সেটা ব্যবহার করো।'))return;
+toast('📋 এই feature এখনো তৈরি হয়নি!');
+toast('💡 JSON file থেকে restore করো — সবচেয়ে reliable');
 }
 function loadEmailSettings(){const c=DB.settings.email||{};
 document.getElementById('emailTo').value=c.toEmail||'brandandbeard@gmail.com';
