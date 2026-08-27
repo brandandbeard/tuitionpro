@@ -1542,84 +1542,83 @@ html+=`<button class="icon-btn qr-btn" onclick="sendQRViaWhatsApp('${s.id}')" ti
 html+='</div>';
 return html;
 }
-// গ্লোবাল ভেরিয়েবল (QR শেয়ারের জন্য)
-let currentQRWaNum = '';
-let currentQRMsg = '';
-
 async function sendQRViaWhatsApp(sid){
-    const s = DB.students.find(x => x.id === sid);
-    if(!s) return;
-    
-    const waNum = (s.wa || s.mobile || '').replace(/\D/g, '');
-    if(!waNum) {
-        toast('⚠️ No WhatsApp number saved!');
-        return;
-    }
-    
-    const ps = getPaymentStatus(s);
-    const upi = DB.settings.upi || {};
-    const upiId = upi.id || '';
-    
-    if(!upiId) {
-        toast('⚠️ UPI ID not set in Settings!');
-        return;
-    }
-
-    toast('📱 QR তৈরি হচ্ছে...');
-    const qrUrl = getUPIQRLink(ps.totalDue);
-    
-    try {
-        // ১. ইমেজটি Blob হিসেবে ডাউনলোড করার চেষ্টা
-        const response = await fetch(qrUrl);
-        const blob = await response.blob();
-        const file = new File([blob], s.name + '_Payment_QR.png', { type: 'image/png' });
-        
-        // ২. যদি ডিভাইস সরাসরি ফাইল শেয়ার সাপোর্ট করে (কোনো টেক্সট ছাড়া শুধু ইমেজ)
-        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-            try {
-                await navigator.share({
-                    files: [file],
-                    title: s.name + ' Payment QR'
-                    // এখানে 'text' প্রপার্টি ইচ্ছাকৃতভাবে দেওয়া হয়নি, তাই শুধু ইমেজই যাবে!
-                });
-                toast('✅ QR শেয়ার করা হয়েছে!');
-                return;
-            } catch (shareErr) {
-                console.log('Native share failed, falling back to download');
-            }
-        }
-        
-        // ৩. ফলব্যাক: ইমেজটি ডিভাইসে অটোমেটিক ডাউনলোড করে দেওয়া
-        const objectUrl = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = objectUrl;
-        a.download = s.name + '_Payment_QR.png';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(objectUrl);
-        
-        toast('📥 QR ডাউনলোড হয়েছে! WhatsApp ওপেন হচ্ছে...');
-        
-        // ৪. কোনো টেক্সট ছাড়া সরাসরি ওই নম্বরের WhatsApp চ্যাট ওপেন করে দেওয়া
-        setTimeout(() => {
-            window.open('https://wa.me/' + waNum, '_blank');
-        }, 1200);
-        
-    } catch (e) {
-        console.error(e);
-        // ৫. চরম ফলব্যাক: যদি fetch কাজ না করে, সরাসরি ইমেজ লিংক নতুন ট্যাবে ওপেন করে দেবে
-        window.open(qrUrl, '_blank');
-        setTimeout(() => {
-            window.open('https://wa.me/' + waNum, '_blank');
-        }, 1200);
-        toast('📱 QR ওপেন হয়েছে। সেভ করে WhatsApp-এ পাঠান।');
-    }
+const s=DB.students.find(x=>x.id===sid);
+if(!s)return;
+const waNum=(s.wa||s.mobile||'').replace(/\D/g,'');
+if(!waNum){toast('⚠️ No WhatsApp number!');return;}
+const ps=getPaymentStatus(s);
+const upi=DB.settings.upi||{};
+const upiId=upi.id||'';
+const upiPhone=upi.phone||'';
+if(!upiId){toast('⚠️ UPI ID not set!');return;}
+toast('📱 QR তৈরি হচ্ছে...');
+const qrUrl=getUPIQRLink(ps.totalDue);
+try{
+const img=new Image();
+img.crossOrigin='anonymous';
+img.src=qrUrl;
+await new Promise((res,rej)=>{img.onload=res;img.onerror=rej;});
+const canvas=document.createElement('canvas');
+const W=420;
+const headerH=110;
+const footerH=50;
+canvas.width=W;
+canvas.height=headerH+img.height+footerH;
+const ctx=canvas.getContext('2d');
+ctx.fillStyle='#ffffff';
+ctx.fillRect(0,0,W,canvas.height);
+ctx.fillStyle='#7c3aed';
+ctx.fillRect(0,0,W,headerH);
+ctx.fillStyle='#ffffff';
+ctx.textAlign='center';
+ctx.font='bold 20px Arial, sans-serif';
+ctx.fillText('Scan & Pay ₹'+ps.totalDue,W/2,30);
+ctx.font='bold 15px Arial, sans-serif';
+ctx.fillText('UPI: '+upiId,W/2,58);
+if(upiPhone){
+ctx.font='14px Arial, sans-serif';
+ctx.fillText('Ph: '+upiPhone,W/2,82);
 }
-function openWhatsAppForQR(){
-    if(currentQRWaNum && currentQRMsg){
-        window.open('https://wa.me/' + currentQRWaNum + '?text=' + encodeURIComponent(currentQRMsg), '_blank');
-    }
+ctx.font='12px Arial, sans-serif';
+ctx.fillText('PhonePe / GPay / Paytm',W/2,102);
+ctx.drawImage(img,(W-img.width)/2,headerH);
+ctx.fillStyle='#f5f5f5';
+ctx.fillRect(0,headerH+img.height,W,footerH);
+ctx.fillStyle='#666666';
+ctx.font='12px Arial, sans-serif';
+ctx.fillText('TuitionPro • '+s.name,W/2,headerH+img.height+30);
+canvas.toBlob(async(blob)=>{
+const file=new File([blob],s.name+'_QR.png',{type:'image/png'});
+if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
+try{
+await navigator.share({files:[file],title:s.name+' QR'});
+toast('✅ QR পাঠানো হয়েছে!');
+return;
+}catch(e){}
+}
+qrFallback(blob,s,waNum,ps,upiId,upiPhone);
+},'image/png');
+}catch(e){
+toast('❌ QR তৈরি ব্যর্থ!');
+}
+}
+function qrFallback(blob,s,waNum,ps,upiId,upiPhone){
+const url=URL.createObjectURL(blob);
+const a=document.createElement('a');
+a.href=url;
+a.download=s.name+'_QR.png';
+a.click();
+URL.revokeObjectURL(url);
+let msg='📱 *'+s.name+' Payment QR*\n\n';
+msg+='UPI: '+upiId+'\n';
+if(upiPhone)msg+='Ph: '+upiPhone+'\n';
+msg+='Amount: ₹'+ps.totalDue+'\n\n';
+msg+='👆 QR image download হয়েছে।\nWhatsApp-এ attach করে পাঠান।';
+setTimeout(()=>{
+window.open('https://wa.me/'+waNum+'?text='+encodeURIComponent(msg),'_blank');
+},500);
+toast('📥 QR Downloaded! WhatsApp-এ attach করুন');
 }
 function renderAll(){
 renderDashboard();renderStudents();renderAttClassGrid();renderFees();renderClasses();loadEmailSettings();loadSheetUrl();
