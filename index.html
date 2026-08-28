@@ -85,10 +85,10 @@ table{width:100%;border-collapse:collapse;font-size:clamp(11px,3vw,13px);min-wid
 th{background:rgba(0,0,0,.3);padding:12px;text-align:left;font-weight:600;font-size:clamp(10px,2.5vw,11px);text-transform:uppercase;letter-spacing:1px;color:var(--muted);border-bottom:1px solid var(--glass-border)}
 td{padding:12px;border-bottom:1px solid rgba(255,255,255,.05);vertical-align:middle}
 tr:hover td{background:rgba(255,255,255,.03)}
-.photo{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;font-weight:700;color:#fff;font-size:14px;flex-shrink:0;cursor:pointer;transition:.2s}
+.photo{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;font-weight:700;color:#fff;font-size:14px;flex-shrink:0;cursor:pointer;transition:.2s;overflow:hidden}
 .photo:hover{transform:scale(1.1);box-shadow:0 4px 16px rgba(124,58,237,.4)}
 .photo.lg{width:70px;height:70px;font-size:24px}
-.photo img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+.photo img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
 .badge{padding:3px 10px;border-radius:20px;font-size:clamp(9px,2.5vw,11px);font-weight:600;display:inline-block}
 .badge-ok{background:rgba(16,185,129,.15);color:#6ee7b7;border:1px solid rgba(16,185,129,.3)}
 .badge-due{background:rgba(239,68,68,.18);color:#fca5a5;border:1px solid rgba(239,68,68,.4);animation:pulse 2s infinite}
