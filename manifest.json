@@ -1,10 +1,10 @@
 {
-  "name": "TuitionPro - Tuition Management",
-  "short_name": "TuitionPro",
-  "start_url": "./",
+  "name": "Tuitionpro by Arif Hussain",
+  "short_name": "Tuitionpro",
+  "start_url": "index.html",
   "display": "standalone",
-  "background_color": "#0f0c29",
-  "theme_color": "#0f0c29",
+  "background_color": "#000000",
+  "theme_color": "#000000",
   "icons": [
     {
       "src": "icon-192.png",
