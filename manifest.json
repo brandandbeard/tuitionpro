@@ -1,8 +1,9 @@
 {
   "name": "TuitionPro - Tuition Management",
   "short_name": "TuitionPro",
-  "start_url": "./",
+  "start_url": "./index.html",
   "scope": "./",
+  "id": "./",
   "display": "standalone",
   "background_color": "#0f0c29",
   "theme_color": "#0f0c29",
@@ -12,7 +13,7 @@
       "src": "icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "icon-512.png",
