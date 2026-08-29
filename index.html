@@ -1121,12 +1121,80 @@ doAutoBackup();}
 },60000);
 }
 async function doAutoBackup(){
-if(!emailReady())return;
-try{const c=DB.settings.email;emailjs.init({publicKey:c.publicKey});
-const slim=JSON.parse(JSON.stringify(DB));slim.students.forEach(s=>s.photo='');
-await emailjs.send(c.serviceId,c.templateId,{to_email:c.toEmail,subject:'🤖 Auto Backup - '+new Date().toLocaleString('en-IN'),message:JSON.stringify(slim,null,2)});
-DB.settings.lastBackup=new Date().toISOString();saveToCloud();toast('🤖 Auto backup sent');
-}catch(e){console.error(e);}
+  let emailSuccess = false;
+  let sheetSuccess = false;
+
+  // ১. ইমেইল অটো ব্যাকআপ
+  if(emailReady()){
+    try{
+      const c = DB.settings.email;
+      emailjs.init({publicKey: c.publicKey});
+      const slim = JSON.parse(JSON.stringify(DB));
+      slim.students.forEach(s => s.photo = ''); // মেমোরি বাঁচাতে ফটো বাদ
+      
+      await emailjs.send(c.serviceId, c.templateId, {
+        to_email: c.toEmail,
+        subject: '🤖 Auto Backup - ' + new Date().toLocaleString('en-IN'),
+        message: JSON.stringify(slim, null, 2)
+      });
+      emailSuccess = true;
+    } catch(e) {
+      console.error('Auto Email Backup failed:', e);
+    }
+  }
+
+  // ২. গুগল শিট অটো ব্যাকআপ
+  const sheetUrl = DB.settings.sheetBackupUrl;
+  if(sheetUrl && DB.students.length > 0){
+    try{
+      const dues = {};
+      DB.students.forEach(s => {
+        const ps = getPaymentStatus(s);
+        dues[s.id] = {due: ps.totalDue, advance: ps.totalAdvance, totalPaid: ps.totalPaid};
+      });
+      
+      const payload = {
+        students: DB.students.map(s => ({
+          id: s.id, name: s.name, class: s.class, fee: s.fee,
+          admission: "'" + s.admission, mobile: "'" + (s.mobile || ''),
+          wa: "'" + (s.wa || ''), ig: s.ig || '',
+          payments: (s.payments || []).map(p => ({amount: p.amount, date: "'" + p.date, note: p.note || ''}))
+        })),
+        classes: DB.classes,
+        dues: dues,
+        backupTime: new Date().toISOString()
+      };
+
+      await fetch(sheetUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {'Content-Type': 'text/plain;charset=utf-8'},
+        body: JSON.stringify(payload)
+      });
+      sheetSuccess = true;
+    } catch(e) {
+      console.error('Auto Sheet Backup failed:', e);
+    }
+  }
+
+  // ৩. স্ট্যাটাস আপডেট এবং টোস্ট মেসেজ
+  if(emailSuccess || sheetSuccess){
+    DB.settings.lastBackup = new Date().toISOString();
+    saveToCloud();
+    
+    let msg = '🤖 Auto backup successful!';
+    if(emailSuccess && sheetSuccess) msg = '🤖 Auto backup sent to Email & Sheet!';
+    else if(emailSuccess) msg = '🤖 Auto backup sent to Email!';
+    else if(sheetSuccess) msg = '🤖 Auto backup sent to Sheet!';
+    
+    toast(msg);
+  } else {
+    if(!emailReady() && !sheetUrl) {
+      console.warn('Auto backup skipped: No Email or Sheet URL configured.');
+    } else {
+      toast('❌ Auto backup failed! Check Email/Sheet settings.');
+    }
+  }
 }
 function checkMonthlyReminder(){
 if(!DB.settings.monthlyReminder)return;
