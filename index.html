@@ -88,7 +88,7 @@ tr:hover td{background:rgba(255,255,255,.03)}
 .photo{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;font-weight:700;color:#fff;font-size:14px;flex-shrink:0;cursor:pointer;transition:.2s;overflow:hidden}
 .photo:hover{transform:scale(1.1);box-shadow:0 4px 16px rgba(124,58,237,.4)}
 .photo.lg{width:70px;height:70px;font-size:24px}
-.photo img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block;object-position:center;}
+.photo img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
 .badge{padding:3px 10px;border-radius:20px;font-size:clamp(9px,2.5vw,11px);font-weight:600;display:inline-block}
 .badge-ok{background:rgba(16,185,129,.15);color:#6ee7b7;border:1px solid rgba(16,185,129,.3)}
 .badge-due{background:rgba(239,68,68,.18);color:#fca5a5;border:1px solid rgba(239,68,68,.4);animation:pulse 2s infinite}
@@ -609,25 +609,7 @@ tr:hover td{background:rgba(255,255,255,.03)}
 <div class="field"><label>Mobile</label><input id="stuMobile"/></div>
 <div class="field"><label>WhatsApp</label><input id="stuWa"/></div>
 <div class="field"><label>Instagram</label><input id="stuIg" placeholder="@username"/></div>
-<div class="field">
-  <label>Photo</label>
-  <div class="photo-upload">
-    <label class="photo-preview" id="stuPhotoPreview" for="stuPhoto">
-      <span class="ph-ic">📷</span>
-    </label>
-    <input type="file" id="stuPhoto" accept="image/*" style="display:none"/>
-    <input type="hidden" id="stuPhotoData"/>
-    <div class="photo-tools">
-      <div class="photo-actions">
-        <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('stuPhoto').click()">📁 Upload</button>
-        <button type="button" class="btn btn-danger btn-sm" onclick="clearStudentPhoto()">🗑️ Remove</button>
-      </div>
-      <small style="color:var(--muted);font-size:10px">
-        Upload korle WhatsApp er moto drag/zoom kore center koro.
-      </small>
-    </div>
-  </div>
-</div>
+<div class="field"><label>Photo</label><input type="file" id="stuPhoto" accept="image/*"/></div>
 </div>
 <div style="display:flex;gap:10px;margin-top:20px;justify-content:flex-end;flex-wrap:wrap">
 <button type="button" class="btn btn-ghost" onclick="closeModal('studentModal')">Cancel</button>
@@ -781,27 +763,7 @@ tr:hover td{background:rgba(255,255,255,.03)}
 </div>
 </div>
 <div class="toast" id="toast"></div>
-<!-- Photo Crop Modal -->
-<div class="modal-bg" id="photoCropModal">
-  <div class="modal sm">
-    <button class="modal-close" onclick="closePhotoCrop()">×</button>
-    <h3>🖼️ Crop Profile Photo</h3>
-
-    <div class="crop-stage" id="cropStage">
-      <img id="cropImage" class="crop-img" alt="Crop preview"/>
-    </div>
-
-    <div class="field">
-      <label>Zoom</label>
-      <input type="range" id="cropZoom" class="crop-slider" min="100" max="300" value="100"/>
-    </div>
-
-    <div style="display:flex;gap:10px;margin-top:16px;justify-content:flex-end;flex-wrap:wrap">
-      <button type="button" class="btn btn-ghost" onclick="closePhotoCrop()">Cancel</button>
-      <button type="button" class="btn btn-primary" onclick="applyCroppedPhoto()">✅ Set Photo</button>
-    </div>
-  </div>
-</div>
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
 <symbol id="icon-wa" viewBox="0 0 24 24"><path fill="#25D366" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.297-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></symbol>
 <symbol id="icon-ig" viewBox="0 0 24 24"><path fill="#E1306C" d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></symbol>
 <symbol id="icon-sms" viewBox="0 0 24 24"><path fill="#22d3ee" d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM9 11H7V9h2v2zm4 0h-2V9h2v2zm4 0h-2V9h2v2z"/></symbol>
@@ -1285,10 +1247,6 @@ if(Object.keys(DB.classes).length===0){DB.classes['General']={days:[],times:{},f
 const sel=document.getElementById('stuClass');
 sel.innerHTML=Object.keys(DB.classes).map(c=>`<option>${c}</option>`).join('');
 document.getElementById('stuId').value='';document.getElementById('studentForm').reset();
-photoChanged = false;
-document.getElementById('stuPhotoData').value = '';
-document.getElementById('stuPhoto').value = '';
-setPhotoPreview('');
 document.getElementById('stuAdm').value=todayISO();
 document.getElementById('stuModalTitle').textContent=id?'✏️ Edit Student':'➕ Add Student';
 if(id){const s=DB.students.find(x=>x.id===id);if(s){
@@ -1296,46 +1254,24 @@ document.getElementById('stuId').value=s.id;document.getElementById('stuName').v
 document.getElementById('stuClass').value=s.class;document.getElementById('stuFee').value=s.fee;
 document.getElementById('stuAdm').value=s.admission;document.getElementById('stuMobile').value=s.mobile||'';
 document.getElementById('stuWa').value=s.wa||'';document.getElementById('stuIg').value=s.ig||'';}}
-setPhotoPreview(s.photo || '');
 document.getElementById('studentModal').classList.add('show');
 }
-let photoChanged = false;
-
 function saveStudent(e){
-  e.preventDefault();
-
-  const id = document.getElementById('stuId').value || uid();
-  const existing = DB.students.find(x => x.id === id);
-
-  const finalPhoto = photoChanged
-    ? (document.getElementById('stuPhotoData').value || '')
-    : (existing?.photo || '');
-
-  const stu = {
-    id,
-    name: document.getElementById('stuName').value.trim(),
-    class: document.getElementById('stuClass').value,
-    fee: +document.getElementById('stuFee').value,
-    admission: document.getElementById('stuAdm').value,
-    mobile: document.getElementById('stuMobile').value.trim(),
-    wa: document.getElementById('stuWa').value.trim(),
-    ig: document.getElementById('stuIg').value.trim().replace('@',''),
-    photo: finalPhoto,
-    payments: existing?.payments || [],
-    attendance: existing?.attendance || {}
-  };
-
-  if(existing){
-    DB.students = DB.students.map(x => x.id === id ? stu : x);
-    toast('✅ Updated');
-  } else {
-    DB.students.push(stu);
-    toast('🎉 Added');
-  }
-
-  saveToCloud();
-  closeModal('studentModal');
-  renderAll();
+e.preventDefault();
+const id=document.getElementById('stuId').value||uid();
+const photoInput=document.getElementById('stuPhoto');
+const existing=DB.students.find(x=>x.id===id);
+const finalize=(photo)=>{
+const stu={id,name:document.getElementById('stuName').value.trim(),class:document.getElementById('stuClass').value,
+fee:+document.getElementById('stuFee').value,admission:document.getElementById('stuAdm').value,
+mobile:document.getElementById('stuMobile').value.trim(),wa:document.getElementById('stuWa').value.trim(),
+ig:document.getElementById('stuIg').value.trim().replace('@',''),photo:photo||(existing?.photo||''),
+payments:existing?.payments||[],attendance:existing?.attendance||{}};
+if(existing){DB.students=DB.students.map(x=>x.id===id?stu:x);toast('✅ Updated');}
+else{DB.students.push(stu);toast('🎉 Added');}
+saveToCloud();closeModal('studentModal');renderAll();};
+if(photoInput.files[0]){const r=new FileReader();r.onload=ev=>finalize(ev.target.result);r.readAsDataURL(photoInput.files[0]);}
+else finalize(null);
 }
 function openDeleteConfirm(id){
 const s=DB.students.find(x=>x.id===id);
@@ -2237,221 +2173,6 @@ DB.settings.lastBackup=new Date().toISOString();saveToCloud();
 document.getElementById('lastBackup').textContent=new Date().toLocaleString('en-IN');toast('✅ Emailed!');
 }catch(e){toast('❌ '+(e.text||'Failed'));}
 }
-// ===============================
-// Profile Photo Crop / Preview
-// ===============================
-let cropState = null;
-let cropDragging = false;
-
-function setPhotoPreview(src){
-  const el = document.getElementById('stuPhotoPreview');
-  if(!el) return;
-  el.innerHTML = src
-    ? '<img src="' + src + '" alt="photo"/>'
-    : '<span class="ph-ic">📷</span>';
-}
-
-function clearStudentPhoto(){
-  photoChanged = true;
-  const data = document.getElementById('stuPhotoData');
-  const file = document.getElementById('stuPhoto');
-  if(data) data.value = '';
-  if(file) file.value = '';
-  setPhotoPreview('');
-}
-
-function openPhotoCrop(src){
-  const modal = document.getElementById('photoCropModal');
-  const img = document.getElementById('cropImage');
-  const stage = document.getElementById('cropStage');
-  if(!modal || !img || !stage) return;
-
-  modal.classList.add('show');
-
-  cropState = {
-    img,
-    src,
-    natW: 0,
-    natH: 0,
-    stageW: stage.offsetWidth || 320,
-    stageH: stage.offsetHeight || 320,
-    x: 0,
-    y: 0,
-    scale: 1,
-    minScale: 1,
-    lastX: 0,
-    lastY: 0
-  };
-
-  img.onload = function(){
-    cropState.natW = img.naturalWidth;
-    cropState.natH = img.naturalHeight;
-    cropState.stageW = stage.offsetWidth || 320;
-    cropState.stageH = stage.offsetHeight || 320;
-
-    cropState.minScale = Math.max(
-      cropState.stageW / cropState.natW,
-      cropState.stageH / cropState.natH
-    );
-
-    cropState.scale = cropState.minScale;
-    centerCropImage();
-    updateCropTransform();
-
-    const slider = document.getElementById('cropZoom');
-    if(slider) slider.value = 100;
-  };
-
-  img.src = src;
-
-  if(img.complete && img.naturalWidth){
-    img.onload();
-  }
-}
-
-function closePhotoCrop(){
-  const modal = document.getElementById('photoCropModal');
-  if(modal) modal.classList.remove('show');
-  cropState = null;
-}
-
-function centerCropImage(){
-  if(!cropState) return;
-  cropState.x = (cropState.stageW - cropState.natW * cropState.scale) / 2;
-  cropState.y = (cropState.stageH - cropState.natH * cropState.scale) / 2;
-}
-
-function clampCrop(){
-  if(!cropState) return;
-
-  const minX = cropState.stageW - cropState.natW * cropState.scale;
-  const minY = cropState.stageH - cropState.natH * cropState.scale;
-
-  cropState.x = minX >= 0
-    ? minX / 2
-    : Math.min(0, Math.max(minX, cropState.x));
-
-  cropState.y = minY >= 0
-    ? minY / 2
-    : Math.min(0, Math.max(minY, cropState.y));
-}
-
-function updateCropTransform(){
-  if(!cropState) return;
-  cropState.img.style.transform =
-    'translate(' + cropState.x + 'px,' + cropState.y + 'px) scale(' + cropState.scale + ')';
-}
-
-function zoomCropTo(newScale, cx, cy){
-  if(!cropState) return;
-
-  const oldScale = cropState.scale;
-  newScale = Math.max(cropState.minScale, Math.min(cropState.minScale * 3, newScale));
-
-  cropState.x = cx - ((cx - cropState.x) * newScale / oldScale);
-  cropState.y = cy - ((cy - cropState.y) * newScale / oldScale);
-  cropState.scale = newScale;
-
-  clampCrop();
-  updateCropTransform();
-
-  const slider = document.getElementById('cropZoom');
-  if(slider){
-    slider.value = Math.round((cropState.scale / cropState.minScale) * 100);
-  }
-}
-
-function applyCroppedPhoto(){
-  if(!cropState) return;
-
-  const size = 400;
-  const ratioX = size / cropState.stageW;
-  const ratioY = size / cropState.stageH;
-
-  const canvas = document.createElement('canvas');
-  canvas.width = size;
-  canvas.height = size;
-
-  const ctx = canvas.getContext('2d');
-  ctx.fillStyle = '#000';
-  ctx.fillRect(0, 0, size, size);
-
-  ctx.drawImage(
-    cropState.img,
-    cropState.x * ratioX,
-    cropState.y * ratioY,
-    cropState.natW * cropState.scale * ratioX,
-    cropState.natH * cropState.scale * ratioY
-  );
-
-  const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
-
-  const data = document.getElementById('stuPhotoData');
-  if(data) data.value = dataUrl;
-
-  setPhotoPreview(dataUrl);
-  photoChanged = true;
-
-  closePhotoCrop();
-  toast('✅ Photo set! Ekhon Save chapo');
-}
-
-function initPhotoCropper(){
-  const file = document.getElementById('stuPhoto');
-  const stage = document.getElementById('cropStage');
-  const slider = document.getElementById('cropZoom');
-
-  if(file){
-    file.addEventListener('change', function(){
-      const f = this.files[0];
-      if(!f) return;
-
-      const r = new FileReader();
-      r.onload = ev => openPhotoCrop(ev.target.result);
-      r.readAsDataURL(f);
-
-      this.value = '';
-    });
-  }
-
-  if(stage){
-    stage.addEventListener('pointerdown', function(e){
-      if(!cropState) return;
-      cropDragging = true;
-      this.setPointerCapture(e.pointerId);
-      cropState.lastX = e.clientX;
-      cropState.lastY = e.clientY;
-    });
-
-    stage.addEventListener('pointermove', function(e){
-      if(!cropDragging || !cropState) return;
-
-      cropState.x += e.clientX - cropState.lastX;
-      cropState.y += e.clientY - cropState.lastY;
-      cropState.lastX = e.clientX;
-      cropState.lastY = e.clientY;
-
-      clampCrop();
-      updateCropTransform();
-    });
-
-    ['pointerup','pointercancel'].forEach(ev => {
-      stage.addEventListener(ev, function(){
-        cropDragging = false;
-      });
-    });
-  }
-
-  if(slider){
-    slider.addEventListener('input', function(){
-      if(!cropState) return;
-      const factor = +this.value / 100;
-      zoomCropTo(cropState.minScale * factor, cropState.stageW / 2, cropState.stageH / 2);
-    });
-  }
-}
-
-initPhotoCropper();
 document.addEventListener('DOMContentLoaded',function(){setupNavigation();});
 </script>
 <script>
@@ -2462,71 +2183,6 @@ document.addEventListener('DOMContentLoaded',function(){setupNavigation();});
         .catch(err => console.log('❌ SW registration failed', err));
     });
   }
-.photo-upload{
-  display:flex;
-  align-items:center;
-  gap:14px;
-  flex-wrap:wrap;
-}
-.photo-preview{
-  width:86px;
-  height:86px;
-  border-radius:50%;
-  background:rgba(0,0,0,.35);
-  border:2px dashed rgba(255,255,255,.18);
-  overflow:hidden;
-  display:grid;
-  place-items:center;
-  cursor:pointer;
-  flex-shrink:0;
-}
-.photo-preview img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  object-position:center;
-  display:block;
-}
-.photo-preview .ph-ic{
-  font-size:30px;
-  opacity:.65;
-}
-.photo-tools{
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-  min-width:180px;
-  flex:1;
-}
-.photo-actions{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-}
-.crop-stage{
-  position:relative;
-  width:min(80vw,320px);
-  height:min(80vw,320px);
-  margin:0 auto 16px;
-  overflow:hidden;
-  border-radius:50%;
-  border:2px solid rgba(255,255,255,.25);
-  background:#000;
-  touch-action:none;
-}
-.crop-img{
-  position:absolute;
-  left:0;
-  top:0;
-  transform-origin:0 0;
-  user-select:none;
-  -webkit-user-drag:none;
-  pointer-events:none;
-  max-width:none;
-}
-.crop-slider{
-  width:100%;
-}
 </script>
 </body>
 </html>
