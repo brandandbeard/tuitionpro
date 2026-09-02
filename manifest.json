@@ -3,6 +3,7 @@
   "short_name": "Tuitionpro",
   "start_url": "./",
   "scope": "./",
+  "id": "/", 
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#000000",
