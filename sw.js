@@ -1,63 +1,86 @@
-// ক্যাশ ভার্সন আপডেট করুন যাতে পুরোনো ক্যাশ মুছে যায়
-const CACHE_NAME = 'mega-quiz-v3';
+/* ═══ TuitionPro — Offline Service Worker (Safe Version) ═══ */
+const APP_CACHE = 'tuitionpro-app-v1';
 
-// ক্যাশে যুক্ত করার প্রয়োজনীয় ফাইলগুলোর তালিকা
-const urlsToCache = [
-  './', // মূল পেজ
-  'index.html',
-  'manifest.json',
-  'icon-192.png?v=2', // আইকন ফাইল যুক্ত করুন
-  'icon-512.png?v=2'  // আইকন ফাইল যুক্ত করুন
-];
-
-// ইনস্টল ইভেন্ট - নতুন ফাইলগুলো ক্যাশে যুক্ত করুন
-self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      console.log('Opened cache');
-      return cache.addAll(urlsToCache);
-    })
-  );
+self.addEventListener('install', e => {
+    e.waitUntil(
+        caches.open(APP_CACHE).then(c => Promise.all([
+            c.add('./').catch(() => {}),
+            c.add('index.html').catch(() => {}),
+            c.add('manifest.json').catch(() => {}),
+            c.add('icon-192.png').catch(() => {}),
+            c.add('icon-512.png').catch(() => {}),
+            // EmailJS CDN ক্যাশ করা
+            c.add('https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js').catch(() => {})
+        ]))
+    );
+    // নতুন Service Worker-কে সাথে সাথে অ্যাক্টিভ হতে বাধ্য করে
+    self.skipWaiting(); 
 });
 
-// অ্যাক্টিভেট ইভেন্ট - পুরোনো ক্যাশ মুছে ফেলুন
-self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(cacheNames => {
-      return Promise.all(
-        cacheNames.map(cacheName => {
-          if (cacheName !== CACHE_NAME) {
-            console.log('Deleting old cache:', cacheName);
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
-  );
+self.addEventListener('activate', e => {
+    e.waitUntil(
+        // পুরোনো সব ক্যাশ অটোমেটিক ডিলিট করে দেয়
+        caches.keys().then(keys => 
+            Promise.all(keys.filter(k => k !== APP_CACHE).map(k => caches.delete(k)))
+        ).then(() => self.clients.claim())
+    );
 });
 
-// ফেচ ইভেন্ট - ক্যাশ থেকে ফাইল সরবরাহ করুন
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request).then(response => {
-      // ক্যাশে ফাইল থাকলে সেটি ব্যবহার করুন
-      if (response) {
-        return response;
-      }
-      // ক্যাশে না থাকলে নেটওয়ার্ক থেকে ডাউনলোড করুন
-      return fetch(event.request).then(response => {
-        // ইনভ্যালিড রেসপন্স বা ইরর থাকলে ফেরত দিন না
-        if (!response || response.status !== 200 || response.type !== 'basic') {
-          return response;
+self.addEventListener('fetch', e => {
+    const req = e.request;
+    if (req.method !== 'GET') return;
+
+    try {
+        const url = new URL(req.url);
+        const host = url.hostname;
+
+        /* Fonts: Cache-first */
+        if (host === 'fonts.googleapis.com' || host === 'fonts.gstatic.com') {
+            e.respondWith(
+                caches.match(req).then(c => 
+                    c || fetch(req).then(res => {
+                        if (res && res.ok) {
+                            const cp = res.clone();
+                            caches.open(APP_CACHE).then(cc => cc.put(req, cp)).catch(() => {});
+                        }
+                        return res;
+                    })
+                )
+            );
+            return;
         }
-        return response;
-      }).catch(() => {
-        // অফলাইনে থাকলে ডিফল্ট প্রতিক্রিয়া ফেরত দিন
-        return new Response('অফলাইন', {
-          status: 503,
-          statusText: 'Service Unavailable'
-        });
-      });
-    })
-  );
+
+        /* HTML page: Network-first, fallback to cache */
+        if (req.mode === 'navigate') {
+            e.respondWith(
+                fetch(req).then(res => {
+                    if (res && res.ok) {
+                        const cp = res.clone();
+                        caches.open(APP_CACHE).then(c => c.put(new Request(url.pathname), cp)).catch(() => {});
+                    }
+                    return res;
+                }).catch(() => 
+                    caches.match(new Request(url.pathname)).then(c => c || caches.match('/index.html'))
+                )
+            );
+            return;
+        }
+
+        /* বাকি সব (CDN, Images, Scripts): Cache-first, fallback to network */
+        e.respondWith(
+            caches.match(req).then(c => {
+                if (c) return c;
+                return fetch(req).then(res => {
+                    if (res && res.ok) {
+                        const cp = res.clone();
+                        caches.open(APP_CACHE).then(cc => cc.put(req, cp)).catch(() => {});
+                    }
+                    return res;
+                });
+            }).catch(() => caches.match(req))
+        );
+    } catch (error) {
+        // URL পাস করতে সমস্যা হলে ডিফল্ট ফেচ
+        return;
+    }
 });
