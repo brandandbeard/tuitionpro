@@ -2196,27 +2196,6 @@ document.addEventListener('DOMContentLoaded',function(){setupNavigation();});
         .catch(err => console.log('❌ SW registration failed', err));
     });
   }
-<script>
-  let deferredPrompt;
-  const installBtn = document.createElement('button');
-  installBtn.innerHTML = '📱 Install App';
-  installBtn.style.cssText = 'position:fixed;bottom:20px;right:20px;z-index:9999;padding:15px 25px;background:linear-gradient(135deg,#7c3aed,#ec4899);color:#fff;border:none;border-radius:50px;font-weight:bold;box-shadow:0 10px 20px rgba(0,0,0,0.3);cursor:pointer;display:none;font-family:Inter,sans-serif;';
-  document.body.appendChild(installBtn);
-
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    installBtn.style.display = 'block'; // বাটন শো করবে
-  });
-
-  installBtn.addEventListener('click', async () => {
-    if (!deferredPrompt) return;
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    console.log(`User response: ${outcome}`);
-    deferredPrompt = null;
-    installBtn.style.display = 'none';
-  });
 </script>
 </body>
 </html>
