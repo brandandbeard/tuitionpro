@@ -1,25 +1,20 @@
-/* ═══ TuitionPro — Offline Service Worker (Safe Version) ═══ */
-const APP_CACHE = 'tuitionpro-app-v1';
+/* ═══ TuitionPro — Smart Advanced Service Worker (Best of Both) ═══ */
+const APP_CACHE = 'tuitionpro-smart-v2';
 
 self.addEventListener('install', e => {
     e.waitUntil(
         caches.open(APP_CACHE).then(c => Promise.all([
             c.add('./').catch(() => {}),
             c.add('index.html').catch(() => {}),
-            c.add('manifest.json').catch(() => {}),
-            c.add('icon-192.png').catch(() => {}),
-            c.add('icon-512.png').catch(() => {}),
-            // EmailJS CDN ক্যাশ করা
+            // 🚨 আইকন এবং manifest এখানে ক্যাশ করবো না, যাতে ইন্সটল বাটন ব্লক না হয়
             c.add('https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js').catch(() => {})
         ]))
     );
-    // নতুন Service Worker-কে সাথে সাথে অ্যাক্টিভ হতে বাধ্য করে
     self.skipWaiting(); 
 });
 
 self.addEventListener('activate', e => {
     e.waitUntil(
-        // পুরোনো সব ক্যাশ অটোমেটিক ডিলিট করে দেয়
         caches.keys().then(keys => 
             Promise.all(keys.filter(k => k !== APP_CACHE).map(k => caches.delete(k)))
         ).then(() => self.clients.claim())
@@ -33,6 +28,12 @@ self.addEventListener('fetch', e => {
     try {
         const url = new URL(req.url);
         const host = url.hostname;
+
+        /* 🚨 সবচেয়ে গুরুত্বপূর্ণ: আইকন বা ম্যানিফেস্ট ফাইল ক্যাশ থেকে নেবো না! */
+        if (url.pathname.includes('.png') || url.pathname.includes('manifest.json')) {
+            e.respondWith(fetch(req)); // সরাসরি নেটওয়ার্ক থেকে আনবে (No Cache)
+            return;
+        }
 
         /* Fonts: Cache-first */
         if (host === 'fonts.googleapis.com' || host === 'fonts.gstatic.com') {
@@ -66,7 +67,7 @@ self.addEventListener('fetch', e => {
             return;
         }
 
-        /* বাকি সব (CDN, Images, Scripts): Cache-first, fallback to network */
+        /* বাকি সব (CDN, Scripts): Cache-first */
         e.respondWith(
             caches.match(req).then(c => {
                 if (c) return c;
@@ -80,7 +81,6 @@ self.addEventListener('fetch', e => {
             }).catch(() => caches.match(req))
         );
     } catch (error) {
-        // URL পাস করতে সমস্যা হলে ডিফল্ট ফেচ
         return;
     }
 });
