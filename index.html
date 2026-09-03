@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <title>TuitionPro ✨</title>
 
+<!-- Flash fix: BLACK splash -->
+<style>
+html { background: #000000; }
+body { margin: 0; padding: 0; background: #000000; }
+</style>
+
 <!-- PWA Manifest (App Install) -->
 <link rel="manifest" href="manifest.json">
 
@@ -20,7 +26,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#0f0c29">
+<meta name="theme-color" content="#000000">
 
 <!-- Fonts & Scripts (আপনার আগের ফন্ট এবং স্ক্রিপ্ট) -->
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
@@ -243,7 +249,7 @@ tr:hover td{background:rgba(255,255,255,.03)}
 @keyframes toastIn{from{transform:translate(-50%,20px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
 .class-card{background:rgba(0,0,0,.2);border:1px solid var(--glass-border);border-radius:14px;padding:clamp(12px,3vw,16px);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .code-box{background:rgba(0,0,0,.35);border:1px solid var(--glass-border);border-radius:10px;padding:10px;font-family:'Courier New',monospace;font-size:clamp(10px,2.5vw,12px);color:#67e8f9;white-space:pre-wrap;word-break:break-all;margin:8px 0}
-.loading-screen{position:fixed;inset:0;background:linear-gradient(135deg,var(--bg1),var(--bg2),var(--bg3));display:grid;place-items:center;z-index:999}
+.loading-screen{position:fixed;inset:0;background:#000000;display:grid;place-items:center;z-index:999}
 .spinner{width:50px;height:50px;border:3px solid rgba(255,255,255,.1);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .day-toggle{display:flex;flex-direction:column;gap:8px;margin-top:8px;width:100%}
@@ -332,7 +338,7 @@ tr:hover td{background:rgba(255,255,255,.03)}
 #deletePayModal.modal-bg,#confirmModal.modal-bg,#alertModal.modal-bg,#deleteStuModal.modal-bg{z-index:3100}
 </style>
 </head>
-<body>
+<body style="background: #0f0c29; margin: 0; padding: 0;">
 <div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
 <div class="loading-screen" id="loadingScreen">
 <div style="text-align:center"><div class="spinner"></div><p style="margin-top:20px;color:var(--muted)">Loading TuitionPro...</p></div>
