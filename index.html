@@ -832,7 +832,7 @@ const DAY_NAMES=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const DAY_FULL=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 const MONTH_NAMES=['January','February','March','April','May','June','July','August','September','October','November','December'];
 const MONTH_SHORT=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-const todayISO=()=>new Date().toISOString().slice(0,10);
+const todayISO=()=>new Date().toISOString().slice(0,1000);
 const todayYM=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`};
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600);}
