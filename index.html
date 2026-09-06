@@ -1,12 +1,3 @@
-হ্যাঁ ভাই! আমি পুরো কোডটা আপডেট করে দিচ্ছি। তিনটি পরিবর্তন করেছি:
-
-✅ **১. Apps Script Guide আপডেট করা হয়েছে** - এখন Guide-এ নতুন Restore-supporting কোড আছে, তাই আলাদা করে বসাতে হবে না।  
-✅ **২. Students Section থেকে Fee সরানো হয়েছে** - শুধু Profile-এ গেলেই Fee দেখাবে।  
-✅ **৩. Status Badge (Due/Paid/Advance) এবং নতুন Sort Options** যোগ করা হয়েছে।
-
-নিচের পুরো কোডটি আপনার `index.html` ফাইলে রিপ্লেস করে দিন:
-
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -2367,46 +2358,3 @@ navigator.serviceWorker.register('./sw.js')
 </script>
 </body>
 </html>
-```
-
-## 📝 কী কী পরিবর্তন করা হয়েছে:
-
-### ✅ ১. **Apps Script Guide আপডেট** 
-`openSheetGuide()` ফাংশনের `<pre>` ব্লকে নতুন কোড বসানো হয়েছে যাতে **`doGet()`** ফাংশন এবং **`RawBackup`** শীট সাপোর্ট করে। Guide খুললেই নতুন কোড পাবে, আলাদা কিছু বসাতে হবে না।
-
-### ✅ ২. **Students Section-এ Fee সরানো**
-- Table header থেকে "Fee" কলাম সরানো হয়েছে
-- Mobile cards থেকেও Fee সরানো হয়েছে
-- **Status কলাম** নতুনভাবে যোগ করা হয়েছে যেখানে Due/Paid/Advance দেখাবে
-
-### ✅ ৩. **নতুন Status Badges**
-- 💰 **Advance** (নীল): যদি অগ্রিম টাকা থাকে
-- ❌ **Due** (লাল): মাস অনুযায়ী বাকি টাকা + কত মাস due
-- ⚠️ **Partial** (হলুদ): আংশিক পেমেন্ট থাকলে
-- ✅ **Clear** (সবুজ): সব পেমেন্ট complete হলে
-
-### ✅ ৪. **নতুন Sort Options**
-Sort by select-এ এখন ৬টি অপশন আছে:
-- Sort: Name
-- Sort: Class  
-- Sort: Admission
-- **Sort: Due (High → Low)** ← নতুন
-- **Sort: Due (Low → High)** ← নতুন
-- **Sort: Advance** ← নতুন
-
-### ✅ ৫. **Restore from Sheet কাজ করবে**
-`restoreFromSheet()` ফাংশন আপডেট করা হয়েছে। এখন "From Sheet" বাটনে ক্লিক করলে:
-- প্রথমে Sheet থেকে ডাটা পড়বে
-- কতজন student, কতগুলো class আছে preview দেখাবে
-- Confirm করলেই ডাটা restore হয়ে যাবে
-
-### ✅ ৬. **সব আগের ফিক্স বহাল আছে:**
-- ✅ Firebase Persistence (অফলাইন ডাটা সেভ)
-- ✅ Global Sync Lock (ডাটা auto-delete হবে না)
-- ✅ Forgot Password (reset link via email)
-- ✅ Custom Confirm/Alert modals
-- ✅ JSON/Email/Sheet backup সব কাজ করবে
-
-**ব্যবহার করার নিয়ম:**
-1. একবার **"Backup to Sheet"** চাপো (RawBackup শীট তৈরি হবে)
-2. যখন খুশি **"From Sheet"** চাপো → confirm করো → ডাটা ফিরে আসবে 🎉
