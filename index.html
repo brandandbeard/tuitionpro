@@ -1,3 +1,9 @@
+Bhai, niche **full updated code** dilam.  
+Eta-te **data auto-delete fix** + **Forgot Password reset link flow** + **custom confirm/alert** sob add kora ache.
+
+> Tumi eta `index.html` hisebe full replace korte paro.
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,32 +11,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <title>TuitionPro ✨</title>
 
-<!-- Flash fix: BLACK splash -->
 <style>
 html { background: #000000; }
 body { margin: 0; padding: 0; background: #000000; }
 </style>
 
-<!-- PWA Manifest (App Install) -->
 <link rel="manifest" href="manifest.json">
-
-<!-- Favicon (Browser Tab Icon) -->
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
 <link rel="shortcut icon" href="favicon.ico">
-
-<!-- Apple Touch Icon (iOS Add to Home Screen) -->
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 
-<!-- PWA & Mobile Settings -->
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#000000">
 
-<!-- Fonts & Scripts (আপনার আগের ফন্ট এবং স্ক্রিপ্ট) -->
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
 <style>
 :root{--bg1:#0f0c29;--bg2:#302b63;--bg3:#24243e;--accent:#7c3aed;--accent2:#ec4899;--accent3:#06b6d4;--glass:rgba(255,255,255,.06);--glass-border:rgba(255,255,255,.12);--text:#f1f5f9;--muted:#94a3b8;--danger:#ef4444;--success:#10b981;--wa:#25D366}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -340,9 +339,11 @@ tr:hover td{background:rgba(255,255,255,.03)}
 </head>
 <body style="background: #0f0c29; margin: 0; padding: 0;">
 <div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
+
 <div class="loading-screen" id="loadingScreen">
 <div style="text-align:center"><div class="spinner"></div><p style="margin-top:20px;color:var(--muted)">Loading TuitionPro...</p></div>
 </div>
+
 <div class="login-wrap" id="loginScreen" style="display:none">
 <div class="login-card">
 <div style="text-align:center;font-size:48px;margin-bottom:10px">🎓</div>
@@ -358,9 +359,41 @@ tr:hover td{background:rgba(255,255,255,.03)}
 <button type="submit" class="btn btn-primary" id="authBtn" style="width:100%">🔐 Login</button>
 </form>
 <p id="authError" style="color:#fca5a5;font-size:12px;text-align:center;margin-top:10px;display:none"></p>
+<p style="text-align:right;margin-top:12px">
+<a href="#" onclick="showForgotPassword();return false;" style="color:#a78bfa;font-size:12px;font-weight:600;text-decoration:underline">Forgot Password?</a>
+</p>
 </div>
 </div>
+
+<div class="login-wrap" id="forgotScreen" style="display:none">
+<div class="login-card">
+<div style="text-align:center;font-size:48px;margin-bottom:10px">🔑</div>
+<h2>Forgot <span>Password</span></h2>
+<p>আপনার email দিন, reset link পাঠাবো</p>
+<div class="field"><label>Email</label><input type="email" id="forgotEmail" placeholder="you@gmail.com"/></div>
+<button class="btn btn-primary" id="forgotBtn" style="width:100%" onclick="sendForgotLink()">📧 Send Reset Link</button>
+<button class="btn btn-ghost" style="width:100%;margin-top:10px" onclick="backToLogin()">← Back to Login</button>
+<p id="forgotOk" style="color:#6ee7b7;font-size:12px;text-align:center;margin-top:10px;display:none"></p>
+<p id="forgotErr" style="color:#fca5a5;font-size:12px;text-align:center;margin-top:10px;display:none"></p>
+</div>
+</div>
+
+<div class="login-wrap" id="resetScreen" style="display:none">
+<div class="login-card">
+<div style="text-align:center;font-size:48px;margin-bottom:10px">🔒</div>
+<h2>Reset <span>Password</span></h2>
+<p id="resetEmailLabel">New password enter করো</p>
+<div class="field"><label>New Password (min 6)</label><input type="password" id="resetPass1" minlength="6" placeholder="••••••"/></div>
+<div class="field"><label>Confirm New Password</label><input type="password" id="resetPass2" minlength="6" placeholder="••••••"/></div>
+<button class="btn btn-primary" id="resetBtn" style="width:100%" onclick="submitResetPassword()">✅ Set New Password</button>
+<button class="btn btn-ghost" style="width:100%;margin-top:10px" onclick="backToLogin()">← Back to Login</button>
+<p id="resetOk" style="color:#6ee7b7;font-size:12px;text-align:center;margin-top:10px;display:none"></p>
+<p id="resetErr" style="color:#fca5a5;font-size:12px;text-align:center;margin-top:10px;display:none"></p>
+</div>
+</div>
+
 <button class="menu-toggle" id="menuToggle" style="display:none">☰</button>
+
 <div class="app" id="mainApp">
 <aside class="sidebar" id="sidebar">
 <div class="logo"><div class="logo-icon">🎓</div><h1>Tuition<span>Pro</span></h1></div>
@@ -377,6 +410,7 @@ tr:hover td{background:rgba(255,255,255,.03)}
 <button class="btn btn-danger btn-sm" style="width:100%" onclick="doLogout()">🚪 Logout</button>
 </div>
 </aside>
+
 <main class="main">
 <section class="page active" id="dashboard">
 <div class="page-head">
@@ -401,6 +435,7 @@ tr:hover td{background:rgba(255,255,255,.03)}
 <div id="dashDueEmpty" class="empty-state" style="display:none;padding:30px"><div class="big">🎉</div>All fees are paid!</div>
 </div>
 </section>
+
 <section class="page" id="students">
 <div class="page-head"><div><h2>My <span>Students</span></h2><p>Click name for profile</p></div><button class="btn btn-primary" onclick="openStudentModal()">➕ Add Student</button></div>
 <div class="search-bar">
@@ -417,6 +452,7 @@ tr:hover td{background:rgba(255,255,255,.03)}
 <div id="stuEmpty" class="empty-state" style="display:none"><div class="big">👥</div>No students yet.</div>
 </div>
 </section>
+
 <section class="page" id="attendance">
 <div class="page-head"><div><h2>Smart <span>Attendance</span></h2><p>Tap a class to check routine, then start</p></div></div>
 <div id="attStep1"><div class="class-select-grid" id="attClassGrid"></div></div>
@@ -442,6 +478,7 @@ tr:hover td{background:rgba(255,255,255,.03)}
 </div>
 </div>
 </section>
+
 <section class="page" id="fees">
 <div class="page-head"><div><h2>Fees & <span>Dues</span></h2><p>Track payments</p></div></div>
 <div class="search-bar">
@@ -460,12 +497,15 @@ tr:hover td{background:rgba(255,255,255,.03)}
 <div class="mobile-cards" id="feesCards"></div>
 </div>
 </section>
+
 <section class="page" id="classes">
 <div class="page-head"><div><h2>Classes & <span>Routine</span></h2><p>Set routine & fines per class</p></div><button class="btn btn-primary" onclick="openClassModal()">➕ Add Class</button></div>
 <div class="card" id="classesCard"></div>
 </section>
+
 <section class="page" id="backup">
 <div class="page-head"><div><h2>Backup & <span>Settings</span></h2></div></div>
+
 <div class="card">
 <h3 style="margin-bottom:12px;font-family:'Space Grotesk';font-size:clamp(15px,4vw,18px)">📊 Google Sheet Backup</h3>
 <p style="color:var(--muted);font-size:12px;margin-bottom:14px">Backup directly to your Google Sheet</p>
@@ -483,6 +523,7 @@ tr:hover td{background:rgba(255,255,255,.03)}
 </div>
 <p id="sheetStatus" style="color:var(--muted);font-size:11px;margin-top:12px"></p>
 </div>
+
 <div class="card">
 <h3 style="margin-bottom:6px;font-family:'Space Grotesk';font-size:clamp(15px,4vw,18px)">📧 Email Backup</h3>
 <p style="color:var(--muted);font-size:12px;margin-bottom:14px">Bind email for auto backups</p>
@@ -499,6 +540,7 @@ tr:hover td{background:rgba(255,255,255,.03)}
 <button class="btn btn-ghost" onclick="openEmailGuide()">📖 Email Guide</button>
 </div>
 </div>
+
 <div class="card">
 <h3 style="margin-bottom:12px;font-family:'Space Grotesk';font-size:clamp(15px,4vw,18px)">💾 Manual Backup & Restore</h3>
 <p style="color:var(--muted);font-size:12px;margin-bottom:14px">Download or restore your data</p>
@@ -521,17 +563,14 @@ tr:hover td{background:rgba(255,255,255,.03)}
 📊 Restore Excel
 <input type="file" accept=".csv,.xlsx,.xls" onchange="restoreFromExcel(event)" style="display:none"/>
 </label>
-<button class="btn btn-ghost" onclick="restoreFromEmail()" style="justify-content:flex-start">
-📧 From Email
-</button>
-<button class="btn btn-ghost" onclick="restoreFromSheet()" style="justify-content:flex-start">
-📋 From Sheet
-</button>
+<button class="btn btn-ghost" onclick="restoreFromEmail()" style="justify-content:flex-start">📧 From Email</button>
+<button class="btn btn-ghost" onclick="restoreFromSheet()" style="justify-content:flex-start">📋 From Sheet</button>
 </div>
 <p style="color:var(--muted);font-size:11px;margin-top:10px">💡 <b>JSON</b> সবচেয়ে reliable restore method</p>
 </div>
 <p style="color:var(--muted);font-size:11px;margin-top:12px">Last backup: <b id="lastBackup">Never</b></p>
 </div>
+
 <div class="card">
 <h3 style="margin-bottom:12px;font-family:'Space Grotesk';font-size:clamp(15px,4vw,18px)">⏰ Auto Backup</h3>
 <div class="backup-schedule">
@@ -554,6 +593,7 @@ tr:hover td{background:rgba(255,255,255,.03)}
 </div>
 </div>
 </div>
+
 <div class="card">
 <h3 style="margin-bottom:12px;font-family:'Space Grotesk';font-size:clamp(15px,4vw,18px)">💳 UPI Settings</h3>
 <div class="form-grid">
@@ -563,6 +603,7 @@ tr:hover td{background:rgba(255,255,255,.03)}
 <button class="btn btn-ghost" style="margin-top:10px" onclick="saveUPISettings()">💾 Save UPI</button>
 </div>
 </section>
+
 <section class="page" id="about">
 <div class="page-head"><div><h2>About <span>Us</span></h2></div></div>
 <div class="about-section">
@@ -586,6 +627,7 @@ tr:hover td{background:rgba(255,255,255,.03)}
 </div>
 </div>
 </section>
+
 <section class="page" id="profilePage">
 <div class="page-head">
 <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
@@ -614,6 +656,7 @@ tr:hover td{background:rgba(255,255,255,.03)}
 </section>
 </main>
 </div>
+
 <div class="modal-bg" id="studentModal">
 <div class="modal">
 <button class="modal-close" onclick="closeModal('studentModal')">×</button>
@@ -637,6 +680,7 @@ tr:hover td{background:rgba(255,255,255,.03)}
 </form>
 </div>
 </div>
+
 <div class="modal-bg" id="paymentModal">
 <div class="modal sm">
 <button class="modal-close" onclick="closeModal('paymentModal')">×</button>
@@ -665,6 +709,7 @@ tr:hover td{background:rgba(255,255,255,.03)}
 </div>
 </div>
 </div>
+
 <div class="modal-bg" id="deletePayModal">
 <div class="modal sm">
 <button class="modal-close" onclick="closeModal('deletePayModal')">×</button>
@@ -680,6 +725,7 @@ tr:hover td{background:rgba(255,255,255,.03)}
 </div>
 </div>
 </div>
+
 <div class="modal-bg" id="classModal">
 <div class="modal sm">
 <button class="modal-close" onclick="closeModal('classModal')">×</button>
@@ -703,6 +749,7 @@ tr:hover td{background:rgba(255,255,255,.03)}
 </div>
 </div>
 </div>
+
 <div class="modal-bg" id="routineModal" style="align-items:center">
 <div class="routine-preview">
 <button class="modal-close" onclick="closeModal('routineModal')">×</button>
@@ -722,7 +769,7 @@ tr:hover td{background:rgba(255,255,255,.03)}
 </div>
 </div>
 </div>
-<!-- Delete Student Confirmation Modal -->
+
 <div class="modal-bg" id="deleteStuModal">
 <div class="modal sm">
 <button class="modal-close" onclick="closeModal('deleteStuModal')">×</button>
@@ -743,6 +790,7 @@ tr:hover td{background:rgba(255,255,255,.03)}
 </div>
 </div>
 </div>
+
 <div class="modal-bg" id="wipeModal">
 <div class="modal sm">
 <button class="modal-close" onclick="closeModal('wipeModal')">×</button>
@@ -756,7 +804,7 @@ tr:hover td{background:rgba(255,255,255,.03)}
 </div>
 </div>
 </div>
-<!-- NEW: Custom Confirm Modal (Replaces browser confirm()) -->
+
 <div class="modal-bg" id="confirmModal">
 <div class="modal sm">
 <button class="modal-close" onclick="closeModal('confirmModal')">×</button>
@@ -770,7 +818,7 @@ tr:hover td{background:rgba(255,255,255,.03)}
 </div>
 </div>
 </div>
-<!-- NEW: Custom Alert Modal (Replaces browser alert()) -->
+
 <div class="modal-bg" id="alertModal">
 <div class="modal sm">
 <button class="modal-close" onclick="closeModal('alertModal')">×</button>
@@ -781,7 +829,9 @@ tr:hover td{background:rgba(255,255,255,.03)}
 </div>
 </div>
 </div>
+
 <div class="toast" id="toast"></div>
+
 <svg style="display:none" xmlns="http://www.w3.org/2000/svg">
 <symbol id="icon-wa" viewBox="0 0 24 24"><path fill="#25D366" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.297-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></symbol>
 <symbol id="icon-ig" viewBox="0 0 24 24"><path fill="#E1306C" d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></symbol>
@@ -793,22 +843,28 @@ tr:hover td{background:rgba(255,255,255,.03)}
 <path d="M3 11h8V3H3v8zm2-6h4v4H5V5zM3 21h8v-8H3v8zm2-6h4v4H5v-4zM13 3v8h8V3h-8zm6 6h-4V5h4v4zM13 13h2v2h-2zM15 15h2v2h-2zM13 17h2v2h-2zM17 13h2v2h-2zM19 15h2v2h-2zM15 19h2v2h-2zM17 17h2v2h-2zM19 19h2v2h-2z"/>
 </symbol>
 </svg>
+
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script>
 const firebaseConfig={apiKey:"AIzaSyBQzKo8mH7URnwjH91MfcvD6fPCL9uB-tk",authDomain:"tution-a56bc.firebaseapp.com",projectId:"tution-a56bc",storageBucket:"tution-a56bc.firebasestorage.app",messagingSenderId:"583011986186",appId:"1:583011986186:web:fb09fee46ca26a1e8fa8f3",measurementId:"G-6YP7HT7VEY"};
 firebase.initializeApp(firebaseConfig);
-const auth=firebase.auth();const db=firebase.firestore();
+const auth=firebase.auth();
+const db=firebase.firestore();
+
+db.enablePersistence({synchronizeTabs:true}).catch((err)=>{
+if(err.code=='failed-precondition') console.warn('Persistence failed: multiple tabs open');
+else if(err.code=='unimplemented') console.warn('Persistence not supported');
+});
+
 let currentUser=null;
 let DB={students:[],classes:{},settings:{backupFreq:'daily',backupTime:'00:00',lastBackup:null,monthlyReminder:true,email:{},upi:{id:'arho065-1@okicici',phone:'9564385573'},sheetBackupUrl:''}};
-let unsubscribe=null,savingTimer=null,isSaving=false;
+let unsubscribe=null,savingTimer=null,isSaving=false,isInitialLoadComplete=false;
 let currentAttClass=null,currentProfileId=null,profileMonth=new Date(),autoBackupInterval=null;
-let pendingRoutineClass=null;
-let editingClassDays=[];
-let editingClassTimes={};
-let afterClassSaveCallback=null;
-let confirmCallback=null;
+let pendingRoutineClass=null,editingClassDays=[],editingClassTimes={},afterClassSaveCallback=null,confirmCallback=null;
+let isResetMode=false,resetOobCode=null;
+
 const DAY_NAMES=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const DAY_FULL=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 const MONTH_NAMES=['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -816,46 +872,45 @@ const MONTH_SHORT=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','
 const todayISO=()=>new Date().toISOString().slice(0,10);
 const todayYM=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`};
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600);}
 function closeModal(id){document.getElementById(id).classList.remove('show')}
 
-// ===== NEW: Custom Confirm & Alert Functions (No more browser dialogs!) =====
-function showConfirm(title, msg, callback){
-  confirmCallback = callback;
-  document.getElementById('confirmTitle').innerHTML = title;
-  document.getElementById('confirmMsg').innerHTML = msg;
-  document.getElementById('confirmInput').value = '';
-  document.getElementById('confirmBtn').disabled = true;
-  document.getElementById('confirmModal').classList.add('show');
-  setTimeout(() => document.getElementById('confirmInput').focus(), 100);
+function showConfirm(title,msg,callback){
+confirmCallback=callback;
+document.getElementById('confirmTitle').innerHTML=title;
+document.getElementById('confirmMsg').innerHTML=msg;
+document.getElementById('confirmInput').value='';
+document.getElementById('confirmBtn').disabled=true;
+document.getElementById('confirmModal').classList.add('show');
+setTimeout(()=>document.getElementById('confirmInput').focus(),100);
 }
-
-document.getElementById('confirmInput').addEventListener('input', function(e){
-  document.getElementById('confirmBtn').disabled = e.target.value.trim().toLowerCase() !== 'delete';
+document.getElementById('confirmInput').addEventListener('input',function(e){
+document.getElementById('confirmBtn').disabled=e.target.value.trim().toLowerCase()!=='delete';
 });
-
-document.getElementById('confirmBtn').addEventListener('click', function(){
-  closeModal('confirmModal');
-  if(confirmCallback){
-    const cb = confirmCallback;
-    confirmCallback = null;
-    cb();
-  }
+document.getElementById('confirmBtn').addEventListener('click',function(){
+closeModal('confirmModal');
+if(confirmCallback){const cb=confirmCallback;confirmCallback=null;cb();}
 });
-
-function showAlert(title, msg){
-  document.getElementById('alertTitle').innerHTML = title;
-  document.getElementById('alertMsg').innerHTML = msg;
-  document.getElementById('alertModal').classList.add('show');
+function showAlert(title,msg){
+document.getElementById('alertTitle').innerHTML=title;
+document.getElementById('alertMsg').innerHTML=msg;
+document.getElementById('alertModal').classList.add('show');
 }
-// ===== END NEW =====
 
 const sidebarEl=document.getElementById('sidebar');
 const menuToggleBtn=document.getElementById('menuToggle');
 menuToggleBtn.addEventListener('click',function(e){e.stopPropagation();sidebarEl.classList.toggle('open');});
 document.addEventListener('click',function(e){if(window.innerWidth<=768){if(!sidebarEl.contains(e.target)&&!menuToggleBtn.contains(e.target)){sidebarEl.classList.remove('open');}}});
+
 let authMode='login';
-function switchTab(mode){authMode=mode;document.querySelectorAll('.login-tab').forEach((t,i)=>t.classList.toggle('active',(mode==='login'?i===0:i===1)));document.getElementById('authBtn').textContent=mode==='login'?'🔐 Login':'✨ Create Account';document.getElementById('authError').style.display='none';}
+function switchTab(mode){
+authMode=mode;
+document.querySelectorAll('.login-tab').forEach((t,i)=>t.classList.toggle('active',(mode==='login'?i===0:i===1)));
+document.getElementById('authBtn').textContent=mode==='login'?'🔐 Login':'✨ Create Account';
+document.getElementById('authError').style.display='none';
+}
+
 async function handleAuth(e){
 e.preventDefault();
 const email=document.getElementById('authEmail').value.trim();
@@ -868,9 +923,7 @@ if(authMode==='signup'){
 const cred=await auth.createUserWithEmailAndPassword(email,pass);
 await cred.user.sendEmailVerification();
 await auth.signOut();
-// ✅ CHANGED: Custom alert instead of browser alert()
-showAlert('✅ Account Created!', 
-  'তোমার account তৈরি হয়েছে!<br><br>📧 <b>'+email+'</b> এ একটা verification link পাঠানো হয়েছে।<br><br>⚠️ <b>Spam folder</b> চেক করো!<br><br>Link-এ click করার পর আবার Login করো!');
+showAlert('✅ Account Created!','তোমার account তৈরি হয়েছে!<br><br>📧 <b>'+email+'</b> এ একটা verification link পাঠানো হয়েছে।<br><br>⚠️ <b>Spam folder</b> চেক করো!<br><br>Link-এ click করার পর আবার Login করো!');
 switchTab('login');
 return;
 }else{
@@ -884,18 +937,127 @@ return;
 }
 }catch(e){err.textContent=e.message.replace('Firebase: ','');err.style.display='block';}
 }
-// ✅ CHANGED: Custom confirm instead of browser confirm()
+
 function doLogout(){
-  showConfirm('🚪 Logout', 
-    'তুমি কি সত্যিই logout করতে চাও?<br><span style="font-size:11px;opacity:.8">তোমার সব ডাটা safe থাকবে</span>', 
-    () => { auth.signOut(); }
-  );
+showConfirm('🚪 Logout','তুমি কি সত্যিই logout করতে চাও?<br><span style="font-size:11px;opacity:.8">তোমার সব ডাটা safe থাকবে</span>',()=>{auth.signOut();});
 }
+
+function showForgotPassword(){
+document.getElementById('loginScreen').style.display='none';
+document.getElementById('forgotScreen').style.display='grid';
+document.getElementById('resetScreen').style.display='none';
+document.getElementById('forgotOk').style.display='none';
+document.getElementById('forgotErr').style.display='none';
+document.getElementById('forgotEmail').value='';
+}
+
+function backToLogin(){
+try{
+if(resetOobCode) history.replaceState(null,'',window.location.pathname);
+}catch(e){}
+isResetMode=false;
+resetOobCode=null;
+document.getElementById('forgotScreen').style.display='none';
+document.getElementById('resetScreen').style.display='none';
+if(currentUser){
+document.getElementById('loginScreen').style.display='none';
+document.getElementById('mainApp').classList.add('show');
+document.getElementById('menuToggle').style.display='flex';
+}else{
+document.getElementById('loginScreen').style.display='grid';
+document.getElementById('mainApp').classList.remove('show');
+document.getElementById('menuToggle').style.display='none';
+}
+}
+
+async function sendForgotLink(){
+const email=document.getElementById('forgotEmail').value.trim();
+const ok=document.getElementById('forgotOk');
+const err=document.getElementById('forgotErr');
+const btn=document.getElementById('forgotBtn');
+ok.style.display='none';
+err.style.display='none';
+if(!email){err.textContent='⚠️ আগে আপনার email দিন!';err.style.display='block';return;}
+btn.disabled=true;btn.textContent='Sending...';
+try{
+const continueUrl=(window.location.origin && window.location.origin!=='null')?(window.location.origin+window.location.pathname):null;
+if(continueUrl){
+try{await auth.sendPasswordResetEmail(email,{url:continueUrl});}
+catch(e1){await auth.sendPasswordResetEmail(email);}
+}else{
+await auth.sendPasswordResetEmail(email);
+}
+ok.textContent='✅ Reset link পাঠানো হয়েছে! Inbox/Spam check করো।';
+ok.style.display='block';
+}catch(e){
+err.textContent='❌ '+e.message.replace('Firebase: ','');
+err.style.display='block';
+}
+btn.disabled=false;btn.textContent='📧 Send Reset Link';
+}
+
+function checkResetModeFromURL(){
+const params=new URLSearchParams(window.location.search);
+const mode=params.get('mode');
+const oobCode=params.get('oobCode');
+if(mode==='resetPassword' && oobCode){
+isResetMode=true;
+resetOobCode=oobCode;
+document.getElementById('loadingScreen').style.display='none';
+document.getElementById('loginScreen').style.display='none';
+document.getElementById('forgotScreen').style.display='none';
+document.getElementById('resetScreen').style.display='grid';
+document.getElementById('mainApp').classList.remove('show');
+document.getElementById('menuToggle').style.display='none';
+auth.verifyPasswordResetCode(oobCode)
+.then(email=>{document.getElementById('resetEmailLabel').textContent='Resetting: '+email;})
+.catch(()=>{
+document.getElementById('resetErr').textContent='❌ Link invalid/expired! আবার Forgot Password করো।';
+document.getElementById('resetErr').style.display='block';
+document.getElementById('resetBtn').disabled=true;
+});
+}
+}
+checkResetModeFromURL();
+
+async function submitResetPassword(){
+const p1=document.getElementById('resetPass1').value;
+const p2=document.getElementById('resetPass2').value;
+const ok=document.getElementById('resetOk');
+const err=document.getElementById('resetErr');
+const btn=document.getElementById('resetBtn');
+ok.style.display='none';err.style.display='none';
+if(!p1 || p1.length<6){err.textContent='⚠️ Password কমপক্ষে 6 অক্ষরের হতে হবে!';err.style.display='block';return;}
+if(p1!==p2){err.textContent='⚠️ Password match করছে না!';err.style.display='block';return;}
+if(!resetOobCode){err.textContent='❌ Reset link পাওয়া যায়নি!';err.style.display='block';return;}
+btn.disabled=true;btn.textContent='Saving...';
+try{
+await auth.confirmPasswordReset(resetOobCode,p1);
+ok.textContent='✅ Password change successful! Login করো।';
+ok.style.display='block';
+setTimeout(()=>backToLogin(),1500);
+}catch(e){
+err.textContent='❌ '+e.message.replace('Firebase: ','');
+err.style.display='block';
+}
+btn.disabled=false;btn.textContent='✅ Set New Password';
+}
+
 auth.onAuthStateChanged(async(user)=>{
 document.getElementById('loadingScreen').style.display='none';
+if(isResetMode){
+document.getElementById('loginScreen').style.display='none';
+document.getElementById('forgotScreen').style.display='none';
+document.getElementById('resetScreen').style.display='grid';
+document.getElementById('mainApp').classList.remove('show');
+document.getElementById('menuToggle').style.display='none';
+return;
+}
 if(user){
 currentUser=user;
 document.getElementById('loginScreen').style.display='none';
+document.getElementById('forgotScreen').style.display='none';
+document.getElementById('resetScreen').style.display='none';
 document.getElementById('mainApp').classList.add('show');
 document.getElementById('menuToggle').style.display='flex';
 document.getElementById('userEmail').textContent=user.email;
@@ -905,37 +1067,48 @@ currentUser=null;
 if(unsubscribe){unsubscribe();unsubscribe=null;}
 if(autoBackupInterval){clearInterval(autoBackupInterval);autoBackupInterval=null;}
 document.getElementById('loginScreen').style.display='grid';
+document.getElementById('forgotScreen').style.display='none';
+document.getElementById('resetScreen').style.display='none';
 document.getElementById('mainApp').classList.remove('show');
 document.getElementById('menuToggle').style.display='none';
 }
 });
+
 function userDoc(){return db.collection('users').doc(currentUser.uid);}
+
+function applyUserData(data){
+DB.students=data.students||[];
+DB.classes=data.classes||{};
+DB.settings=Object.assign({backupFreq:'daily',backupTime:'00:00',lastBackup:null,monthlyReminder:true,email:{},upi:{id:'arho065-1@okicici',phone:'9564385573'},sheetBackupUrl:''},data.settings||{});
+DB.settings.email=DB.settings.email||{};
+DB.settings.upi=Object.assign({id:'arho065-1@okicici',phone:'9564385573'},DB.settings.upi||{});
+DB.settings.sheetBackupUrl=DB.settings.sheetBackupUrl||'';
+}
+
 async function startCloudSync(){
+if(unsubscribe){unsubscribe();unsubscribe=null;}
+isInitialLoadComplete=false;
 try{
 const doc=await userDoc().get();
-if(doc.exists){
-const data=doc.data();
-DB.students=data.students||[];DB.classes=data.classes||{};
-DB.settings=Object.assign({backupFreq:'daily',backupTime:'00:00',lastBackup:null,monthlyReminder:true,email:{},upi:{id:'arho065-1@okicici',phone:'9564385573'},sheetBackupUrl:''},data.settings||{});
-DB.settings.email=DB.settings.email||{};DB.settings.upi=DB.settings.upi||{id:'arho065-1@okicici',phone:'9564385573'};DB.settings.sheetBackupUrl=DB.settings.sheetBackupUrl||'';
-}else{
-DB.classes={'General':{days:[],times:{},fineEnabled:false,fineAmount:10}};
-await userDoc().set({students:[],classes:DB.classes,settings:DB.settings});
-}
+if(doc.exists){applyUserData(doc.data());}
+else{DB.classes={'General':{days:[],times:{},fineEnabled:false,fineAmount:10}};}
 }catch(e){console.error(e);}
 unsubscribe=userDoc().onSnapshot((doc)=>{
-if(doc.exists&&!isSaving){
-const data=doc.data();
-DB.students=data.students||[];DB.classes=data.classes||DB.classes;
-DB.settings=Object.assign(DB.settings,data.settings||{});
-DB.settings.email=DB.settings.email||{};DB.settings.upi=DB.settings.upi||{id:'arho065-1@okicici',phone:'9564385573'};DB.settings.sheetBackupUrl=DB.settings.sheetBackupUrl||'';
+if(doc.exists&&!isSaving){applyUserData(doc.data());renderAll();}
+if(!isInitialLoadComplete){
+isInitialLoadComplete=true;
+if(!doc.exists) saveToCloud();
 renderAll();
 }
+},(error)=>{
+console.error(error);
+if(!isInitialLoadComplete){isInitialLoadComplete=true;renderAll();}
 });
 renderAll();loadUPISettings();loadBackupSettings();loadSheetUrl();
 }
+
 function saveToCloud(){
-if(!currentUser)return;
+if(!currentUser || !isInitialLoadComplete) return;
 clearTimeout(savingTimer);
 savingTimer=setTimeout(async()=>{
 isSaving=true;
@@ -944,6 +1117,7 @@ catch(e){toast('⚠️ Cloud save failed');}
 isSaving=false;
 },500);
 }
+
 function setupNavigation(){
 document.querySelectorAll('.nav-btn').forEach(btn=>{
 btn.addEventListener('click',function(e){
@@ -963,6 +1137,7 @@ renderAll();
 });
 });
 }
+
 function loadSheetUrl(){
 const url=DB.settings.sheetBackupUrl||'';
 const el=document.getElementById('sheetBackupUrl');if(el)el.value=url;
@@ -970,12 +1145,14 @@ const status=document.getElementById('sheetStatus');if(!status)return;
 if(url){status.innerHTML='✅ URL saved. Click <b>Backup to Sheet</b>!';status.style.color='#6ee7b7';}
 else{status.innerHTML='⚠️ Please save your Apps Script URL first';status.style.color='#fca5a5';}
 }
+
 function saveSheetUrl(){
 const url=document.getElementById('sheetBackupUrl').value.trim();
 if(!url){toast('⚠️ Please enter URL!');return;}
 if(!url.includes('script.google.com')){toast('⚠️ Please enter a valid Apps Script URL!');return;}
 DB.settings.sheetBackupUrl=url;saveToCloud();toast('✅ URL saved!');loadSheetUrl();
 }
+
 async function testSheetConnection(){
 const url=DB.settings.sheetBackupUrl;
 if(!url){toast('⚠️ Save URL first!');return;}
@@ -987,6 +1164,7 @@ if(text.includes('TuitionPro')||r.ok){status.innerHTML='✅ Connection successfu
 else{throw new Error('Invalid response');}
 }catch(e){status.innerHTML='❌ Connection failed! Did you deploy Apps Script?';status.style.color='#fca5a5';toast('❌ Connection failed');}
 }
+
 async function backupToSheet(){
 const url=DB.settings.sheetBackupUrl;
 if(!url){toast('⚠️ Save Apps Script URL first!');return;}
@@ -1004,6 +1182,7 @@ status.innerHTML='✅ Success! <a href="https://docs.google.com/spreadsheets" ta
 status.style.color='#6ee7b7';toast('✅ Backup sent to Google Sheet!');
 }catch(e){status.innerHTML='❌ Failed! '+e.message;status.style.color='#fca5a5';toast('❌ Backup failed');}
 }
+
 function openSheetGuide(){
 const guideHtml=`<div style="padding:20px;max-width:600px">
 <h3 style="font-family:'Space Grotesk';margin-bottom:16px">📊 Google Sheet সেটআপ গাইড</h3>
@@ -1016,40 +1195,40 @@ const guideHtml=`<div style="padding:20px;max-width:600px">
 <h4 style="margin-bottom:8px;color:#a78bfa">⚙️ ধাপ ২: অ্যাপস স্ক্রিপ্ট বানাও</h4>
 <p style="font-size:13px;color:var(--muted)">শীটে যাও → উপরে Extensions → Apps Script ক্লিক করো। সব কোড মুছে দিয়ে নিচের কোড পেস্ট করো:</p>
 <pre style="background:rgba(0,0,0,0.3);padding:10px;border-radius:8px;font-size:11px;color:#67e8f9;overflow-x:auto;margin-top:10px">function doPost(e){
-  try{
-    var data=JSON.parse(e.postData.contents);
-    var ss=SpreadsheetApp.getActiveSpreadsheet();
-    var sh1=ss.getSheets()[0];
-    sh1.clear();
-    sh1.appendRow(['SL','Name','Class','Fee','Admission','Mobile','WhatsApp','Instagram','Total Due','Advance','Total Paid']);
-    (data.students||[]).forEach(function(s,i){
-      var due=data.dues&&data.dues[s.id]?data.dues[s.id]:{due:0,advance:0,totalPaid:0};
-      sh1.appendRow([i+1,s.name,s.class,s.fee,s.admission,s.mobile,s.wa,s.ig,due.due||0,due.advance||0,due.totalPaid||0]);
-    });
-    var sh2=ss.getSheetByName('Classes')||ss.insertSheet('Classes');
-    sh2.clear();
-    sh2.appendRow(['Class','Days','Fine/Day','Fine Enabled','Students']);
-    Object.keys(data.classes||{}).forEach(function(name){
-      var cfg=data.classes[name];
-      var days=(cfg.days||[]).map(function(d){return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d]}).join(', ');
-      var count=(data.students||[]).filter(function(s){return s.class===name}).length;
-      sh2.appendRow([name,days,cfg.fineAmount||0,cfg.fineEnabled?'Yes':'No',count]);
-    });
-    var sh3=ss.getSheetByName('Payments')||ss.insertSheet('Payments');
-    sh3.clear();
-    sh3.appendRow(['Student','Class','Amount','Date','Note']);
-    (data.students||[]).forEach(function(s){
-      (s.payments||[]).forEach(function(p){
-        sh3.appendRow([s.name,s.class,p.amount,p.date,p.note||'']);
-      });
-    });
-    return ContentService.createTextOutput(JSON.stringify({status:'success'})).setMimeType(ContentService.MimeType.JSON);
-  }catch(err){
-    return ContentService.createTextOutput(JSON.stringify({status:'error',msg:err.toString()})).setMimeType(ContentService.MimeType.JSON);
-  }
+try{
+var data=JSON.parse(e.postData.contents);
+var ss=SpreadsheetApp.getActiveSpreadsheet();
+var sh1=ss.getSheets()[0];
+sh1.clear();
+sh1.appendRow(['SL','Name','Class','Fee','Admission','Mobile','WhatsApp','Instagram','Total Due','Advance','Total Paid']);
+(data.students||[]).forEach(function(s,i){
+var due=data.dues&&data.dues[s.id]?data.dues[s.id]:{due:0,advance:0,totalPaid:0};
+sh1.appendRow([i+1,s.name,s.class,s.fee,s.admission,s.mobile,s.wa,s.ig,due.due||0,due.advance||0,due.totalPaid||0]);
+});
+var sh2=ss.getSheetByName('Classes')||ss.insertSheet('Classes');
+sh2.clear();
+sh2.appendRow(['Class','Days','Fine/Day','Fine Enabled','Students']);
+Object.keys(data.classes||{}).forEach(function(name){
+var cfg=data.classes[name];
+var days=(cfg.days||[]).map(function(d){return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d]}).join(', ');
+var count=(data.students||[]).filter(function(s){return s.class===name}).length;
+sh2.appendRow([name,days,cfg.fineAmount||0,cfg.fineEnabled?'Yes':'No',count]);
+});
+var sh3=ss.getSheetByName('Payments')||ss.insertSheet('Payments');
+sh3.clear();
+sh3.appendRow(['Student','Class','Amount','Date','Note']);
+(data.students||[]).forEach(function(s){
+(s.payments||[]).forEach(function(p){
+sh3.appendRow([s.name,s.class,p.amount,p.date,p.note||'']);
+});
+});
+return ContentService.createTextOutput(JSON.stringify({status:'success'})).setMimeType(ContentService.MimeType.JSON);
+}catch(err){
+return ContentService.createTextOutput(JSON.stringify({status:'error',msg:err.toString()})).setMimeType(ContentService.MimeType.JSON);
+}
 }
 function doGet(e){
-  return ContentService.createTextOutput('TuitionPro Backup Active').setMimeType(ContentService.MimeType.TEXT);
+return ContentService.createTextOutput('TuitionPro Backup Active').setMimeType(ContentService.MimeType.TEXT);
 }</pre>
 <p style="font-size:12px;color:var(--muted);margin-top:8px">কোড পেস্ট করার পর 💾 Save করো</p>
 </div>
@@ -1075,6 +1254,7 @@ modal.innerHTML=`<div class="modal" style="max-height:85vh"><button class="modal
 modal.addEventListener('click',function(e){if(e.target===modal)modal.remove();});
 document.body.appendChild(modal);
 }
+
 function openEmailGuide(){
 const guideHtml=`<div style="padding:20px;max-width:600px">
 <h3 style="font-family:'Space Grotesk';margin-bottom:16px">📧 ইমেইল ব্যাকআপ গাইড</h3>
@@ -1125,6 +1305,7 @@ modal.innerHTML=`<div class="modal" style="max-height:85vh"><button class="modal
 modal.addEventListener('click',function(e){if(e.target===modal)modal.remove();});
 document.body.appendChild(modal);
 }
+
 function startAutoBackupTimer(){
 if(autoBackupInterval)clearInterval(autoBackupInterval);
 autoBackupInterval=setInterval(()=>{
@@ -1139,82 +1320,43 @@ if(freq==='daily'&&diffH<23)return;if(freq==='weekly'&&diffH<7*24-1)return;if(fr
 doAutoBackup();}
 },60000);
 }
+
 async function doAutoBackup(){
-  let emailSuccess = false;
-  let sheetSuccess = false;
-
-  // ১. ইমেইল অটো ব্যাকআপ
-  if(emailReady()){
-    try{
-      const c = DB.settings.email;
-      emailjs.init({publicKey: c.publicKey});
-      const slim = JSON.parse(JSON.stringify(DB));
-      slim.students.forEach(s => s.photo = ''); // মেমোরি বাঁচাতে ফটো বাদ
-      
-      await emailjs.send(c.serviceId, c.templateId, {
-        to_email: c.toEmail,
-        subject: '🤖 Auto Backup - ' + new Date().toLocaleString('en-IN'),
-        message: JSON.stringify(slim, null, 2)
-      });
-      emailSuccess = true;
-    } catch(e) {
-      console.error('Auto Email Backup failed:', e);
-    }
-  }
-
-  // ২. গুগল শিট অটো ব্যাকআপ
-  const sheetUrl = DB.settings.sheetBackupUrl;
-  if(sheetUrl && DB.students.length > 0){
-    try{
-      const dues = {};
-      DB.students.forEach(s => {
-        const ps = getPaymentStatus(s);
-        dues[s.id] = {due: ps.totalDue, advance: ps.totalAdvance, totalPaid: ps.totalPaid};
-      });
-      
-      const payload = {
-        students: DB.students.map(s => ({
-          id: s.id, name: s.name, class: s.class, fee: s.fee,
-          admission: "'" + s.admission, mobile: "'" + (s.mobile || ''),
-          wa: "'" + (s.wa || ''), ig: s.ig || '',
-          payments: (s.payments || []).map(p => ({amount: p.amount, date: "'" + p.date, note: p.note || ''}))
-        })),
-        classes: DB.classes,
-        dues: dues,
-        backupTime: new Date().toISOString()
-      };
-
-      await fetch(sheetUrl, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: {'Content-Type': 'text/plain;charset=utf-8'},
-        body: JSON.stringify(payload)
-      });
-      sheetSuccess = true;
-    } catch(e) {
-      console.error('Auto Sheet Backup failed:', e);
-    }
-  }
-
-  // ৩. স্ট্যাটাস আপডেট এবং টোস্ট মেসেজ
-  if(emailSuccess || sheetSuccess){
-    DB.settings.lastBackup = new Date().toISOString();
-    saveToCloud();
-    
-    let msg = '🤖 Auto backup successful!';
-    if(emailSuccess && sheetSuccess) msg = '🤖 Auto backup sent to Email & Sheet!';
-    else if(emailSuccess) msg = '🤖 Auto backup sent to Email!';
-    else if(sheetSuccess) msg = '🤖 Auto backup sent to Sheet!';
-    
-    toast(msg);
-  } else {
-    if(!emailReady() && !sheetUrl) {
-      console.warn('Auto backup skipped: No Email or Sheet URL configured.');
-    } else {
-      toast('❌ Auto backup failed! Check Email/Sheet settings.');
-    }
-  }
+let emailSuccess=false;
+let sheetSuccess=false;
+if(emailReady()){
+try{
+const c=DB.settings.email;
+emailjs.init({publicKey:c.publicKey});
+const slim=JSON.parse(JSON.stringify(DB));
+slim.students.forEach(s=>s.photo='');
+await emailjs.send(c.serviceId,c.templateId,{to_email:c.toEmail,subject:'🤖 Auto Backup - '+new Date().toLocaleString('en-IN'),message:JSON.stringify(slim,null,2)});
+emailSuccess=true;
+}catch(e){console.error('Auto Email Backup failed:',e);}
 }
+const sheetUrl=DB.settings.sheetBackupUrl;
+if(sheetUrl && DB.students.length>0){
+try{
+const dues={};
+DB.students.forEach(s=>{const ps=getPaymentStatus(s);dues[s.id]={due:ps.totalDue,advance:ps.totalAdvance,totalPaid:ps.totalPaid};});
+const payload={students:DB.students.map(s=>({id:s.id,name:s.name,class:s.class,fee:s.fee,admission:"'"+s.admission,mobile:"'"+(s.mobile||''),wa:"'"+(s.wa||''),ig:s.ig||'',payments:(s.payments||[]).map(p=>({amount:p.amount,date:"'"+p.date,note:p.note||''}))})),classes:DB.classes,dues:dues,backupTime:new Date().toISOString()};
+await fetch(sheetUrl,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
+sheetSuccess=true;
+}catch(e){console.error('Auto Sheet Backup failed:',e);}
+}
+if(emailSuccess || sheetSuccess){
+DB.settings.lastBackup=new Date().toISOString();saveToCloud();
+let msg='🤖 Auto backup successful!';
+if(emailSuccess && sheetSuccess) msg='🤖 Auto backup sent to Email & Sheet!';
+else if(emailSuccess) msg='🤖 Auto backup sent to Email!';
+else if(sheetSuccess) msg='🤖 Auto backup sent to Sheet!';
+toast(msg);
+}else{
+if(!emailReady() && !sheetUrl) console.warn('Auto backup skipped: No Email or Sheet URL configured.');
+else toast('❌ Auto backup failed! Check Email/Sheet settings.');
+}
+}
+
 function checkMonthlyReminder(){
 if(!DB.settings.monthlyReminder)return;
 const now=new Date();const key=`monthly_${now.getFullYear()}_${now.getMonth()}`;
@@ -1222,45 +1364,59 @@ const lastAlert=localStorage.getItem('lastMonthlyAlert');
 if(lastAlert===key)return;
 if(now.getDate()<=3){localStorage.setItem('lastMonthlyAlert',key);setTimeout(()=>{renderMonthlyBanner();},1500);}
 }
+
 function renderMonthlyBanner(){
 const now=new Date();
 document.getElementById('monthlyAlertBanner').innerHTML=`<div class="monthly-banner"><div><h4>📅 New Month — ${MONTH_NAMES[now.getMonth()]} ${now.getFullYear()}</h4><p>Time to collect fees and backup!</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-primary btn-sm" onclick="backupNow()">💾 Backup</button><button class="btn btn-ghost btn-sm" onclick="this.closest('.monthly-banner').remove()">✕</button></div></div>`;
 }
+
 function toggleMonthlyReminder(){const t=document.getElementById('monthlyReminder');t.classList.toggle('on');DB.settings.monthlyReminder=t.classList.contains('on');saveBackupSettings();}
+
 function loadBackupSettings(){
 document.getElementById('backupFreq').value=DB.settings.backupFreq||'daily';
 document.getElementById('backupTime').value=DB.settings.backupTime||'00:00';
 document.getElementById('monthlyReminder').classList.toggle('on',DB.settings.monthlyReminder!==false);
 if(DB.settings.lastBackup)document.getElementById('lastBackup').textContent=new Date(DB.settings.lastBackup).toLocaleString('en-IN');
 }
+
 function saveBackupSettings(){
 DB.settings.backupFreq=document.getElementById('backupFreq').value;
 DB.settings.backupTime=document.getElementById('backupTime').value;
 DB.settings.monthlyReminder=document.getElementById('monthlyReminder').classList.contains('on');
 saveToCloud();startAutoBackupTimer();toast('✅ Saved');
 }
+
 function loadUPISettings(){
 document.getElementById('upiId').value=DB.settings.upi?.id||'arho065-1@okicici';
 document.getElementById('upiPhone').value=DB.settings.upi?.phone||'9564385573';
 }
+
 function saveUPISettings(){DB.settings.upi={id:document.getElementById('upiId').value.trim(),phone:document.getElementById('upiPhone').value.trim()};saveToCloud();toast('✅ UPI saved');}
+
 function getUPIQRLink(amount){
 const u=DB.settings.upi||{};if(!u.id)return'';
 let upiString=`upi://pay?pa=${u.id}&pn=${encodeURIComponent('Tuition Fees')}&cu=INR`;
 if(amount)upiString+=`&am=${amount}`;
 return`https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=10&data=${encodeURIComponent(upiString)}`;
 }
+
 function isTuitionDay(dateISO,className){const cls=DB.classes[className];if(!cls||!cls.days||cls.days.length===0)return true;return cls.days.includes(new Date(dateISO).getDay());}
+
 function getDayTime(className,dayIndex){const cls=DB.classes[className];if(!cls)return'';if(cls.times&&cls.times[String(dayIndex)])return cls.times[String(dayIndex)];return cls.time||'';}
+
 function formatDateShort(iso){if(!iso)return'';const d=new Date(iso);return `${d.getDate()} ${MONTH_SHORT[d.getMonth()]} ${d.getFullYear()}`;}
+
 function formatTime12(t){if(!t)return'';const[h,m]=t.split(':').map(Number);const ampm=h>=12?'PM':'AM';const h12=h%12||12;return `${h12}:${String(m).padStart(2,'0')} ${ampm}`;}
+
 function openWipeModal(){document.getElementById('wipeInput').value='';document.getElementById('wipeConfirmBtn').disabled=true;document.getElementById('wipeModal').classList.add('show');}
 document.getElementById('wipeInput').addEventListener('input',e=>{document.getElementById('wipeConfirmBtn').disabled=e.target.value.trim().toLowerCase()!=='wipe out all data';});
+
 function doWipe(){
 const keepEmail=DB.settings.email,keepFreq=DB.settings.backupFreq,keepTime=DB.settings.backupTime,keepUPI=DB.settings.upi,keepMR=DB.settings.monthlyReminder,keepSheet=DB.settings.sheetBackupUrl;
 DB={students:[],classes:{'General':{days:[],times:{},fineEnabled:false,fineAmount:10}},settings:{backupFreq:keepFreq,backupTime:keepTime,lastBackup:null,monthlyReminder:keepMR,email:keepEmail,upi:keepUPI,sheetBackupUrl:keepSheet}};
 saveToCloud();renderAll();closeModal('wipeModal');toast('🗑️ Wiped');
 }
+
 function openStudentModal(id=null){
 if(Object.keys(DB.classes).length===0){DB.classes['General']={days:[],times:{},fineEnabled:false,fineAmount:10};saveToCloud();}
 const sel=document.getElementById('stuClass');
@@ -1275,6 +1431,7 @@ document.getElementById('stuAdm').value=s.admission;document.getElementById('stu
 document.getElementById('stuWa').value=s.wa||'';document.getElementById('stuIg').value=s.ig||'';}}
 document.getElementById('studentModal').classList.add('show');
 }
+
 function saveStudent(e){
 e.preventDefault();
 const id=document.getElementById('stuId').value||uid();
@@ -1292,6 +1449,7 @@ saveToCloud();closeModal('studentModal');renderAll();};
 if(photoInput.files[0]){const r=new FileReader();r.onload=ev=>finalize(ev.target.result);r.readAsDataURL(photoInput.files[0]);}
 else finalize(null);
 }
+
 function openDeleteConfirm(id){
 const s=DB.students.find(x=>x.id===id);
 if(!s)return;
@@ -1304,6 +1462,7 @@ document.getElementById('deleteStuModal').classList.add('show');
 document.getElementById('delStuInput').addEventListener('input',function(e){
 document.getElementById('delStuConfirmBtn').disabled=e.target.value.trim().toLowerCase()!=='delete';
 });
+
 function confirmDeleteStudent(){
 const id=document.getElementById('delStuId').value;
 const s=DB.students.find(x=>x.id===id);
@@ -1319,10 +1478,12 @@ document.querySelector('.nav-btn[data-page="students"]').classList.add('active')
 renderAll();
 toast('🗑️ '+name+' deleted!');
 }
+
 function editStudentFromProfile(id){
 document.getElementById('profilePage').classList.remove('active');
 openStudentModal(id);
 }
+
 function renderDayToggles(){
 const wrap=document.getElementById('clsDays');
 wrap.innerHTML=DAY_NAMES.map((d,i)=>{
@@ -1330,12 +1491,15 @@ const active=editingClassDays.includes(i);const time=editingClassTimes[String(i)
 return`<div class="day-item ${active?'active':''}"><span class="day-chip ${active?'on':''}" onclick="toggleDayChip(${i})">${d}</span><input type="time" class="day-time-input" data-day="${i}" value="${time}" ${active?'':'disabled'} onchange="setDayTime(${i},this.value)" onclick="event.stopPropagation()"/></div>`;
 }).join('');
 }
+
 function toggleDayChip(i){
 if(editingClassDays.includes(i)){editingClassDays=editingClassDays.filter(x=>x!==i);delete editingClassTimes[String(i)];}
 else{editingClassDays.push(i);if(!editingClassTimes[String(i)])editingClassTimes[String(i)]='18:00';}
 renderDayToggles();
 }
+
 function setDayTime(dayIndex,value){if(value)editingClassTimes[String(dayIndex)]=value;else delete editingClassTimes[String(dayIndex)];}
+
 function openClassModal(name=null,callback=null){
 afterClassSaveCallback=callback;
 editingClassDays=[];
@@ -1358,6 +1522,7 @@ document.getElementById('clsModalTitle').textContent='✏️ Edit Class';
 renderDayToggles();
 document.getElementById('classModal').classList.add('show');
 }
+
 function saveClass(){
 const name=document.getElementById('clsName').value.trim();
 if(!name){toast('⚠️ Name required');return;}
@@ -1368,35 +1533,31 @@ DB.classes[name]={days:[...editingClassDays].sort((a,b)=>a-b),times:times,fineEn
 saveToCloud();closeModal('classModal');renderAll();toast('✅ Saved');
 if(afterClassSaveCallback){afterClassSaveCallback(name);afterClassSaveCallback=null;}
 }
-// ✅ CHANGED: Custom confirm instead of browser confirm()
+
 function deleteClass(name){
-  showConfirm('🗑️ Delete Class', 
-    `তুমি কি সত্যিই <b>"${name}"</b> class টা delete করতে চাও?<br><br>
-    <div style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:12px;padding:14px">
-    ⚠️ এই class-এর routine delete হয়ে যাবে!<br>
-    <span style="font-size:11px;opacity:.8">Students-দের class "General" হয়ে যাবে।</span>
-    </div>`,
-    () => {
-      delete DB.classes[name];
-      DB.students.forEach(s => { if(s.class === name) s.class = 'General'; });
-      saveToCloud();
-      renderAll();
-      toast('🗑️ Class deleted');
-    }
-  );
+showConfirm('🗑️ Delete Class',`তুমি কি সত্যিই <b>"${name}"</b> class টা delete করতে চাও?<br><br>
+<div style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:12px;padding:14px">
+⚠️ এই class-এর routine delete হয়ে যাবে!<br>
+<span style="font-size:11px;opacity:.8">Students-দের class "General" হয়ে যাবে।</span>
+</div>`,()=>{
+delete DB.classes[name];
+DB.students.forEach(s=>{if(s.class===name)s.class='General';});
+saveToCloud();renderAll();toast('🗑️ Class deleted');
+});
 }
-// ✅ FIX 1: Only completed months (current month excluded)
+
 function getAllMonths(stu){
 const adm=new Date(stu.admission);const now=new Date();let months=[];
 let cur=new Date(adm.getFullYear(),adm.getMonth(),1);
-const end=new Date(now.getFullYear(),now.getMonth(),1); // First day of CURRENT month
-// ✅ Changed from <= to < so current month is NOT included
+const end=new Date(now.getFullYear(),now.getMonth(),1);
 while(cur<end){
 const ym=`${cur.getFullYear()}-${String(cur.getMonth()+1).padStart(2,'0')}`;
 months.push({ym:ym,m:cur.getMonth(),y:cur.getFullYear(),label:`${MONTH_SHORT[cur.getMonth()]} ${cur.getFullYear()}`,fullLabel:`${MONTH_NAMES[cur.getMonth()]} ${cur.getFullYear()}`});
-cur.setMonth(cur.getMonth()+1);}
+cur.setMonth(cur.getMonth()+1);
+}
 return months;
 }
+
 function buildPaymentDistribution(stu){
 const months=getAllMonths(stu);
 const payments=(stu.payments||[]).slice().sort((a,b)=>new Date(a.date)-new Date(b.date));
@@ -1423,8 +1584,10 @@ const feeDue=Math.max(0,totalFeeDue-totalPaid);
 const fine=getFineTotal(stu);
 return{months:monthDetails,totalFeeDue,totalPaid,feeDue,fine,totalDue:feeDue+fine,totalAdvance:advance,paidMonths:monthDetails.filter(m=>m.status==='paid').length,partialMonths:monthDetails.filter(m=>m.status==='partial').length,unpaidMonths:monthDetails.filter(m=>m.status==='unpaid').length};
 }
+
 function getPaymentStatus(stu){return buildPaymentDistribution(stu);}
 function getDueMonths(stu){const ps=getPaymentStatus(stu);return ps.months.filter(m=>m.status!=='paid').map(m=>m.ym);}
+
 function getFineTotal(stu){
 const cls=DB.classes[stu.class];if(!cls||!cls.fineEnabled)return 0;
 const now=new Date();const ym=todayYM();let absent=0;
@@ -1434,6 +1597,7 @@ if(stu.attendance&&stu.attendance[key]===false&&isTuitionDay(key,stu.class))abse
 }
 return absent*cls.fineAmount;
 }
+
 function openPaymentModal(sid){
 const s=DB.students.find(x=>x.id===sid);if(!s)return;
 document.getElementById('payStuId').value=sid;
@@ -1466,6 +1630,7 @@ if(ps2.totalAdvance>0){html+=`💰 <b>Advance balance: ₹${ps2.totalAdvance}</b
 preview.innerHTML=html;preview.style.display='block';
 };
 }
+
 function confirmPayment(){
 const sid=document.getElementById('payStuId').value;
 const amount=+document.getElementById('payAmount').value;
@@ -1480,34 +1645,25 @@ toast(`💰 ₹${amount} payment recorded!`);
 renderAll();
 if(document.getElementById('profilePage').classList.contains('active')){renderProfilePay();}
 }
-// ✅ CHANGED: Custom confirm instead of browser confirm()
+
 function deletePayment(sid,payId){
-  const s = DB.students.find(x => x.id === sid);
-  if(!s) return;
-  const p = (s.payments || []).find(x => x.id === payId);
-  if(!p) return;
-  
-  showConfirm('🗑️ Delete Payment', 
-    `তুমি কি সত্যিই এই payment টা delete করতে চাও?<br><br>
-    <div style="background:rgba(0,0,0,.3);padding:12px;border-radius:10px;margin:8px 0;border-left:3px solid var(--accent)">
-    <div style="font-family:'Space Grotesk';font-size:18px;font-weight:700;color:#6ee7b7">₹${p.amount}</div>
-    <div style="font-size:12px;color:var(--text);margin-top:4px">📅 ${formatDateShort(p.date)}</div>
-    ${p.note ? `<div style="font-size:11px;color:var(--muted);margin-top:4px">📝 ${p.note}</div>` : ''}
-    </div>
-    <div style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:10px;margin-top:10px">
-    <span style="font-size:12px;color:#fca5a5">⚠️ Fee calculation পরিবর্তন হবে!</span>
-    </div>`,
-    () => {
-      s.payments = (s.payments || []).filter(p => p.id !== payId);
-      saveToCloud();
-      toast('🗑️ Payment deleted');
-      renderAll();
-      if(document.getElementById('profilePage').classList.contains('active')){
-        renderProfilePay();
-      }
-    }
-  );
+const s=DB.students.find(x=>x.id===sid);if(!s)return;
+const p=(s.payments||[]).find(x=>x.id===payId);if(!p)return;
+showConfirm('🗑️ Delete Payment',`তুমি কি সত্যিই এই payment টা delete করতে চাও?<br><br>
+<div style="background:rgba(0,0,0,.3);padding:12px;border-radius:10px;margin:8px 0;border-left:3px solid var(--accent)">
+<div style="font-family:'Space Grotesk';font-size:18px;font-weight:700;color:#6ee7b7">₹${p.amount}</div>
+<div style="font-size:12px;color:var(--text);margin-top:4px">📅 ${formatDateShort(p.date)}</div>
+${p.note?`<div style="font-size:11px;color:var(--muted);margin-top:4px">📝 ${p.note}</div>`:''}
+</div>
+<div style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:10px;margin-top:10px">
+<span style="font-size:12px;color:#fca5a5">⚠️ Fee calculation পরিবর্তন হবে!</span>
+</div>`,()=>{
+s.payments=(s.payments||[]).filter(p=>p.id!==payId);
+saveToCloud();toast('🗑️ Payment deleted');renderAll();
+if(document.getElementById('profilePage').classList.contains('active')){renderProfilePay();}
+});
 }
+
 function quickMarkMonthPaid(sid,ym){
 const s=DB.students.find(x=>x.id===sid);if(!s)return;
 const ps=getPaymentStatus(s);
@@ -1519,6 +1675,7 @@ s.payments.push({id:uid(),amount:needed,date:todayISO(),note:`Quick pay: ${month
 saveToCloud();toast(`✅ ${monthInfo.label} marked as paid!`);renderAll();
 if(document.getElementById('profilePage').classList.contains('active')){renderProfilePay();}
 }
+
 function openDeleteMonthPayment(sid,ym){
 const s=DB.students.find(x=>x.id===sid);if(!s)return;
 const ps=getPaymentStatus(s);
@@ -1533,6 +1690,7 @@ document.getElementById('deletePayModal').classList.add('show');
 document.getElementById('deletePayInput').addEventListener('input',function(e){
 document.getElementById('deletePayConfirmBtn').disabled=e.target.value.trim().toLowerCase()!=='delete';
 });
+
 function confirmDeleteMonthPayment(){
 const sid=document.getElementById('deletePayStuId').value;
 const ym=document.getElementById('deletePayYm').value;
@@ -1553,67 +1711,67 @@ toast(`🗑️ ${monthInfo.label} payment removed!`);
 renderAll();
 if(document.getElementById('profilePage').classList.contains('active')){renderProfilePay();}
 }
+
 function feeMessage(s){
 const ps=getPaymentStatus(s);
 const total=ps.totalDue;
 const upi=DB.settings.upi||{};
 const upiId=upi.id||'';
-let msg="*নমস্কার।*\n\n";
-msg+="আপনার সন্তানের টিউশন ফি বাকি আছে। অনুগ্রহ করে দ্রুত বাকি টাকা জমা দিয়ে দিন।\n\n";
-msg+="*নাম:* "+s.name+"\n";
-msg+="*Class:* "+s.class+"\n";
-msg+="*নেট বাকি:* ₹"+total+"\n\n";
-msg+="📊 *মাস-অনুযায়ী হিসাব: (মাসিক ফি: ₹"+s.fee+")*\n";
-msg+="━━━━━━━━━━━━━━━━━━\n";
+let lines=[];
+lines.push('*নমস্কার।*');
+lines.push('আপনার সন্তানের টিউশন ফি বাকি আছে। অনুগ্রহ করে দ্রুত বাকি টাকা জমা দিয়ে দিন।');
+lines.push('*নাম:* '+s.name);
+lines.push('*Class:* '+s.class);
+lines.push('*নেট বাকি:* ₹'+total);
+lines.push('📊 *মাস-অনুযায়ী হিসাব: (মাসিক ফি: ₹'+s.fee+')*');
+lines.push('━━━━━━━━━━━━━━━━━━');
 const unpaidMonths=ps.months.filter(m=>m.status!=='paid');
-if(unpaidMonths.length===0){
-msg+="✅ সব মাস পরিশোধিত।\n";
-}else{
+if(unpaidMonths.length===0){lines.push('✅ সব মাস পরিশোধিত।');}
+else{
 unpaidMonths.forEach(m=>{
-let statusIcon='';
-if(m.status==='partial')statusIcon='⚠️';
-else statusIcon='❌';
+let statusIcon=m.status==='partial'?'⚠️':'❌';
 let line=`${statusIcon} *${m.label}*: `;
-if(m.status==='partial'){
-line+=`₹${m.paid} paid, *₹${m.due} বাকি*`;
-}else{
-line+=`*₹${m.fee} বাকি*`;
-}
-msg+=line+'\n';
+if(m.status==='partial') line+=`₹${m.paid} paid, *₹${m.due} বাকি*`;
+else line+=`*₹${m.fee} বাকি*`;
+lines.push(line);
 });
 }
-msg+="━━━━━━━━━━━━━━━━━━\n\n";
-msg+=`*Total Fee Due:* ₹${ps.totalFeeDue}\n`;
-msg+=`*Total Paid:* ₹${ps.totalPaid}\n`;
-if(ps.fine>0){
-msg+=`*Fine (Attendance):* ₹${ps.fine}\n`;
-}
+lines.push('━━━━━━━━━━━━━━━━━━');
+lines.push(`*Total Fee Due:* ₹${ps.totalFeeDue}`);
+lines.push(`*Total Paid:* ₹${ps.totalPaid}`);
+if(ps.fine>0) lines.push(`*Fine (Attendance):* ₹${ps.fine}`);
 if(ps.totalAdvance>0){
-msg+=`\n💰 *Advance Balance:* ₹${ps.totalAdvance}\n`;
-msg+=`(এই টাকা পরের মাসের ফি-তে অ্যাডজাস্ট হবে)\n`;
+lines.push('');
+lines.push(`💰 *Advance Balance:* ₹${ps.totalAdvance}`);
+lines.push('(এই টাকা পরের মাসের ফি-তে অ্যাডজাস্ট হবে)');
 }else if(ps.feeDue>0){
-msg+=`\n❗ *Net Due:* ₹${ps.feeDue}`;
-if(ps.fine>0)msg+=` + Fine ₹${ps.fine} = *₹${total}*`;
-msg+='\n';
+let net=`❗ *Net Due:* ₹${ps.feeDue}`;
+if(ps.fine>0) net+=` + Fine ₹${ps.fine} = *₹${total}*`;
+lines.push('');
+lines.push(net);
 }
 if(upiId&&total>0){
-msg+="\n-------------------------\n";
-msg+="*💳 পেমেন্ট করার জন্য:*\n\n";
-msg+="📱 *UPI ID:* "+upiId+"\n";
-if(upi.phone)msg+="📞 *Phone:* "+upi.phone+"\n";
-msg+="💰 *Amount:* ₹"+total+"\n\n";
-msg+="🔹 PhonePe / Google Pay / Paytm যেকোনো অ্যাপে\n";
-msg+="   UPI ID কপি করে পেমেন্ট করুন\n";
-msg+="-------------------------\n";
+lines.push('');
+lines.push('-------------------------');
+lines.push('*💳 পেমেন্ট করার জন্য:*');
+lines.push('📱 *UPI ID:* '+upiId);
+if(upi.phone) lines.push('📞 *Phone:* '+upi.phone);
+lines.push('💰 *Amount:* ₹'+total);
+lines.push('🔹 PhonePe / Google Pay / Paytm যেকোনো অ্যাপে');
+lines.push('   UPI ID কপি করে পেমেন্ট করুন');
+lines.push('-------------------------');
 }
-msg+="\nধন্যবাদ।";
-return msg;
+lines.push('');
+lines.push('ধন্যবাদ।');
+return lines.join('\n');
 }
+
 function photoHTML(s,lg=false,clickable=true){
 const clickAttr=clickable?`onclick="openProfile('${s.id}')"`:'';
 if(s.photo)return `<div class="photo ${lg?'lg':''}" ${clickAttr}><img src="${s.photo}"/></div>`;
 return `<div class="photo ${lg?'lg':''}" ${clickAttr}>${s.name.charAt(0).toUpperCase()}</div>`;
 }
+
 function alertButtons(s){
 const msg=feeMessage(s);
 const waNum=(s.wa||s.mobile||'').replace(/\D/g,'');
@@ -1630,9 +1788,9 @@ html+=`<button class="icon-btn qr-btn" onclick="sendQRViaWhatsApp('${s.id}')" ti
 html+='</div>';
 return html;
 }
+
 async function sendQRViaWhatsApp(sid){
-const s=DB.students.find(x=>x.id===sid);
-if(!s)return;
+const s=DB.students.find(x=>x.id===sid);if(!s)return;
 const waNum=(s.wa||s.mobile||'').replace(/\D/g,'');
 if(!waNum){toast('⚠️ No WhatsApp number!');return;}
 const ps=getPaymentStatus(s);
@@ -1664,10 +1822,7 @@ ctx.font='bold 20px Arial, sans-serif';
 ctx.fillText('Scan & Pay ₹'+ps.totalDue,W/2,30);
 ctx.font='bold 15px Arial, sans-serif';
 ctx.fillText('UPI: '+upiId,W/2,58);
-if(upiPhone){
-ctx.font='14px Arial, sans-serif';
-ctx.fillText('Ph: '+upiPhone,W/2,82);
-}
+if(upiPhone){ctx.font='14px Arial, sans-serif';ctx.fillText('Ph: '+upiPhone,W/2,82);}
 ctx.font='12px Arial, sans-serif';
 ctx.fillText('PhonePe / GPay / Paytm',W/2,102);
 ctx.drawImage(img,(W-img.width)/2,headerH);
@@ -1679,18 +1834,13 @@ ctx.fillText('TuitionPro • '+s.name,W/2,headerH+img.height+30);
 canvas.toBlob(async(blob)=>{
 const file=new File([blob],s.name+'_QR.png',{type:'image/png'});
 if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
-try{
-await navigator.share({files:[file],title:s.name+' QR'});
-toast('✅ QR পাঠানো হয়েছে!');
-return;
-}catch(e){}
+try{await navigator.share({files:[file],title:s.name+' QR'});toast('✅ QR পাঠানো হয়েছে!');return;}catch(e){}
 }
 qrFallback(blob,s,waNum,ps,upiId,upiPhone);
 },'image/png');
-}catch(e){
-toast('❌ QR তৈরি ব্যর্থ!');
+}catch(e){toast('❌ QR তৈরি ব্যর্থ!');}
 }
-}
+
 function qrFallback(blob,s,waNum,ps,upiId,upiPhone){
 const url=URL.createObjectURL(blob);
 const a=document.createElement('a');
@@ -1698,16 +1848,15 @@ a.href=url;
 a.download=s.name+'_QR.png';
 a.click();
 URL.revokeObjectURL(url);
-let msg='📱 *'+s.name+' Payment QR*\n\n';
+let msg='📱 *'+s.name+' Payment QR*\n';
 msg+='UPI: '+upiId+'\n';
 if(upiPhone)msg+='Ph: '+upiPhone+'\n';
-msg+='Amount: ₹'+ps.totalDue+'\n\n';
+msg+='Amount: ₹'+ps.totalDue+'\n';
 msg+='👆 QR image download হয়েছে।\nWhatsApp-এ attach করে পাঠান।';
-setTimeout(()=>{
-window.open('https://wa.me/'+waNum+'?text='+encodeURIComponent(msg),'_blank');
-},500);
+setTimeout(()=>{window.open('https://wa.me/'+waNum+'?text='+encodeURIComponent(msg),'_blank');},500);
 toast('📥 QR Downloaded! WhatsApp-এ attach করুন');
 }
+
 function renderAll(){
 renderDashboard();renderStudents();renderAttClassGrid();renderFees();renderClasses();loadEmailSettings();loadSheetUrl();
 const classes=Object.keys(DB.classes);
@@ -1715,6 +1864,7 @@ const classes=Object.keys(DB.classes);
 el.innerHTML='<option value="">All Classes</option>'+classes.map(c=>`<option ${cur===c?'selected':''}>${c}</option>`).join('');});
 if(document.getElementById('attStep2').style.display!=='none'&&currentAttClass)renderAttendanceDay();
 }
+
 function renderDashboard(){
 document.getElementById('todayDate').textContent=new Date().toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
 document.getElementById('sTotal').textContent=DB.students.length;
@@ -1743,6 +1893,7 @@ bulkBtn.style.display=dueStudents.length>0?'inline-flex':'none';
 document.getElementById('dashDueEmpty').style.display=dueStudents.length?'none':'block';
 document.getElementById('dashDueTbl').style.display=dueStudents.length?'':'none';
 }
+
 function renderStudents(){
 if(Object.keys(DB.classes).length===0){DB.classes['General']={days:[],times:{},fineEnabled:false,fineAmount:10};saveToCloud();}
 const q=(document.getElementById('searchInput')?.value||'').toLowerCase();
@@ -1761,13 +1912,12 @@ tbody.innerHTML=list.map(s=>`<tr>
 <td>₹${s.fee}</td>
 <td>${formatDateShort(s.admission)}</td>
 <td style="font-size:11px;color:var(--muted)">${s.mobile||'—'}</td>
-<td><div class="action-row">
-${alertButtons(s)}
-</div></td></tr>`).join('');
+<td><div class="action-row">${alertButtons(s)}</div></td></tr>`).join('');
 const cards=document.getElementById('studentsCards');
 cards.innerHTML=list.map(s=>`<div class="m-card">${photoHTML(s,false,true)}<div class="body"><div class="nm" onclick="openProfile('${s.id}')">${s.name}</div><div class="meta"><span class="badge badge-class">${s.class}</span><span>₹${s.fee}/mo</span><span>${formatDateShort(s.admission)}</span></div><div class="actions">${alertButtons(s)}</div></div></div>`).join('');
 document.getElementById('stuEmpty').style.display=list.length?'none':'block';
 }
+
 function renderAttClassGrid(){
 const grid=document.getElementById('attClassGrid');const classes=Object.keys(DB.classes);
 if(!classes.length){grid.innerHTML='<div class="empty-state"><div class="big">🏫</div>No classes yet!</div>';return;}
@@ -1777,6 +1927,7 @@ const daysText=c.days&&c.days.length?c.days.map(d=>{const t=getDayTime(name,d);r
 return`<div class="class-pick-card" onclick="showRoutinePreview('${name.replace(/'/g,"\\'")}')"><div class="nm">${name}</div><div class="info">📅 ${daysText}</div><div class="count">👥 ${count} student(s)</div></div>`;
 }).join('');
 }
+
 function showRoutinePreview(name){
 pendingRoutineClass=name;const c=DB.classes[name];
 const count=DB.students.filter(s=>s.class===name).length;
@@ -1788,6 +1939,7 @@ else{list.innerHTML='<div style="color:var(--muted);font-size:13px;padding:10px;
 document.getElementById('routineFineDisplay').innerHTML=c.fineEnabled?`Fine enabled: <b>₹${c.fineAmount}</b> per absent tuition day`:`Fine system: <b style="color:#94a3b8">Disabled</b>`;
 document.getElementById('routineModal').classList.add('show');
 }
+
 function startAttendanceFromRoutine(){
 if(!pendingRoutineClass)return;closeModal('routineModal');
 currentAttClass=pendingRoutineClass;
@@ -1795,12 +1947,15 @@ document.getElementById('attStep1').style.display='none';document.getElementById
 document.getElementById('attClassName').textContent=currentAttClass;
 document.getElementById('attDate').value=todayISO();renderAttendanceDay();
 }
+
 function editRoutineClass(){
 if(!pendingRoutineClass)return;closeModal('routineModal');
 openClassModal(pendingRoutineClass,(savedName)=>{setTimeout(()=>showRoutinePreview(savedName),300);});
 }
+
 function backToClassSelect(){currentAttClass=null;document.getElementById('attStep1').style.display='';document.getElementById('attStep2').style.display='none';renderAttClassGrid();}
 function setAttToday(){document.getElementById('attDate').value=todayISO();renderAttendanceDay();}
+
 function renderAttendanceDay(){
 const dateISO=document.getElementById('attDate').value;
 if(!dateISO||!currentAttClass)return;
@@ -1822,12 +1977,14 @@ return`<div class="stu-att-row">${photoHTML(s,false,true)}<div class="info" oncl
 }).join('');
 document.getElementById('attSummary').textContent=`${present} ✓ • ${absent} ✗ • ${unmarked} ?`;
 }
+
 function setAtt(sid,date,val){
 const s=DB.students.find(x=>x.id===sid);if(!s)return;
 if(!s.attendance)s.attendance={};
 if(val===null)delete s.attendance[date];else s.attendance[date]=val;
 saveToCloud();renderAttendanceDay();renderDashboard();
 }
+
 function openProfile(id,tab='info'){
 currentProfileId=id;profileMonth=new Date();
 document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -1841,10 +1998,12 @@ document.getElementById('profilePageSub').textContent=s.class+' • ₹'+s.fee+'
 renderProfile();switchProfileTab(tab);
 window.scrollTo({top:0,behavior:'smooth'});
 }
+
 function openProfileAndRecordPayment(id){
 openProfile(id,'pay');
 setTimeout(()=>{openPaymentModal(id);},300);
 }
+
 function closeProfilePage(){
 document.getElementById('profilePage').classList.remove('active');
 document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -1853,6 +2012,7 @@ document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
 document.querySelector('.nav-btn[data-page="students"]').classList.add('active');
 window.scrollTo({top:0,behavior:'smooth'});
 }
+
 function switchProfileTab(tab){
 document.querySelectorAll('.profile-tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));
 document.querySelectorAll('.profile-pane').forEach(p=>p.classList.remove('active'));
@@ -1861,6 +2021,7 @@ if(tab==='att')renderProfileAtt();
 if(tab==='pay')renderProfilePay();
 if(tab==='info')renderProfileInfo();
 }
+
 function renderProfile(){
 const s=DB.students.find(x=>x.id===currentProfileId);if(!s)return;
 document.getElementById('profileHeader').innerHTML=`
@@ -1868,6 +2029,7 @@ ${photoHTML(s,true,false)}
 <div class="info"><h3>${s.name}</h3><div style="color:var(--muted);font-size:12px"><span class="badge badge-class">${s.class}</span> • ₹${s.fee}/mo</div></div>`;
 renderProfileInfo();
 }
+
 function renderProfileInfo(){
 const s=DB.students.find(x=>x.id===currentProfileId);if(!s)return;
 const ps=getPaymentStatus(s);const cls=DB.classes[s.class]||{};const upi=DB.settings.upi||{};
@@ -1904,12 +2066,14 @@ ${upi.phone?`<div class="upi-row"><div class="lbl">Phone</div><div class="val">$
 </div>`:''}
 <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center">${alertButtons(s)}</div>`;
 }
+
 function alertParents(sid){
 const s=DB.students.find(x=>x.id===sid);if(!s)return;
 const waNum=(s.wa||s.mobile||'').replace(/\D/g,'');
 if(waNum)window.open(`https://wa.me/${waNum}?text=${encodeURIComponent(feeMessage(s))}`,'_blank');
 else toast('⚠️ No WhatsApp/Mobile saved');
 }
+
 function renderProfileAtt(){
 const s=DB.students.find(x=>x.id===currentProfileId);if(!s)return;
 const y=profileMonth.getFullYear();const m=profileMonth.getMonth();
@@ -1936,7 +2100,9 @@ document.getElementById('pane-att').innerHTML=`
 <div class="info-item"><div class="lbl">Absent</div><div class="val" style="color:#fca5a5">${absent}</div></div>
 <div class="info-item"><div class="lbl">Fine</div><div class="val">₹${total}</div></div></div>`;
 }
+
 function shiftProfileMonth(delta){profileMonth.setMonth(profileMonth.getMonth()+delta);renderProfileAtt();}
+
 function toggleProfileAtt(key){
 const s=DB.students.find(x=>x.id===currentProfileId);if(!s)return;
 if(!s.attendance)s.attendance={};
@@ -1947,6 +2113,7 @@ else delete s.attendance[key];
 saveToCloud();renderProfileAtt();renderDashboard();
 if(document.getElementById('attStep2').style.display!=='none')renderAttendanceDay();
 }
+
 function renderProfilePay(){
 const s=DB.students.find(x=>x.id===currentProfileId);if(!s)return;
 const ps=getPaymentStatus(s);
@@ -1979,8 +2146,7 @@ tickClass='unpaid';tickIcon='○';
 statusInfo=`<span class="badge badge-due">❌ ₹${m.fee} বাকি</span>`;
 tickClass='unpaid';tickIcon='○';
 }
-const delBtn=m.status!=='unpaid'?
-`<button class="month-del-btn" onclick="event.stopPropagation();openDeleteMonthPayment('${s.id}','${m.ym}')" title="Delete payment">🗑️</button>`:'';
+const delBtn=m.status!=='unpaid'?`<button class="month-del-btn" onclick="event.stopPropagation();openDeleteMonthPayment('${s.id}','${m.ym}')" title="Delete payment">🗑️</button>`:'';
 html+=`<div class="pay-month-row ${statusClass}" onclick="quickMarkMonthPaid('${s.id}','${m.ym}')" style="cursor:pointer">
 <div class="ym">${m.label}</div>
 <div class="status-info">${statusInfo}</div>
@@ -2010,6 +2176,7 @@ html+=`<div style="text-align:center;padding:20px;color:var(--muted);font-size:1
 }
 document.getElementById('pane-pay').innerHTML=html;
 }
+
 function renderFees(){
 if(Object.keys(DB.classes).length===0){DB.classes['General']={days:[],times:{},fineEnabled:false,fineAmount:10};saveToCloud();}
 const cls=document.getElementById('feeClass')?.value||'';
@@ -2048,6 +2215,7 @@ else if(ps.partialMonths>0)statusBadge=`<span class="badge badge-partial">${ps.p
 else statusBadge=`<span class="badge badge-ok">✅ Clear</span>`;
 return`<div class="m-card">${photoHTML(s,false,true)}<div class="body" style="flex:1"><div class="nm" onclick="openProfileAndRecordPayment('${s.id}')">${s.name}</div><div class="meta"><span class="badge badge-class">${s.class}</span>${statusBadge}</div><div style="margin:8px 0;font-size:11px;color:var(--muted)">Paid: ${ps.paidMonths} • Partial: ${ps.partialMonths} • Due: ${ps.unpaidMonths}${ps.fine>0?` • Fine ₹${ps.fine}`:''}</div><div style="font-family:'Space Grotesk';font-weight:700;font-size:18px;color:${isDue?'#fca5a5':'#6ee7b7'}">₹${ps.totalDue.toLocaleString('en-IN')}</div><div class="actions" style="margin-top:8px">${alertButtons(s)}</div></div></div>`;}).join('');
 }
+
 function sendBulkReminder(){
 const dueStudents=DB.students.filter(s=>{const ps=getPaymentStatus(s);return ps.totalDue>0;});
 if(dueStudents.length===0){toast('🎉 No pending dues!');return;}
@@ -2057,6 +2225,7 @@ dueStudents.forEach(s=>{const waNum=(s.wa||s.mobile||'').replace(/\D/g,'');
 if(waNum){setTimeout(()=>window.open(`https://wa.me/${waNum}?text=${encodeURIComponent(feeMessage(s))}`,'_blank'),count*600);count++;}});
 toast(`📨 Opening ${count} WhatsApp reminder(s)`);
 }
+
 function renderClasses(){
 if(Object.keys(DB.classes).length===0){DB.classes['General']={days:[],times:{},fineEnabled:false,fineAmount:10};saveToCloud();}
 const card=document.getElementById('classesCard');const entries=Object.entries(DB.classes);
@@ -2065,6 +2234,7 @@ const daysText=cfg.days&&cfg.days.length?cfg.days.map(d=>{const t=getDayTime(nam
 return`<div class="class-card"><div style="flex:1;min-width:200px"><h4 style="font-family:'Space Grotesk';font-size:clamp(14px,4vw,17px)">${name}</h4><div style="font-size:11px;color:var(--muted);margin-top:4px">👥 ${count} students</div><div style="font-size:11px;color:var(--muted);margin-top:2px">📅 ${daysText}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">💰 ₹${cfg.fineAmount}/day ${cfg.fineEnabled?'<span style="color:#6ee7b7">ON</span>':'<span style="color:#94a3b8">OFF</span>'}</div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-sm btn-ghost" onclick="openClassModal('${name.replace(/'/g,"\\'")}')">✏️</button><button class="btn btn-sm btn-danger" onclick="deleteClass('${name.replace(/'/g,"\\'")}')">🗑️</button></div></div>`;}).join('')
 +(entries.length===0?'<div class="empty-state"><div class="big">🏫</div>Add a class</div>':'');
 }
+
 function backupNow(){
 DB.settings.lastBackup=new Date().toISOString();saveToCloud();
 const blob=new Blob([JSON.stringify(DB,null,2)],{type:'application/json'});
@@ -2072,6 +2242,7 @@ const url=URL.createObjectURL(blob);const a=document.createElement('a');
 a.href=url;a.download=`TuitionPro_Backup_${todayISO()}.json`;a.click();URL.revokeObjectURL(url);
 document.getElementById('lastBackup').textContent=new Date().toLocaleString('en-IN');toast('💾 Downloaded');
 }
+
 function backupExcel(){
 if(!DB.students.length){toast('⚠️ No students yet!');return;}
 let csv='\uFEFF';
@@ -2080,128 +2251,131 @@ DB.students.forEach((s,i)=>{const ps=getPaymentStatus(s);
 const name='"'+s.name.replace(/"/g,'""')+'"';const cls='"'+s.class.replace(/"/g,'""')+'"';
 const mob='"'+(s.mobile||'')+'"';const wa='"'+(s.wa||'')+'"';const ig='"'+(s.ig||'')+'"';
 csv+=`${i+1},${name},${cls},${s.fee},"${s.admission}",${mob},${wa},${ig},${ps.totalFeeDue},${ps.totalPaid},${ps.feeDue},${ps.totalAdvance},${ps.fine},${ps.totalDue}\n`;});
-csv+='\n\n=== CLASSES ===\nClass Name,Days,Fine Per Day,Fine Enabled\n';
+csv+='\n=== CLASSES ===\nClass Name,Days,Fine Per Day,Fine Enabled\n';
 Object.entries(DB.classes).forEach(([name,cfg])=>{const days=(cfg.days||[]).map(d=>DAY_NAMES[d]).join(' ');
 csv+=`"${name}","${days}",${cfg.fineAmount||0},${cfg.fineEnabled?'Yes':'No'}\n`;});
-csv+='\n\n=== PAYMENT HISTORY ===\nStudent,Class,Amount,Date,Note\n';
+csv+='\n=== PAYMENT HISTORY ===\nStudent,Class,Amount,Date,Note\n';
 DB.students.forEach(s=>{(s.payments||[]).forEach(p=>{csv+=`"${s.name}","${s.class}",${p.amount},"${p.date}","${(p.note||'').replace(/"/g,'""')}"\n`;});});
 const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
 const url=URL.createObjectURL(blob);const a=document.createElement('a');
 a.href=url;a.download=`TuitionPro_Excel_${todayISO()}.csv`;a.click();URL.revokeObjectURL(url);
 toast('📊 Excel Downloaded!');
 }
-// ✅ CHANGED: Custom confirm instead of browser confirm()
+
 function restoreBackup(e){
-  const f = e.target.files[0];
-  if(!f) return;
-  const r = new FileReader();
-  r.onload = ev => {
-    try{
-      const data = JSON.parse(ev.target.result);
-      if(!data.students) throw 0;
-      
-      showConfirm('⬆️ Restore Backup',
-        `তুমি কি সত্যিই এই backup ফাইল থেকে ডাটা restore করতে চাও?<br><br>
-        <div style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:12px;padding:14px">
-        ⚠️ <b>তোমার বর্তমান সব ডাটা মুছে যাবে!</b><br>
-        <span style="font-size:11px;opacity:.8">এই কাজটা আর ফেরানো যাবে না!</span>
-        </div>`,
-        () => {
-          DB = data;
-          DB.settings.email = DB.settings.email || {};
-          DB.settings.upi = DB.settings.upi || {id:'arho065-1@okicici', phone:'9564385573'};
-          DB.settings.sheetBackupUrl = DB.settings.sheetBackupUrl || '';
-          DB.students.forEach(s => {
-            if(Array.isArray(s.payments)){
-              s.payments = s.payments.map(p => {
-                if(p.ym && !p.amount){
-                  return {id: uid(), amount: s.fee, date: p.date || todayISO(), note: 'Migrated: ' + p.ym};
-                }
-                if(!p.id) p.id = uid();
-                return p;
-              });
-            } else {
-              s.payments = [];
-            }
-          });
-          saveToCloud();
-          renderAll();
-          loadUPISettings();
-          loadBackupSettings();
-          loadSheetUrl();
-          toast('✅ Restored successfully');
-        }
-      );
-    } catch {
-      toast('❌ Invalid backup file');
-    }
-  };
-  r.readAsText(f);
+const f=e.target.files[0];if(!f)return;
+const r=new FileReader();
+r.onload=ev=>{
+try{
+const data=JSON.parse(ev.target.result);
+if(!data.students) throw 0;
+showConfirm('⬆️ Restore Backup',`তুমি কি সত্যিই এই backup ফাইল থেকে ডাটা restore করতে চাও?<br><br>
+<div style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:12px;padding:14px">
+⚠️ <b>তোমার বর্তমান সব ডাটা মুছে যাবে!</b><br>
+<span style="font-size:11px;opacity:.8">এই কাজটা আর ফেরানো যাবে না!</span>
+</div>`,()=>{
+DB=data;
+DB.settings.email=DB.settings.email||{};
+DB.settings.upi=DB.settings.upi||{id:'arho065-1@okicici',phone:'9564385573'};
+DB.settings.sheetBackupUrl=DB.settings.sheetBackupUrl||'';
+DB.students.forEach(s=>{
+if(Array.isArray(s.payments)){
+s.payments=s.payments.map(p=>{
+if(p.ym && !p.amount){return {id:uid(),amount:s.fee,date:p.date||todayISO(),note:'Migrated: '+p.ym};}
+if(!p.id)p.id=uid();
+return p;
+});
+}else{s.payments=[];}
+});
+saveToCloud();renderAll();loadUPISettings();loadBackupSettings();loadSheetUrl();toast('✅ Restored successfully');
+});
+}catch{toast('❌ Invalid backup file');}
+};
+r.readAsText(f);
 }
+
 function restoreFromExcel(e){
 const f=e.target.files[0];if(!f)return;
 toast('⚠️ Excel restore এখনো তৈরি হয়নি!');
 toast('💡 JSON backup ব্যবহার করো — সবচেয়ে reliable');
 e.target.value='';
 }
+
 async function restoreFromEmail(){
-if(!emailReady()){
-toast('⚠️ আগে Email সেটআপ করো!');
-return;
-}
+if(!emailReady()){toast('⚠️ আগে Email সেটআপ করো!');return;}
 toast('📧 এই feature এখনো তৈরি হয়নি!');
 toast('💡 JSON file থেকে restore করো — সবচেয়ে reliable');
 }
+
 async function restoreFromSheet(){
 const url=DB.settings.sheetBackupUrl;
-if(!url){
-toast('⚠️ আগে Sheet URL সেভ করো!');
-return;
-}
+if(!url){toast('⚠️ আগে Sheet URL সেভ করো!');return;}
 toast('📋 এই feature এখনো তৈরি হয়নি!');
 toast('💡 JSON file থেকে restore করো — সবচেয়ে reliable');
 }
-function loadEmailSettings(){const c=DB.settings.email||{};
+
+function loadEmailSettings(){
+const c=DB.settings.email||{};
 document.getElementById('emailTo').value=c.toEmail||'brandandbeard@gmail.com';
 document.getElementById('emailService').value=c.serviceId||'service_ebgbpyo';
 document.getElementById('emailTemplate').value=c.templateId||'template_pc8c1xp';
-document.getElementById('emailKey').value=c.publicKey||'6ZyB3smC300Ho7HEc';}
-function saveEmailSettings(){DB.settings.email={toEmail:document.getElementById('emailTo').value.trim(),serviceId:document.getElementById('emailService').value.trim(),templateId:document.getElementById('emailTemplate').value.trim(),publicKey:document.getElementById('emailKey').value.trim()};saveToCloud();toast('✅ Saved');}
+document.getElementById('emailKey').value=c.publicKey||'6ZyB3smC300Ho7HEc';
+}
+
+function saveEmailSettings(){
+DB.settings.email={toEmail:document.getElementById('emailTo').value.trim(),serviceId:document.getElementById('emailService').value.trim(),templateId:document.getElementById('emailTemplate').value.trim(),publicKey:document.getElementById('emailKey').value.trim()};
+saveToCloud();toast('✅ Saved');
+}
+
 function emailReady(){const c=DB.settings.email;return c&&c.publicKey&&c.serviceId&&c.templateId&&c.toEmail;}
-async function testEmail(){saveEmailSettings();if(!emailReady()){toast('⚠️ Fill all 4 fields');return;}
-toast('📧 Sending...');const c=DB.settings.email;
-try{emailjs.init({publicKey:c.publicKey});
+
+async function testEmail(){
+saveEmailSettings();
+if(!emailReady()){toast('⚠️ Fill all 4 fields');return;}
+toast('📧 Sending...');
+const c=DB.settings.email;
+try{
+emailjs.init({publicKey:c.publicKey});
 await emailjs.send(c.serviceId,c.templateId,{to_email:c.toEmail,subject:'Test',message:'OK! 🎉'});
-toast('✅ Sent!');}catch(e){toast('❌ '+(e.text||'Failed'));}}
+toast('✅ Sent!');
+}catch(e){toast('❌ '+(e.text||'Failed'));}
+}
+
 async function emailBackup(){
-saveEmailSettings();if(!emailReady()){toast('⚠️ Bind email first');return;}
-toast('📧 Preparing...');const c=DB.settings.email;
+saveEmailSettings();
+if(!emailReady()){toast('⚠️ Bind email first');return;}
+toast('📧 Preparing...');
+const c=DB.settings.email;
 const slim=JSON.parse(JSON.stringify(DB));slim.students.forEach(s=>s.photo='');
-let msg='═══════════════════════════\n📊 TUITION PRO - BACKUP REPORT\n═══════════════════════════\n\n';
-msg+='📅 Date: '+new Date().toLocaleString('en-IN')+'\n👥 Total Students: '+DB.students.length+'\n🏫 Total Classes: '+Object.keys(DB.classes).length+'\n\n';
-msg+='━━━━━━━━━━━━━━━━━━━━━━━━━━━\n👥 STUDENTS LIST\n━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+let msg='═══════════════════════════\n📊 TUITION PRO - BACKUP REPORT\n═══════════════════════════\n';
+msg+='📅 Date: '+new Date().toLocaleString('en-IN')+'\n👥 Total Students: '+DB.students.length+'\n🏫 Total Classes: '+Object.keys(DB.classes).length+'\n';
+msg+='━━━━━━━━━━━━━━━━━━━━━━━━━━━\n👥 STUDENTS LIST\n━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
 DB.students.forEach((s,i)=>{const ps=getPaymentStatus(s);
-msg+=`${i+1}. ${s.name}\n   📚 Class: ${s.class}\n   💰 Fee: ₹${s.fee}/month\n   📅 Admission: ${s.admission}\n   📱 Mobile: ${s.mobile||'—'}\n   💬 WhatsApp: ${s.wa||'—'}\n   💳 Total Paid: ₹${ps.totalPaid}\n   ⚠️ Due: ₹${ps.totalDue}\n`;
+msg+=`${i+1}. ${s.name}\n📚 Class: ${s.class}\n💰 Fee: ₹${s.fee}/month\n📅 Admission: ${s.admission}\n📱 Mobile: ${s.mobile||'—'}\n💬 WhatsApp: ${s.wa||'—'}\n💳 Total Paid: ₹${ps.totalPaid}\n⚠️ Due: ₹${ps.totalDue}\n`;
 if(ps.totalAdvance>0)msg+=`   💰 Advance: ₹${ps.totalAdvance}\n`;
 msg+='   ─────────────────────\n';});
-msg+='\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━\n🔧 RAW DATA (JSON)\n━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+msg+='\n━━━━━━━━━━━━━━━━━━━━━━━━━━━\n🔧 RAW DATA (JSON)\n━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
 msg+=JSON.stringify(slim,null,2);
-try{emailjs.init({publicKey:c.publicKey});
+try{
+emailjs.init({publicKey:c.publicKey});
 await emailjs.send(c.serviceId,c.templateId,{to_email:c.toEmail,subject:'📊 TuitionPro Backup - '+new Date().toLocaleDateString('en-IN'),message:msg});
 DB.settings.lastBackup=new Date().toISOString();saveToCloud();
 document.getElementById('lastBackup').textContent=new Date().toLocaleString('en-IN');toast('✅ Emailed!');
 }catch(e){toast('❌ '+(e.text||'Failed'));}
 }
+
 document.addEventListener('DOMContentLoaded',function(){setupNavigation();});
 </script>
+
 <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then(reg => console.log('✅ Service Worker registered!', reg.scope))
-        .catch(err => console.log('❌ SW registration failed', err));
-    });
-  }
+if ('serviceWorker' in navigator) {
+window.addEventListener('load', () => {
+navigator.serviceWorker.register('./sw.js')
+.then(reg => console.log('✅ Service Worker registered!', reg.scope))
+.catch(err => console.log('❌ SW registration failed', err));
+});
+}
 </script>
 </body>
 </html>
+```
