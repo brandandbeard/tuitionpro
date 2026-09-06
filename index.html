@@ -1165,9 +1165,22 @@ if(!url){toast('⚠️ Save Apps Script URL first!');return;}
 if(DB.students.length===0){toast('⚠️ No students yet!');return;}
 const status=document.getElementById('sheetStatus');
 status.innerHTML='📤 Sending to Sheet...';status.style.color='var(--muted)';
+
+// ✅ FIX: পুরো ডাটার একটা "raw JSON" কপিও পাঠানো হয় — এটাই restore-এ কাজে লাগবে
+const slim=JSON.parse(JSON.stringify(DB));
+slim.students.forEach(s=>s.photo='');
+
 const dues={};
 DB.students.forEach(s=>{const ps=getPaymentStatus(s);dues[s.id]={due:ps.totalDue,advance:ps.totalAdvance,totalPaid:ps.totalPaid};});
-const payload={students:DB.students.map(s=>({id:s.id,name:s.name,class:s.class,fee:s.fee,admission:"'"+s.admission,mobile:"'"+(s.mobile||''),wa:"'"+(s.wa||''),ig:s.ig||'',payments:(s.payments||[]).map(p=>({amount:p.amount,date:"'"+p.date,note:p.note||''}))})),classes:DB.classes,dues:dues,backupTime:new Date().toISOString()};
+
+const payload={
+raw:JSON.stringify(slim),
+students:slim.students.map(s=>({id:s.id,name:s.name,class:s.class,fee:s.fee,admission:"'"+s.admission,mobile:"'"+(s.mobile||''),wa:"'"+(s.wa||''),ig:s.ig||'',payments:(s.payments||[]).map(p=>({amount:p.amount,date:"'"+p.date,note:p.note||''}))})),
+classes:DB.classes,
+dues:dues,
+backupTime:new Date().toISOString()
+};
+
 try{
 await fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
 DB.settings.lastBackup=new Date().toISOString();saveToCloud();
@@ -1176,7 +1189,6 @@ status.innerHTML='✅ Success! <a href="https://docs.google.com/spreadsheets" ta
 status.style.color='#6ee7b7';toast('✅ Backup sent to Google Sheet!');
 }catch(e){status.innerHTML='❌ Failed! '+e.message;status.style.color='#fca5a5';toast('❌ Backup failed');}
 }
-
 function openSheetGuide(){
 const guideHtml=`<div style="padding:20px;max-width:600px">
 <h3 style="font-family:'Space Grotesk';margin-bottom:16px">📊 Google Sheet সেটআপ গাইড</h3>
@@ -2262,32 +2274,51 @@ const r=new FileReader();
 r.onload=ev=>{
 try{
 const data=JSON.parse(ev.target.result);
-if(!data.students) throw 0;
-showConfirm('⬆️ Restore Backup',`তুমি কি সত্যিই এই backup ফাইল থেকে ডাটা restore করতে চাও?<br><br>
+if(!data.students)throw 0;
+showConfirm('⬆️ Restore Backup',
+`তুমি কি সত্যিই এই backup ফাইল থেকে ডাটা restore করতে চাও?<br><br>
 <div style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:12px;padding:14px">
 ⚠️ <b>তোমার বর্তমান সব ডাটা মুছে যাবে!</b><br>
 <span style="font-size:11px;opacity:.8">এই কাজটা আর ফেরানো যাবে না!</span>
-</div>`,()=>{
+</div>`,
+()=>{applyRestoredData(data);});
+}catch{toast('❌ Invalid backup file');}
+};
+r.readAsText(f);
+e.target.value='';
+}
+
+// ✅ নতুন: JSON ফাইল + Sheet — দুই জায়গা থেকেই এই এক ফাংশন restore করবে
+function applyRestoredData(data){
+const keepSheetUrl=DB.settings&&DB.settings.sheetBackupUrl;
+const keepEmail=DB.settings&&DB.settings.email;
+
 DB=data;
-DB.settings.email=DB.settings.email||{};
+DB.settings=DB.settings||{};
+DB.settings.email=(DB.settings.email&&DB.settings.email.publicKey)?DB.settings.email:(keepEmail||{});
 DB.settings.upi=DB.settings.upi||{id:'arho065-1@okicici',phone:'9564385573'};
-DB.settings.sheetBackupUrl=DB.settings.sheetBackupUrl||'';
+DB.settings.sheetBackupUrl=DB.settings.sheetBackupUrl||keepSheetUrl||'';
+
+DB.students=DB.students||[];
 DB.students.forEach(s=>{
 if(Array.isArray(s.payments)){
 s.payments=s.payments.map(p=>{
-if(p.ym && !p.amount){return {id:uid(),amount:s.fee,date:p.date||todayISO(),note:'Migrated: '+p.ym};}
+if(p.ym&&!p.amount){return{id:uid(),amount:s.fee,date:p.date||todayISO(),note:'Migrated: '+p.ym};}
 if(!p.id)p.id=uid();
 return p;
 });
 }else{s.payments=[];}
+if(!s.attendance||typeof s.attendance!=='object')s.attendance={};
 });
-saveToCloud();renderAll();loadUPISettings();loadBackupSettings();loadSheetUrl();toast('✅ Restored successfully');
-});
-}catch{toast('❌ Invalid backup file');}
-};
-r.readAsText(f);
+
+if(!DB.classes||Object.keys(DB.classes).length===0){
+DB.classes={'General':{days:[],times:{},fineEnabled:false,fineAmount:10}};
 }
 
+saveToCloud();
+renderAll();loadUPISettings();loadBackupSettings();loadSheetUrl();
+toast('✅ Restored successfully');
+}
 function restoreFromExcel(e){
 const f=e.target.files[0];if(!f)return;
 toast('⚠️ Excel restore এখনো তৈরি হয়নি!');
@@ -2304,8 +2335,40 @@ toast('💡 JSON file থেকে restore করো — সবচেয়ে r
 async function restoreFromSheet(){
 const url=DB.settings.sheetBackupUrl;
 if(!url){toast('⚠️ আগে Sheet URL সেভ করো!');return;}
-toast('📋 এই feature এখনো তৈরি হয়নি!');
-toast('💡 JSON file থেকে restore করো — সবচেয়ে reliable');
+toast('📋 Sheet থেকে backup আনা হচ্ছে...');
+try{
+const sep=url.includes('?')?'&':'?';
+const r=await fetch(url+sep+'t='+Date.now());
+const text=await r.text();
+
+if(text.includes('TuitionPro Backup Active')){
+toast('⚠️ পুরনো Apps Script! নতুন কোড দিয়ে আবার Deploy করো');
+return;
+}
+
+let data;
+try{data=JSON.parse(text);}catch(e){
+toast('❌ Sheet-এ কোনো backup নেই! আগে "Backup to Sheet" চাপো');
+return;
+}
+
+if(data.error||!data.students){
+toast('❌ Sheet-এ কোনো backup নেই! আগে "Backup to Sheet" চাপো');
+return;
+}
+
+showConfirm('📋 Restore from Sheet',
+`Sheet backup থেকে ডাটা ফিরিয়ে আনা হবে:<br><br>
+👥 Students: <b>${(data.students||[]).length}</b><br>
+🏫 Classes: <b>${Object.keys(data.classes||{}).length}</b><br><br>
+<div style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:12px;padding:14px">
+⚠️ <b>তোমার বর্তমান ডাটা রিপ্লেস হয়ে যাবে!</b>
+</div>`,
+()=>{applyRestoredData(data);});
+
+}catch(e){
+toast('❌ Sheet পড়া যায়নি! "Anyone" access দিয়ে Deploy করেছো কিনা দেখো');
+}
 }
 
 function loadEmailSettings(){
