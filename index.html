@@ -1832,10 +1832,10 @@ DB.students.forEach(s=>{if(s.attendance[t]!==undefined&&isTuitionDay(t,s.class))
 document.getElementById('sAtt').textContent=(marked?Math.round(present/marked*100):0)+'%';
 document.getElementById('sAttSub').textContent=marked?`${present}/${marked} present`:'Not marked';
 const tbody=document.querySelector('#dashDueTbl tbody');tbody.innerHTML='';
-dueStudents.sort((a,b)=>b.ps.totalDue-a.ps.totalDue).slice(0,10).forEach(({s,ps})=>{
+dueStudents.sort((a,b)=>b.ps.totalDue-a.ps.totalDue).slice(0,1000).forEach(({s,ps})=>{
 tbody.innerHTML+=`<tr><td><div style="display:flex;align-items:center;gap:10px">${photoHTML(s)}<b style="cursor:pointer" onclick="openProfile('${s.id}')">${s.name}</b></div></td><td><span class="badge badge-class">${s.class}</span></td><td><span class="badge badge-due">₹${ps.totalDue.toLocaleString('en-IN')}</span>${ps.fine>0?`<div style="font-size:10px;color:var(--muted);margin-top:2px">incl. ₹${ps.fine} fine</div>`:''}</td><td>${alertButtons(s)}</td></tr>`;});
 const cards=document.getElementById('dashDueCards');
-cards.innerHTML=dueStudents.sort((a,b)=>b.ps.totalDue-a.ps.totalDue).slice(0,10).map(({s,ps})=>`<div class="m-card">${photoHTML(s)}<div class="body"><div class="nm" onclick="openProfile('${s.id}')">${s.name}</div><div class="meta"><span class="badge badge-class">${s.class}</span><span class="badge badge-due">₹${ps.totalDue.toLocaleString('en-IN')} due</span></div><div class="actions">${alertButtons(s)}</div></div></div>`).join('');
+cards.innerHTML=dueStudents.sort((a,b)=>b.ps.totalDue-a.ps.totalDue).slice(0,1000).map(({s,ps})=>`<div class="m-card">${photoHTML(s)}<div class="body"><div class="nm" onclick="openProfile('${s.id}')">${s.name}</div><div class="meta"><span class="badge badge-class">${s.class}</span><span class="badge badge-due">₹${ps.totalDue.toLocaleString('en-IN')} due</span></div><div class="actions">${alertButtons(s)}</div></div></div>`).join('');
 const bulkBtn=document.getElementById('bulkAlertBtn');
 bulkBtn.style.display=dueStudents.length>0?'inline-flex':'none';
 document.getElementById('dashDueEmpty').style.display=dueStudents.length?'none':'block';
