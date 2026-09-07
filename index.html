@@ -1451,6 +1451,9 @@ document.getElementById('stuId').value=s.id;document.getElementById('stuName').v
 document.getElementById('stuClass').value=s.class;document.getElementById('stuFee').value=s.fee;
 document.getElementById('stuAdm').value=s.admission;document.getElementById('stuMobile').value=s.mobile||'';
 document.getElementById('stuWa').value=s.wa||'';document.getElementById('stuIg').value=s.ig||'';}}
+// ✅ শেষ ব্যবহৃত class মনে রাখো
+const lastClass=localStorage.getItem('lastUsedClass');
+if(lastClass && DB.classes[lastClass]){ sel.value=lastClass; }
 document.getElementById('studentModal').classList.add('show');
 }
 function saveStudent(e){
@@ -1466,6 +1469,7 @@ ig:document.getElementById('stuIg').value.trim().replace('@',''),photo:photo||(e
 payments:existing?.payments||[],attendance:existing?.attendance||{}};
 if(existing){DB.students=DB.students.map(x=>x.id===id?stu:x);toast('✅ Updated');}
 else{DB.students.push(stu);toast('🎉 Added');}
+localStorage.setItem('lastUsedClass', stu.class);
 saveToCloud();closeModal('studentModal');renderAll();};
 if(photoInput.files[0]){const r=new FileReader();r.onload=ev=>finalize(ev.target.result);r.readAsDataURL(photoInput.files[0]);}
 else finalize(null);
