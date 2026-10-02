@@ -1150,6 +1150,98 @@ status.style.color='#6ee7b7';toast('✅ Backup sent to Google Sheet!');
 }catch(e){status.innerHTML='❌ Failed! '+e.message;status.style.color='#fca5a5';toast('❌ Backup failed');}
 }
 function openSheetGuide(){
+const scriptCode = `function doPost(e){
+  try{
+    var data=JSON.parse(e.postData.contents);
+    var ss=SpreadsheetApp.getActiveSpreadsheet();
+
+    // ১) Raw JSON backup (restore-এ কাজে লাগবে)
+    var rawSheet=ss.getSheetByName('RawBackup');
+    if(!rawSheet) rawSheet=ss.insertSheet('RawBackup');
+    rawSheet.clear();
+    var raw=data.raw||'';
+    var CHUNK=45000;
+    var chunks=Math.ceil(raw.length/CHUNK);
+    for(var i=0;i<chunks;i++){
+      rawSheet.getRange(i+1,1).setValue('~~'+raw.substring(i*CHUNK,(i+1)*CHUNK));
+    }
+    rawSheet.getRange(chunks+2,1).setValue('BACKUP_TIME:'+(data.backupTime||new Date().toISOString()));
+
+    // ২) Students শীট
+    var sh1=ss.getSheetByName('Students');
+    if(!sh1){
+      sh1=ss.getSheets()[0];
+      if(sh1.getName()==='RawBackup') sh1=ss.insertSheet('Students');
+      else sh1.setName('Students');
+    }
+    sh1.clear();
+    sh1.appendRow(['SL','Name','Class','Fee','Admission','Mobile','WhatsApp','Instagram','Total Due','Advance','Total Paid']);
+    (data.students||[]).forEach(function(s,i){
+      var due=data.dues&&data.dues[s.id]?data.dues[s.id]:{due:0,advance:0,totalPaid:0};
+      sh1.appendRow([i+1,s.name,s.class,s.fee,s.admission,s.mobile,s.wa,s.ig,due.due||0,due.advance||0,due.totalPaid||0]);
+    });
+
+    // ৩) Classes শীট
+    var sh2=ss.getSheetByName('Classes');
+    if(!sh2) sh2=ss.insertSheet('Classes');
+    sh2.clear();
+    sh2.appendRow(['Class','Days','Fine/Day','Fine Enabled','Students']);
+    Object.keys(data.classes||{}).forEach(function(name){
+      var cfg=data.classes[name];
+      var days=(cfg.days||[]).map(function(d){return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d];}).join(', ');
+      var count=(data.students||[]).filter(function(s){return s.class===name;}).length;
+      sh2.appendRow([name,days,cfg.fineAmount||0,cfg.fineEnabled?'Yes':'No',count]);
+    });
+
+    // ৪) Payments শীট
+    var sh3=ss.getSheetByName('Payments');
+    if(!sh3) sh3=ss.insertSheet('Payments');
+    sh3.clear();
+    sh3.appendRow(['Student','Class','Amount','Date','Note']);
+    (data.students||[]).forEach(function(s){
+      (s.payments||[]).forEach(function(p){
+        sh3.appendRow([s.name,s.class,p.amount,p.date,p.note||'']);
+      });
+    });
+
+    // ✅ ৫) Attendance শীট (নতুন!)
+    var sh4=ss.getSheetByName('Attendance');
+    if(!sh4) sh4=ss.insertSheet('Attendance');
+    sh4.clear();
+    sh4.appendRow(['SL','Student Name','Class','Date','Status']);
+    var attData=data.attendance||[];
+    attData.forEach(function(att,i){
+      sh4.appendRow([i+1,att.studentName,att.class,"'"+att.date,att.status]);
+    });
+
+    return ContentService.createTextOutput(JSON.stringify({status:'success',sheetsUpdated:5})).setMimeType(ContentService.MimeType.JSON);
+  }catch(err){
+    return ContentService.createTextOutput(JSON.stringify({status:'error',msg:err.toString()})).setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function doGet(e){
+  try{
+    var ss=SpreadsheetApp.getActiveSpreadsheet();
+    var rawSheet=ss.getSheetByName('RawBackup');
+    var out='';
+    if(rawSheet){
+      var lastRow=rawSheet.getLastRow();
+      for(var r=1;r<=lastRow;r++){
+        var v=String(rawSheet.getRange(r,1).getValue());
+        if(v.indexOf('BACKUP_TIME:')===0) break;
+        if(v.indexOf('~~')===0) v=v.substring(2);
+        out+=v;
+      }
+    }
+    if(out){
+      return ContentService.createTextOutput(out).setMimeType(ContentService.MimeType.JSON);
+    }
+    return ContentService.createTextOutput(JSON.stringify({error:'no-backup'})).setMimeType(ContentService.MimeType.JSON);
+  }catch(err){
+    return ContentService.createTextOutput(JSON.stringify({error:err.toString()})).setMimeType(ContentService.MimeType.JSON);
+  }
+}`;
 const guideHtml=`<div style="padding:20px;max-width:600px">
 <h3 style="font-family:'Space Grotesk';margin-bottom:16px">📊 Google Sheet সেটআপ গাইড (Restore Support)</h3>
 <p style="color:var(--muted);font-size:13px;margin-bottom:20px">একবার সেটআপ করলেই Backup এবং Restore দুটোই পারবে!</p>
@@ -1160,91 +1252,8 @@ const guideHtml=`<div style="padding:20px;max-width:600px">
 <div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:12px;padding:16px;margin-bottom:14px">
 <h4 style="margin-bottom:8px;color:#a78bfa">⚙️ ধাপ ২: অ্যাপস স্ক্রিপ্ট বানাও</h4>
 <p style="font-size:13px;color:var(--muted)">শীটে যাও → উপরে Extensions → Apps Script ক্লিক করো। সব কোড মুছে দিয়ে নিচের কোড পেস্ট করো:</p>
-<pre style="background:rgba(0,0,0,0.3);padding:10px;border-radius:8px;font-size:10px;color:#67e8f9;overflow-x:auto;margin-top:10px;max-height:300px">function doPost(e){
-try{
-var data=JSON.parse(e.postData.contents);
-var ss=SpreadsheetApp.getActiveSpreadsheet();
-// ১) Raw JSON backup (restore-এ কাজে লাগবে)
-var rawSheet=ss.getSheetByName('RawBackup');
-if(!rawSheet) rawSheet=ss.insertSheet('RawBackup');
-rawSheet.clear();
-var raw=data.raw||'';
-var CHUNK=45000;
-var chunks=Math.ceil(raw.length/CHUNK);
-for(var i=0;i<chunks;i++){
-rawSheet.getRange(i+1,1).setValue('~~'+raw.substring(i*CHUNK,(i+1)*CHUNK));
-}
-rawSheet.getRange(chunks+2,1).setValue('BACKUP_TIME:'+(data.backupTime||new Date().toISOString()));
-// ২) Students শীট
-var sh1=ss.getSheetByName('Students');
-if(!sh1){
-sh1=ss.getSheets()[0];
-if(sh1.getName()==='RawBackup') sh1=ss.insertSheet('Students');
-else sh1.setName('Students');
-}
-sh1.clear();
-sh1.appendRow(['SL','Name','Class','Fee','Admission','Mobile','WhatsApp','Instagram','Total Due','Advance','Total Paid']);
-(data.students||[]).forEach(function(s,i){
-var due=data.dues&&data.dues[s.id]?data.dues[s.id]:{due:0,advance:0,totalPaid:0};
-sh1.appendRow([i+1,s.name,s.class,s.fee,s.admission,s.mobile,s.wa,s.ig,due.due||0,due.advance||0,due.totalPaid||0]);
-});
-// ৩) Classes শীট
-var sh2=ss.getSheetByName('Classes');
-if(!sh2) sh2=ss.insertSheet('Classes');
-sh2.clear();
-sh2.appendRow(['Class','Days','Fine/Day','Fine Enabled','Students']);
-Object.keys(data.classes||{}).forEach(function(name){
-var cfg=data.classes[name];
-var days=(cfg.days||[]).map(function(d){return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d];}).join(', ');
-var count=(data.students||[]).filter(function(s){return s.class===name;}).length;
-sh2.appendRow([name,days,cfg.fineAmount||0,cfg.fineEnabled?'Yes':'No',count]);
-});
-// ৪) Payments শীট
-var sh3=ss.getSheetByName('Payments');
-if(!sh3) sh3=ss.insertSheet('Payments');
-sh3.clear();
-sh3.appendRow(['Student','Class','Amount','Date','Note']);
-(data.students||[]).forEach(function(s){
-(s.payments||[]).forEach(function(p){
-sh3.appendRow([s.name,s.class,p.amount,p.date,p.note||'']);
-});
-});
-// ✅ ৫) Attendance শীট (নতুন!)
-var sh4=ss.getSheetByName('Attendance');
-if(!sh4) sh4=ss.insertSheet('Attendance');
-sh4.clear();
-sh4.appendRow(['SL','Student Name','Class','Date','Status']);
-var attData=data.attendance||[];
-attData.forEach(function(att,i){
-sh4.appendRow([i+1,att.studentName,att.class,"'"+att.date,att.status]);
-});
-return ContentService.createTextOutput(JSON.stringify({status:'success',sheetsUpdated:5})).setMimeType(ContentService.MimeType.JSON);
-}catch(err){
-return ContentService.createTextOutput(JSON.stringify({status:'error',msg:err.toString()})).setMimeType(ContentService.MimeType.JSON);
-}
-}
-function doGet(e){
-try{
-var ss=SpreadsheetApp.getActiveSpreadsheet();
-var rawSheet=ss.getSheetByName('RawBackup');
-var out='';
-if(rawSheet){
-var lastRow=rawSheet.getLastRow();
-for(var r=1;r<=lastRow;r++){
-var v=String(rawSheet.getRange(r,1).getValue());
-if(v.indexOf('BACKUP_TIME:')===0) break;
-if(v.indexOf('~~')===0) v=v.substring(2);
-out+=v;
-}
-}
-if(out){
-return ContentService.createTextOutput(out).setMimeType(ContentService.MimeType.JSON);
-}
-return ContentService.createTextOutput(JSON.stringify({error:'no-backup'})).setMimeType(ContentService.MimeType.JSON);
-}catch(err){
-return ContentService.createTextOutput(JSON.stringify({error:err.toString()})).setMimeType(ContentService.MimeType.JSON);
-}
-}</pre>
+<button class="btn btn-primary btn-sm" onclick="const txt=document.getElementById('sheetScriptCode').innerText;if(navigator.clipboard){navigator.clipboard.writeText(txt).then(()=>{this.innerHTML='✅ Copied!';setTimeout(()=>{this.innerHTML='📋 Copy Code';},2000);}).catch(()=>{fallbackCopy(txt,this);});}else{fallbackCopy(txt,this);}" style="margin:10px 0">📋 Copy Code</button>
+<pre id="sheetScriptCode" style="background:rgba(0,0,0,0.3);padding:10px;border-radius:8px;font-size:10px;color:#67e8f9;overflow-x:auto;margin-top:0;max-height:300px;white-space:pre-wrap">${scriptCode}</pre>
 <p style="font-size:12px;color:var(--muted);margin-top:8px">কোড পেস্ট করার পর 💾 Save করো</p>
 </div>
 <div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:12px;padding:16px;margin-bottom:14px">
@@ -2415,6 +2424,22 @@ await emailjs.send(c.serviceId,c.templateId,{to_email:c.toEmail,subject:'📊 Tu
 DB.settings.lastBackup=new Date().toISOString();saveToCloud();
 document.getElementById('lastBackup').textContent=new Date().toLocaleString('en-IN');toast('✅ Emailed!');
 }catch(e){toast('❌ '+(e.text||'Failed'));}
+}
+function fallbackCopy(text, btn){
+  const ta=document.createElement('textarea');
+  ta.value=text;
+  ta.style.position='fixed';
+  ta.style.opacity='0';
+  document.body.appendChild(ta);
+  ta.select();
+  try{
+    document.execCommand('copy');
+    btn.innerHTML='✅ Copied!';
+    setTimeout(()=>{btn.innerHTML='📋 Copy Code';},2000);
+  }catch(e){
+    toast('❌ Copy failed');
+  }
+  document.body.removeChild(ta);
 }
 document.addEventListener('DOMContentLoaded',function(){setupNavigation();});
 </script>
