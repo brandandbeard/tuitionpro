@@ -1242,7 +1242,6 @@ function doGet(e){
     return ContentService.createTextOutput(JSON.stringify({error:err.toString()})).setMimeType(ContentService.MimeType.JSON);
   }
 }`;
-
 const guideHtml=`<div style="padding:20px;max-width:600px">
 <h3 style="font-family:'Space Grotesk';margin-bottom:16px">📊 Google Sheet সেটআপ গাইড (Restore Support)</h3>
 <p style="color:var(--muted);font-size:13px;margin-bottom:20px">একবার সেটআপ করলেই Backup এবং Restore দুটোই পারবে!</p>
@@ -1281,7 +1280,6 @@ modal.innerHTML=`<div class="modal" style="max-height:85vh"><button class="modal
 modal.addEventListener('click',function(e){if(e.target===modal)modal.remove();});
 document.body.appendChild(modal);
 }
-function openEmailGuide(){
 function openEmailGuide(){
 const guideHtml=`<div style="padding:20px;max-width:600px">
 <h3 style="font-family:'Space Grotesk';margin-bottom:16px">📧 ইমেইল ব্যাকআপ গাইড</h3>
@@ -1457,7 +1455,6 @@ document.getElementById('stuId').value=s.id;document.getElementById('stuName').v
 document.getElementById('stuClass').value=s.class;document.getElementById('stuFee').value=s.fee;
 document.getElementById('stuAdm').value=s.admission;document.getElementById('stuMobile').value=s.mobile||'';
 document.getElementById('stuWa').value=s.wa||'';document.getElementById('stuIg').value=s.ig||'';}}
-// ✅ শেষ ব্যবহৃত class মনে রাখো
 const lastClass=localStorage.getItem('lastUsedClass');
 if(lastClass && DB.classes[lastClass]){ sel.value=lastClass; }
 document.getElementById('studentModal').classList.add('show');
@@ -2430,20 +2427,20 @@ document.getElementById('lastBackup').textContent=new Date().toLocaleString('en-
 }catch(e){toast('❌ '+(e.text||'Failed'));}
 }
 function fallbackCopy(text, btn){
-  const ta=document.createElement('textarea');
-  ta.value=text;
-  ta.style.position='fixed';
-  ta.style.opacity='0';
-  document.body.appendChild(ta);
-  ta.select();
-  try{
-    document.execCommand('copy');
-    btn.innerHTML='✅ Copied!';
-    setTimeout(()=>{btn.innerHTML='📋 Copy Code';},2000);
-  }catch(e){
-    toast('❌ Copy failed');
-  }
-  document.body.removeChild(ta);
+const ta=document.createElement('textarea');
+ta.value=text;
+ta.style.position='fixed';
+ta.style.opacity='0';
+document.body.appendChild(ta);
+ta.select();
+try{
+document.execCommand('copy');
+btn.innerHTML='✅ Copied!';
+setTimeout(()=>{btn.innerHTML='📋 Copy Code';},2000);
+}catch(e){
+toast('❌ Copy failed');
+}
+document.body.removeChild(ta);
 }
 document.addEventListener('DOMContentLoaded',function(){setupNavigation();});
 </script>
