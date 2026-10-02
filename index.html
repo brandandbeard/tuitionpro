@@ -713,6 +713,13 @@ tr:hover td{background:rgba(255,255,255,.03)}
 <label>📅 Tuition Days & Time</label>
 <div class="day-toggle" id="clsDays"></div>
 </div>
+<div class="field" style="margin-top:14px">
+<label>💰 Fee Calculation Cycle</label>
+<select id="clsFeeCycle" style="width:100%;padding:clamp(10px,2.5vw,12px) 14px;border-radius:10px;background:rgba(0,0,0,.25);border:1px solid var(--glass-border);color:var(--text);font:400 clamp(13px,3.5vw,14px) 'Inter';min-height:44px">
+<option value="admission_day">From Admission Day (Rolling Cycle)</option>
+<option value="calendar_month">Calendar Month (1st to 30/31)</option>
+</select>
+</div>
 <div class="field" style="margin-top:14px;display:flex;align-items:center;justify-content:space-between">
 <label style="margin:0">Enable Fine System</label>
 <span class="toggle" id="clsFineToggle" onclick="this.classList.toggle('on')"></span>
@@ -1039,7 +1046,7 @@ isInitialLoadComplete=false;
 try{
 const doc=await userDoc().get();
 if(doc.exists){applyUserData(doc.data());}
-else{DB.classes={'General':{days:[],times:{},fineEnabled:false,fineAmount:10}};}
+else{DB.classes={'General':{days:[],times:{},fineEnabled:false,fineAmount:10,feeCycle:'calendar_month'}};}
 }catch(e){console.error(e);}
 unsubscribe=userDoc().onSnapshot((doc)=>{
 if(doc.exists&&!isSaving){applyUserData(doc.data());renderAll();}
@@ -1113,22 +1120,19 @@ if(!url){toast('⚠️ Save Apps Script URL first!');return;}
 if(DB.students.length===0){toast('⚠️ No students yet!');return;}
 const status=document.getElementById('sheetStatus');
 status.innerHTML='📤 Sending to Sheet...';status.style.color='var(--muted)';
-
 const slim=JSON.parse(JSON.stringify(DB));
 slim.students.forEach(s=>s.photo='');
-
 const dues={};
 const attendanceData=[];
 DB.students.forEach(s=>{
-  const ps=getPaymentStatus(s);
-  dues[s.id]={due:ps.totalDue,advance:ps.totalAdvance,totalPaid:ps.totalPaid};
-  if(s.attendance){
-    Object.entries(s.attendance).forEach(([date,st])=>{
-      attendanceData.push({studentName:s.name,studentId:s.id,class:s.class,date:date,status:st?'Present':'Absent'});
-    });
-  }
+const ps=getPaymentStatus(s);
+dues[s.id]={due:ps.totalDue,advance:ps.totalAdvance,totalPaid:ps.totalPaid};
+if(s.attendance){
+Object.entries(s.attendance).forEach(([date,st])=>{
+attendanceData.push({studentName:s.name,studentId:s.id,class:s.class,date:date,status:st?'Present':'Absent'});
 });
-
+}
+});
 const payload={
 raw:JSON.stringify(slim),
 students:slim.students.map(s=>({id:s.id,name:s.name,class:s.class,fee:s.fee,admission:"'"+s.admission,mobile:"'"+(s.mobile||''),wa:"'"+(s.wa||''),ig:s.ig||'',payments:(s.payments||[]).map(p=>({amount:p.amount,date:"'"+p.date,note:p.note||''}))})),
@@ -1137,7 +1141,6 @@ dues:dues,
 attendance:attendanceData,
 backupTime:new Date().toISOString()
 };
-
 try{
 await fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
 DB.settings.lastBackup=new Date().toISOString();saveToCloud();
@@ -1158,96 +1161,89 @@ const guideHtml=`<div style="padding:20px;max-width:600px">
 <h4 style="margin-bottom:8px;color:#a78bfa">⚙️ ধাপ ২: অ্যাপস স্ক্রিপ্ট বানাও</h4>
 <p style="font-size:13px;color:var(--muted)">শীটে যাও → উপরে Extensions → Apps Script ক্লিক করো। সব কোড মুছে দিয়ে নিচের কোড পেস্ট করো:</p>
 <pre style="background:rgba(0,0,0,0.3);padding:10px;border-radius:8px;font-size:10px;color:#67e8f9;overflow-x:auto;margin-top:10px;max-height:300px">function doPost(e){
-  try{
-    var data=JSON.parse(e.postData.contents);
-    var ss=SpreadsheetApp.getActiveSpreadsheet();
-
-    // ১) Raw JSON backup (restore-এ কাজে লাগবে)
-    var rawSheet=ss.getSheetByName('RawBackup');
-    if(!rawSheet) rawSheet=ss.insertSheet('RawBackup');
-    rawSheet.clear();
-    var raw=data.raw||'';
-    var CHUNK=45000;
-    var chunks=Math.ceil(raw.length/CHUNK);
-    for(var i=0;i<chunks;i++){
-      rawSheet.getRange(i+1,1).setValue('~~'+raw.substring(i*CHUNK,(i+1)*CHUNK));
-    }
-    rawSheet.getRange(chunks+2,1).setValue('BACKUP_TIME:'+(data.backupTime||new Date().toISOString()));
-
-    // ২) Students শীট
-    var sh1=ss.getSheetByName('Students');
-    if(!sh1){
-      sh1=ss.getSheets()[0];
-      if(sh1.getName()==='RawBackup') sh1=ss.insertSheet('Students');
-      else sh1.setName('Students');
-    }
-    sh1.clear();
-    sh1.appendRow(['SL','Name','Class','Fee','Admission','Mobile','WhatsApp','Instagram','Total Due','Advance','Total Paid']);
-    (data.students||[]).forEach(function(s,i){
-      var due=data.dues&&data.dues[s.id]?data.dues[s.id]:{due:0,advance:0,totalPaid:0};
-      sh1.appendRow([i+1,s.name,s.class,s.fee,s.admission,s.mobile,s.wa,s.ig,due.due||0,due.advance||0,due.totalPaid||0]);
-    });
-
-    // ৩) Classes শীট
-    var sh2=ss.getSheetByName('Classes');
-    if(!sh2) sh2=ss.insertSheet('Classes');
-    sh2.clear();
-    sh2.appendRow(['Class','Days','Fine/Day','Fine Enabled','Students']);
-    Object.keys(data.classes||{}).forEach(function(name){
-      var cfg=data.classes[name];
-      var days=(cfg.days||[]).map(function(d){return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d];}).join(', ');
-      var count=(data.students||[]).filter(function(s){return s.class===name;}).length;
-      sh2.appendRow([name,days,cfg.fineAmount||0,cfg.fineEnabled?'Yes':'No',count]);
-    });
-
-    // ৪) Payments শীট
-    var sh3=ss.getSheetByName('Payments');
-    if(!sh3) sh3=ss.insertSheet('Payments');
-    sh3.clear();
-    sh3.appendRow(['Student','Class','Amount','Date','Note']);
-    (data.students||[]).forEach(function(s){
-      (s.payments||[]).forEach(function(p){
-        sh3.appendRow([s.name,s.class,p.amount,p.date,p.note||'']);
-      });
-    });
-
-    // ✅ ৫) Attendance শীট (নতুন!)
-    var sh4=ss.getSheetByName('Attendance');
-    if(!sh4) sh4=ss.insertSheet('Attendance');
-    sh4.clear();
-    sh4.appendRow(['SL','Student Name','Class','Date','Status']);
-    var attData=data.attendance||[];
-    attData.forEach(function(att,i){
-      sh4.appendRow([i+1,att.studentName,att.class,"'"+att.date,att.status]);
-    });
-
-    return ContentService.createTextOutput(JSON.stringify({status:'success',sheetsUpdated:5})).setMimeType(ContentService.MimeType.JSON);
-  }catch(err){
-    return ContentService.createTextOutput(JSON.stringify({status:'error',msg:err.toString()})).setMimeType(ContentService.MimeType.JSON);
-  }
+try{
+var data=JSON.parse(e.postData.contents);
+var ss=SpreadsheetApp.getActiveSpreadsheet();
+// ১) Raw JSON backup (restore-এ কাজে লাগবে)
+var rawSheet=ss.getSheetByName('RawBackup');
+if(!rawSheet) rawSheet=ss.insertSheet('RawBackup');
+rawSheet.clear();
+var raw=data.raw||'';
+var CHUNK=45000;
+var chunks=Math.ceil(raw.length/CHUNK);
+for(var i=0;i<chunks;i++){
+rawSheet.getRange(i+1,1).setValue('~~'+raw.substring(i*CHUNK,(i+1)*CHUNK));
 }
-
+rawSheet.getRange(chunks+2,1).setValue('BACKUP_TIME:'+(data.backupTime||new Date().toISOString()));
+// ২) Students শীট
+var sh1=ss.getSheetByName('Students');
+if(!sh1){
+sh1=ss.getSheets()[0];
+if(sh1.getName()==='RawBackup') sh1=ss.insertSheet('Students');
+else sh1.setName('Students');
+}
+sh1.clear();
+sh1.appendRow(['SL','Name','Class','Fee','Admission','Mobile','WhatsApp','Instagram','Total Due','Advance','Total Paid']);
+(data.students||[]).forEach(function(s,i){
+var due=data.dues&&data.dues[s.id]?data.dues[s.id]:{due:0,advance:0,totalPaid:0};
+sh1.appendRow([i+1,s.name,s.class,s.fee,s.admission,s.mobile,s.wa,s.ig,due.due||0,due.advance||0,due.totalPaid||0]);
+});
+// ৩) Classes শীট
+var sh2=ss.getSheetByName('Classes');
+if(!sh2) sh2=ss.insertSheet('Classes');
+sh2.clear();
+sh2.appendRow(['Class','Days','Fine/Day','Fine Enabled','Students']);
+Object.keys(data.classes||{}).forEach(function(name){
+var cfg=data.classes[name];
+var days=(cfg.days||[]).map(function(d){return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d];}).join(', ');
+var count=(data.students||[]).filter(function(s){return s.class===name;}).length;
+sh2.appendRow([name,days,cfg.fineAmount||0,cfg.fineEnabled?'Yes':'No',count]);
+});
+// ৪) Payments শীট
+var sh3=ss.getSheetByName('Payments');
+if(!sh3) sh3=ss.insertSheet('Payments');
+sh3.clear();
+sh3.appendRow(['Student','Class','Amount','Date','Note']);
+(data.students||[]).forEach(function(s){
+(s.payments||[]).forEach(function(p){
+sh3.appendRow([s.name,s.class,p.amount,p.date,p.note||'']);
+});
+});
+// ✅ ৫) Attendance শীট (নতুন!)
+var sh4=ss.getSheetByName('Attendance');
+if(!sh4) sh4=ss.insertSheet('Attendance');
+sh4.clear();
+sh4.appendRow(['SL','Student Name','Class','Date','Status']);
+var attData=data.attendance||[];
+attData.forEach(function(att,i){
+sh4.appendRow([i+1,att.studentName,att.class,"'"+att.date,att.status]);
+});
+return ContentService.createTextOutput(JSON.stringify({status:'success',sheetsUpdated:5})).setMimeType(ContentService.MimeType.JSON);
+}catch(err){
+return ContentService.createTextOutput(JSON.stringify({status:'error',msg:err.toString()})).setMimeType(ContentService.MimeType.JSON);
+}
+}
 function doGet(e){
-  try{
-    var ss=SpreadsheetApp.getActiveSpreadsheet();
-    var rawSheet=ss.getSheetByName('RawBackup');
-    var out='';
-    if(rawSheet){
-      var lastRow=rawSheet.getLastRow();
-      for(var r=1;r<=lastRow;r++){
-        var v=String(rawSheet.getRange(r,1).getValue());
-        if(v.indexOf('BACKUP_TIME:')===0) break;
-        if(v.indexOf('~~')===0) v=v.substring(2);
-        out+=v;
-      }
-    }
-    if(out){
-      return ContentService.createTextOutput(out).setMimeType(ContentService.MimeType.JSON);
-    }
-    return ContentService.createTextOutput(JSON.stringify({error:'no-backup'})).setMimeType(ContentService.MimeType.JSON);
-  }catch(err){
-    return ContentService.createTextOutput(JSON.stringify({error:err.toString()})).setMimeType(ContentService.MimeType.JSON);
-  }
+try{
+var ss=SpreadsheetApp.getActiveSpreadsheet();
+var rawSheet=ss.getSheetByName('RawBackup');
+var out='';
+if(rawSheet){
+var lastRow=rawSheet.getLastRow();
+for(var r=1;r<=lastRow;r++){
+var v=String(rawSheet.getRange(r,1).getValue());
+if(v.indexOf('BACKUP_TIME:')===0) break;
+if(v.indexOf('~~')===0) v=v.substring(2);
+out+=v;
+}
+}
+if(out){
+return ContentService.createTextOutput(out).setMimeType(ContentService.MimeType.JSON);
+}
+return ContentService.createTextOutput(JSON.stringify({error:'no-backup'})).setMimeType(ContentService.MimeType.JSON);
+}catch(err){
+return ContentService.createTextOutput(JSON.stringify({error:err.toString()})).setMimeType(ContentService.MimeType.JSON);
+}
 }</pre>
 <p style="font-size:12px;color:var(--muted);margin-top:8px">কোড পেস্ট করার পর 💾 Save করো</p>
 </div>
@@ -1340,7 +1336,6 @@ doAutoBackup();}
 async function doAutoBackup(){
 let emailSuccess=false;
 let sheetSuccess=false;
-
 if(emailReady()){
 try{
 const c=DB.settings.email;
@@ -1351,7 +1346,6 @@ await emailjs.send(c.serviceId,c.templateId,{to_email:c.toEmail,subject:'🤖 Au
 emailSuccess=true;
 }catch(e){console.error('Auto Email Backup failed:',e);}
 }
-
 const sheetUrl=DB.settings.sheetBackupUrl;
 if(sheetUrl && DB.students.length>0){
 try{
@@ -1360,13 +1354,13 @@ slim.students.forEach(s=>s.photo='');
 const dues={};
 const attendanceData=[];
 DB.students.forEach(s=>{
-  const ps=getPaymentStatus(s);
-  dues[s.id]={due:ps.totalDue,advance:ps.totalAdvance,totalPaid:ps.totalPaid};
-  if(s.attendance){
-    Object.entries(s.attendance).forEach(([date,st])=>{
-      attendanceData.push({studentName:s.name,studentId:s.id,class:s.class,date:date,status:st?'Present':'Absent'});
-    });
-  }
+const ps=getPaymentStatus(s);
+dues[s.id]={due:ps.totalDue,advance:ps.totalAdvance,totalPaid:ps.totalPaid};
+if(s.attendance){
+Object.entries(s.attendance).forEach(([date,st])=>{
+attendanceData.push({studentName:s.name,studentId:s.id,class:s.class,date:date,status:st?'Present':'Absent'});
+});
+}
 });
 const payload={
 raw:JSON.stringify(slim),
@@ -1380,7 +1374,6 @@ await fetch(sheetUrl,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text
 sheetSuccess=true;
 }catch(e){console.error('Auto Sheet Backup failed:',e);}
 }
-
 if(emailSuccess || sheetSuccess){
 DB.settings.lastBackup=new Date().toISOString();saveToCloud();
 let msg='🤖 Auto backup successful!';
@@ -1436,11 +1429,11 @@ function openWipeModal(){document.getElementById('wipeInput').value='';document.
 document.getElementById('wipeInput').addEventListener('input',e=>{document.getElementById('wipeConfirmBtn').disabled=e.target.value.trim().toLowerCase()!=='wipe out all data';});
 function doWipe(){
 const keepEmail=DB.settings.email,keepFreq=DB.settings.backupFreq,keepTime=DB.settings.backupTime,keepUPI=DB.settings.upi,keepMR=DB.settings.monthlyReminder,keepSheet=DB.settings.sheetBackupUrl;
-DB={students:[],classes:{'General':{days:[],times:{},fineEnabled:false,fineAmount:10}},settings:{backupFreq:keepFreq,backupTime:keepTime,lastBackup:null,monthlyReminder:keepMR,email:keepEmail,upi:keepUPI,sheetBackupUrl:keepSheet}};
+DB={students:[],classes:{'General':{days:[],times:{},fineEnabled:false,fineAmount:10,feeCycle:'calendar_month'}},settings:{backupFreq:keepFreq,backupTime:keepTime,lastBackup:null,monthlyReminder:keepMR,email:keepEmail,upi:keepUPI,sheetBackupUrl:keepSheet}};
 saveToCloud();renderAll();closeModal('wipeModal');toast('🗑️ Wiped');
 }
 function openStudentModal(id=null){
-if(Object.keys(DB.classes).length===0){DB.classes['General']={days:[],times:{},fineEnabled:false,fineAmount:10};saveToCloud();}
+if(Object.keys(DB.classes).length===0){DB.classes['General']={days:[],times:{},fineEnabled:false,fineAmount:10,feeCycle:'calendar_month'};saveToCloud();}
 const sel=document.getElementById('stuClass');
 sel.innerHTML=Object.keys(DB.classes).map(c=>`<option>${c}</option>`).join('');
 document.getElementById('stuId').value='';document.getElementById('studentForm').reset();
@@ -1525,6 +1518,7 @@ editingClassTimes={};
 document.getElementById('clsOrigName').value='';
 document.getElementById('clsName').value='';
 document.getElementById('clsFine').value='10';
+document.getElementById('clsFeeCycle').value='admission_day';
 document.getElementById('clsFineToggle').classList.remove('on');
 document.getElementById('clsModalTitle').textContent='➕ Add Class';
 if(name&&DB.classes[name]){
@@ -1532,6 +1526,7 @@ const c=DB.classes[name];
 document.getElementById('clsOrigName').value=name;
 document.getElementById('clsName').value=name;
 document.getElementById('clsFine').value=c.fineAmount||10;
+document.getElementById('clsFeeCycle').value=c.feeCycle||'calendar_month';
 document.getElementById('clsFineToggle').classList.toggle('on',c.fineEnabled);
 editingClassDays=[...(c.days||[])];
 editingClassTimes={...(c.times||{})};
@@ -1546,7 +1541,7 @@ if(!name){toast('⚠️ Name required');return;}
 const orig=document.getElementById('clsOrigName').value;
 if(orig&&orig!==name){delete DB.classes[orig];DB.students.forEach(s=>{if(s.class===orig)s.class=name;});}
 const times={};editingClassDays.forEach(d=>{if(editingClassTimes[String(d)])times[String(d)]=editingClassTimes[String(d)];});
-DB.classes[name]={days:[...editingClassDays].sort((a,b)=>a-b),times:times,fineEnabled:document.getElementById('clsFineToggle').classList.contains('on'),fineAmount:+document.getElementById('clsFine').value||10};
+DB.classes[name]={days:[...editingClassDays].sort((a,b)=>a-b),times:times,fineEnabled:document.getElementById('clsFineToggle').classList.contains('on'),fineAmount:+document.getElementById('clsFine').value||10,feeCycle:document.getElementById('clsFeeCycle').value};
 saveToCloud();closeModal('classModal');renderAll();toast('✅ Saved');
 if(afterClassSaveCallback){afterClassSaveCallback(name);afterClassSaveCallback=null;}
 }
@@ -1562,6 +1557,9 @@ saveToCloud();renderAll();toast('🗑️ Class deleted');
 });
 }
 function getAllMonths(stu){
+const cls=DB.classes[stu.class]||{};
+const calcType=cls.feeCycle||'calendar_month';
+if(calcType==='calendar_month'){
 const adm=new Date(stu.admission);const now=new Date();let months=[];
 let cur=new Date(adm.getFullYear(),adm.getMonth(),1);
 const end=new Date(now.getFullYear(),now.getMonth(),1);
@@ -1571,6 +1569,27 @@ months.push({ym:ym,m:cur.getMonth(),y:cur.getFullYear(),label:`${MONTH_SHORT[cur
 cur.setMonth(cur.getMonth()+1);
 }
 return months;
+}else{
+const adm=new Date(stu.admission);const now=new Date();let months=[];
+let i=0;
+while(true){
+let cycleStart=new Date(adm);
+cycleStart.setMonth(cycleStart.getMonth()+i);
+if(cycleStart>now) break;
+let nextStart=new Date(adm);
+nextStart.setMonth(nextStart.getMonth()+i+1);
+let cycleEnd=new Date(nextStart);
+cycleEnd.setDate(cycleEnd.getDate()-1);
+const cycleId=`cyc_${cycleStart.getFullYear()}-${String(cycleStart.getMonth()+1).padStart(2,'0')}-${String(cycleStart.getDate()).padStart(2,'0')}`;
+const startStr=`${MONTH_SHORT[cycleStart.getMonth()]} ${cycleStart.getDate()}`;
+const endStr=`${MONTH_SHORT[cycleEnd.getMonth()]} ${cycleEnd.getDate()}`;
+const label=`${startStr} - ${endStr}`;
+const fullLabel=`${startStr} to ${endStr}, ${cycleEnd.getFullYear()}`;
+months.push({ym:cycleId,m:cycleStart.getMonth(),y:cycleStart.getFullYear(),label:label,fullLabel:fullLabel});
+i++;
+}
+return months;
+}
 }
 function buildPaymentDistribution(stu){
 const months=getAllMonths(stu);
@@ -1893,7 +1912,7 @@ document.getElementById('dashDueEmpty').style.display=dueStudents.length?'none':
 document.getElementById('dashDueTbl').style.display=dueStudents.length?'':'none';
 }
 function renderStudents(){
-if(Object.keys(DB.classes).length===0){DB.classes['General']={days:[],times:{},fineEnabled:false,fineAmount:10};saveToCloud();}
+if(Object.keys(DB.classes).length===0){DB.classes['General']={days:[],times:{},fineEnabled:false,fineAmount:10,feeCycle:'calendar_month'};saveToCloud();}
 const q=(document.getElementById('searchInput')?.value||'').toLowerCase();
 const cf=document.getElementById('classFilter')?.value||'';
 const sort=document.getElementById('sortBy')?.value||'name';
@@ -2185,7 +2204,7 @@ html+=`<div style="text-align:center;padding:20px;color:var(--muted);font-size:1
 document.getElementById('pane-pay').innerHTML=html;
 }
 function renderFees(){
-if(Object.keys(DB.classes).length===0){DB.classes['General']={days:[],times:{},fineEnabled:false,fineAmount:10};saveToCloud();}
+if(Object.keys(DB.classes).length===0){DB.classes['General']={days:[],times:{},fineEnabled:false,fineAmount:10,feeCycle:'calendar_month'};saveToCloud();}
 const cls=document.getElementById('feeClass')?.value||'';
 const sortOpt=document.getElementById('feeSort')?.value||'';
 let list=DB.students.filter(s=>!cls||s.class===cls);
@@ -2232,11 +2251,12 @@ if(waNum){setTimeout(()=>window.open(`https://wa.me/${waNum}?text=${encodeURICom
 toast(`📨 Opening ${count} WhatsApp reminder(s)`);
 }
 function renderClasses(){
-if(Object.keys(DB.classes).length===0){DB.classes['General']={days:[],times:{},fineEnabled:false,fineAmount:10};saveToCloud();}
+if(Object.keys(DB.classes).length===0){DB.classes['General']={days:[],times:{},fineEnabled:false,fineAmount:10,feeCycle:'calendar_month'};saveToCloud();}
 const card=document.getElementById('classesCard');const entries=Object.entries(DB.classes);
 card.innerHTML=entries.map(([name,cfg])=>{const count=DB.students.filter(s=>s.class===name).length;
 const daysText=cfg.days&&cfg.days.length?cfg.days.map(d=>{const t=getDayTime(name,d);return DAY_NAMES[d]+(t?' '+formatTime12(t):'');}).join(', '):'No routine';
-return`<div class="class-card"><div style="flex:1;min-width:200px"><h4 style="font-family:'Space Grotesk';font-size:clamp(14px,4vw,17px)">${name}</h4><div style="font-size:11px;color:var(--muted);margin-top:4px">👥 ${count} students</div><div style="font-size:11px;color:var(--muted);margin-top:2px">📅 ${daysText}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">💰 ₹${cfg.fineAmount}/day ${cfg.fineEnabled?'<span style="color:#6ee7b7">ON</span>':'<span style="color:#94a3b8">OFF</span>'}</div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-sm btn-ghost" onclick="openClassModal('${name.replace(/'/g,"\\'")}')">✏️</button><button class="btn btn-sm btn-danger" onclick="deleteClass('${name.replace(/'/g,"\\'")}')">🗑️</button></div></div>`;}).join('')
+const cycleText=cfg.feeCycle==='admission_day'?'🔄 Rolling Cycle':'📅 Calendar Month';
+return`<div class="class-card"><div style="flex:1;min-width:200px"><h4 style="font-family:'Space Grotesk';font-size:clamp(14px,4vw,17px)">${name}</h4><div style="font-size:11px;color:var(--muted);margin-top:4px">👥 ${count} students</div><div style="font-size:11px;color:var(--muted);margin-top:2px">📅 ${daysText}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">💰 ₹${cfg.fineAmount}/day ${cfg.fineEnabled?'<span style="color:#6ee7b7">ON</span>':'<span style="color:#94a3b8">OFF</span>'}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">${cycleText}</div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-sm btn-ghost" onclick="openClassModal('${name.replace(/'/g,"\\'")}')">✏️</button><button class="btn btn-sm btn-danger" onclick="deleteClass('${name.replace(/'/g,"\\'")}')">🗑️</button></div></div>`;}).join('')
 +(entries.length===0?'<div class="empty-state"><div class="big">🏫</div>Add a class</div>':'');
 }
 function backupNow(){
@@ -2301,7 +2321,7 @@ return p;
 if(!s.attendance||typeof s.attendance!=='object')s.attendance={};
 });
 if(!DB.classes||Object.keys(DB.classes).length===0){
-DB.classes={'General':{days:[],times:{},fineEnabled:false,fineAmount:10}};
+DB.classes={'General':{days:[],times:{},fineEnabled:false,fineAmount:10,feeCycle:'calendar_month'}};
 }
 saveToCloud();
 renderAll();loadUPISettings();loadBackupSettings();loadSheetUrl();
