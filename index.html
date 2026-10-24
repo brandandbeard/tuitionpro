@@ -3605,13 +3605,13 @@ if(document.getElementById('profilePage').classList.contains('active')){renderPr
 const alertMonthSel={};
 const dashSel={};
 let bulkQueue={items:[],idx:0,sent:0,skipped:0};
-function isDashSel(sid){return dashSel[sid]!==false;}
+function isDashSel(sid){return dashSel[sid]===true;}
 function toggleDashSel(sid){
-if(dashSel[sid]===false)delete dashSel[sid];else dashSel[sid]=false;
+if(dashSel[sid]===true)dashSel[sid]=false;else dashSel[sid]=true;
 renderDashboard();
 }
 function toggleAllDashSel(on){
-DB.students.forEach(s=>{if(getPaymentStatus(s).totalDue>0){if(on)delete dashSel[s.id];else dashSel[s.id]=false;}});
+DB.students.forEach(s=>{if(getPaymentStatus(s).totalDue>0){dashSel[s.id]=on?true:false;}});
 renderDashboard();
 }
 function getDueMonthsInfo(s){return getPaymentStatus(s).months.filter(m=>m.status!=='paid');}
