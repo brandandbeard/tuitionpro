@@ -1083,10 +1083,10 @@ tbody tr:hover td{background:rgba(124,92,255,.07)}
 tbody tr:last-child td{border-bottom:0}
 td b{color:var(--ink);font-weight:600;white-space:nowrap}
 /* money columns read right-to-left, like every ledger */
-#feesTbl th:nth-child(4),#feesTbl td:nth-child(4),
-#feesTbl th:nth-child(7),#feesTbl td:nth-child(7),
+#feesTbl th:nth-child(3),#feesTbl td:nth-child(3),
+#feesTbl th:nth-child(6),#feesTbl td:nth-child(6),
 #dashDueTbl th:nth-child(3),#dashDueTbl td:nth-child(3){text-align:right}
-#feesTbl td:nth-child(4),#feesTbl td:nth-child(7),#dashDueTbl td:nth-child(3){font-variant-numeric:tabular-nums}
+#feesTbl td:nth-child(3),#feesTbl td:nth-child(6),#dashDueTbl td:nth-child(3){font-variant-numeric:tabular-nums}
 td[style*="font-size:11px"]{font-variant-numeric:tabular-nums}
 
 /* avatar */
@@ -1160,6 +1160,45 @@ td[style*="font-size:11px"]{font-variant-numeric:tabular-nums}
   border-color:rgba(255,255,255,.28);
   box-shadow:0 8px 16px -10px rgba(124,92,255,.9);
 }
+
+/* ---------- Alert month chips ---------- */
+.mo-chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.mo-chip{
+  display:inline-flex;align-items:center;gap:3px;
+  padding:3px 9px;border-radius:999px;
+  font:600 10.5px/1.5 'JetBrains Mono',ui-monospace,'Courier New',monospace;
+  letter-spacing:.02em;cursor:pointer;
+  user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;
+  border:1px solid transparent;
+  transition:transform var(--t-fast) var(--e-out),opacity var(--t-fast) var(--e-out),filter var(--t-fast) var(--e-out);
+}
+.mo-chip:hover{transform:translateY(-1px)}
+.mo-chip:active{transform:scale(.92)}
+.mo-chip.unpaid{
+  color:var(--bad-ink);
+  background:linear-gradient(160deg,rgba(255,95,109,.26),rgba(255,95,109,.1));
+  border-color:rgba(255,95,109,.48);
+}
+.mo-chip.partial{
+  color:#4a3400;
+  background:linear-gradient(160deg,#fde047,#facc15);
+  border-color:#eab308;
+  box-shadow:0 3px 10px -4px rgba(234,179,8,.8);
+}
+[data-theme="light"] .mo-chip.partial{color:#5c4300}
+.mo-chip.off{opacity:.35;border-style:dashed;text-decoration:line-through;filter:saturate(.35)}
+.stu-check{
+  width:19px;height:19px;flex:0 0 auto;cursor:pointer;
+  accent-color:#25d366;
+}
+
+/* ---------- Bulk queue ---------- */
+.bq-prog-wrap{height:8px;border-radius:99px;background:rgba(255,255,255,.08);border:1px solid var(--line-soft);overflow:hidden;margin:10px 0 16px}
+[data-theme="light"] .bq-prog-wrap{background:#e8edf7}
+.bq-prog{height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,#25d366,#128c4b);transition:width .35s var(--e-out)}
+.bq-card{padding:16px;border-radius:16px;background:rgba(0,0,0,.25);border:1px solid var(--line-soft);text-align:center;margin-bottom:14px}
+[data-theme="light"] .bq-card{background:#f2f5fc}
+.bq-amount{margin-top:10px;font-family:'Space Grotesk','Inter',sans-serif;font-weight:700;font-size:22px;color:#6ee7b7}
 
 /* ---------- Due cells ---------- */
 .due-cell{display:flex;flex-direction:column;align-items:flex-start;gap:4px}
@@ -1254,64 +1293,6 @@ td[style*="font-size:11px"]{font-variant-numeric:tabular-nums}
   display:flex;gap:5px;flex-wrap:wrap;align-items:center;
   margin-top:9px;padding-top:9px;border-top:1px solid var(--line-soft);
 }
-
-/* ---------- Bulk Select & WhatsApp Queue ---------- */
-.sel-col{width:42px;text-align:center!important}
-.sel-check{display:inline-grid;place-items:center;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;vertical-align:middle}
-.sel-check input{appearance:none;-webkit-appearance:none;width:21px;height:21px;margin:0;border-radius:7px;border:2px solid var(--muted);background:transparent;cursor:pointer;position:relative;transition:all .18s ease}
-.sel-check input:checked{background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:transparent}
-.sel-check input:checked::after{content:'';position:absolute;left:5.5px;top:1.5px;width:5px;height:11px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(45deg)}
-.sel-check input:indeterminate{border-color:var(--accent);background:rgba(124,92,255,.18)}
-.sel-check input:indeterminate::after{content:'';position:absolute;left:2.5px;top:7px;width:12px;height:2.5px;background:var(--accent);border-radius:2px}
-tr.sel-row td{background:rgba(124,92,255,.08)}
-tr.sel-row td:first-child{box-shadow:inset 3px 0 0 var(--accent)}
-.m-card.has-sel{position:relative;padding-right:46px}
-.m-card .m-sel{position:absolute;top:14px;right:12px;z-index:2}
-.m-card.sel-row{border-color:rgba(124,92,255,.55);background:linear-gradient(140deg,rgba(124,92,255,.12),var(--card-bg-2))}
-.bulk-bar{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(140px);z-index:1500;display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;padding:11px 13px 11px 18px;border-radius:20px;background:linear-gradient(140deg,rgba(28,22,56,.97),rgba(48,32,82,.97));border:1px solid rgba(124,92,255,.5);box-shadow:0 16px 48px rgba(0,0,0,.55);max-width:calc(100vw - 22px);opacity:0;pointer-events:none;transition:transform .32s var(--e-spring),opacity .25s ease}
-[data-theme="light"] .bulk-bar{background:linear-gradient(140deg,#ffffff,#f2edff);border-color:rgba(124,92,255,.4);box-shadow:0 16px 48px rgba(80,50,180,.28)}
-.bulk-bar.show{transform:translateX(-50%) translateY(0);opacity:1;pointer-events:auto}
-.bulk-bar .bb-info{font-size:12.5px;font-weight:600;color:var(--text);white-space:nowrap}
-.bulk-bar .bb-info b{font-family:'Space Grotesk';color:#a78bfa;font-size:15px}
-[data-theme="light"] .bulk-bar .bb-info b{color:#6c3bff}
-.bulk-bar .bb-btn{display:inline-flex;align-items:center;gap:6px;border:0;cursor:pointer;border-radius:14px;padding:10px 16px;font-family:'Space Grotesk','Inter',sans-serif;font-weight:700;font-size:13px;color:#fff;background:linear-gradient(135deg,#16a34a,#25D366);box-shadow:0 6px 18px rgba(37,211,102,.35);transition:transform .15s var(--e-out)}
-.bulk-bar .bb-btn:active{transform:scale(.95)}
-.bulk-bar .bb-clear{background:transparent;border:1px solid var(--line);color:var(--muted);box-shadow:none;padding:10px 12px}
-.bq-opt{margin:14px 0}
-.bq-opt>label:first-child{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;margin-bottom:8px}
-.bq-radio{display:flex;align-items:center;gap:9px;padding:11px 13px;border-radius:13px;border:1px solid var(--line);background:rgba(255,255,255,.04);font-size:13px;color:var(--text);cursor:pointer;margin-bottom:7px}
-.bq-radio input{accent-color:var(--accent);width:17px;height:17px}
-.bq-radio:has(input:checked){border-color:var(--accent);background:rgba(124,92,255,.12)}
-.bq-hint{font-size:11px;color:var(--muted);margin-top:7px;line-height:1.6}
-.bq-warn{font-size:11.5px;line-height:1.7;color:#fbbf24;background:rgba(251,191,36,.09);border:1px solid rgba(251,191,36,.28);border-radius:12px;padding:10px 13px;margin:14px 0}
-.bq-optinfo{font-size:13px;color:var(--text);background:rgba(124,92,255,.1);border:1px solid rgba(124,92,255,.3);border-radius:13px;padding:12px 14px;line-height:1.7;margin-bottom:6px}
-.bq-prog{height:9px;border-radius:99px;background:rgba(255,255,255,.09);overflow:hidden;margin:4px 0 8px}
-[data-theme="light"] .bq-prog{background:rgba(0,0,0,.08)}
-.bq-prog-bar{height:100%;width:0%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent2),#25D366);transition:width .4s var(--e-out)}
-.bq-prog-txt{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted);margin-bottom:14px}
-.bq-prog-txt b{font-family:'Space Grotesk';color:var(--ink)}
-.bq-stu{display:flex;align-items:center;gap:12px;padding:13px 15px;border-radius:17px;background:rgba(255,255,255,.045);border:1px solid var(--line);margin-bottom:12px}
-[data-theme="light"] .bq-stu{background:rgba(108,59,255,.05)}
-.bq-stu .info{flex:1;min-width:0}
-.bq-stu .nm{font-family:'Space Grotesk';font-weight:700;font-size:16px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.bq-stu .meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:11px;color:var(--muted);margin-top:5px}
-.bq-msg{white-space:pre-wrap;font-size:12.5px;line-height:1.75;color:var(--text);background:rgba(0,0,0,.28);border:1px dashed rgba(124,92,255,.35);border-radius:15px;padding:13px 15px;max-height:190px;overflow-y:auto;margin-bottom:14px;overscroll-behavior:contain}
-[data-theme="light"] .bq-msg{background:#f6f4ff;border-color:rgba(108,59,255,.3)}
-.btn.bq-main{width:100%;display:flex;align-items:center;justify-content:center;gap:9px;border:0;cursor:pointer;border-radius:16px;padding:16px;font-family:'Space Grotesk','Inter',sans-serif;font-weight:700;font-size:15px;color:#fff;background:linear-gradient(135deg,#16a34a,#25D366);box-shadow:0 8px 24px rgba(37,211,102,.35);transition:all .2s var(--e-out);text-align:center}
-.btn.bq-main:active{transform:scale(.97)}
-.btn.bq-main.next{background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 8px 24px rgba(124,92,255,.4);animation:bqPulse 1.6s ease-in-out infinite}
-@keyframes bqPulse{0%,100%{box-shadow:0 8px 24px rgba(124,92,255,.4)}50%{box-shadow:0 8px 34px rgba(124,92,255,.75)}}
-.bq-sub{display:flex;gap:9px;margin-top:10px}
-.bq-sub .btn{flex:1}
-.bq-sum{text-align:center;padding:8px 0 4px}
-.bq-sum .big{font-size:44px;margin-bottom:6px}
-.bq-sum h3{padding-right:0}
-.bq-sum-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0}
-.bq-sum-cell{padding:14px;border-radius:16px;background:rgba(255,255,255,.045);border:1px solid var(--line)}
-[data-theme="light"] .bq-sum-cell{background:rgba(108,59,255,.05)}
-.bq-sum-cell .v{font-family:'Space Grotesk';font-size:26px;font-weight:700;color:var(--ink)}
-.bq-sum-cell .l{font-size:11px;color:var(--muted);margin-top:3px}
-.bq-nonum{margin:12px 0;text-align:left;font-size:12px;color:var(--text);background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);border-radius:13px;padding:11px 14px;line-height:1.8}
 
 /* ---------- Modals ---------- */
 .modal-bg{
@@ -2260,7 +2241,10 @@ html[data-theme="light"]{background:#e7ecf5}
 <div class="card">
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px">
 <h3 style="font-family:'Space Grotesk';font-size:clamp(15px,4vw,18px)">⚠️ Students with Pending Fees</h3>
-<button class="btn btn-wa btn-sm" id="bulkAlertBtn" onclick="sendBulkReminder()" style="display:none">📱 Send All Alerts</button>
+<div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+<label id="dashSelAllWrap" for="dashSelAll" style="display:none;align-items:center;gap:7px;cursor:pointer;font-size:12.5px;font-weight:600;color:var(--ink-2);user-select:none;-webkit-user-select:none"><input type="checkbox" id="dashSelAll" class="stu-check" onchange="toggleAllDashSel(this.checked)"/><span id="dashSelAllLbl">Select All</span></label>
+<button class="btn btn-wa btn-sm" id="bulkAlertBtn" onclick="openBulkQueue()" style="display:none">📱 Send Alerts</button>
+</div>
 </div>
 <div class="tbl-wrap"><table id="dashDueTbl"><thead><tr><th>Student</th><th>Class</th><th>Due</th><th>Action</th></tr></thead><tbody></tbody></table></div>
 <div class="mobile-cards" id="dashDueCards"></div>
@@ -2282,7 +2266,7 @@ html[data-theme="light"]{background:#e7ecf5}
 </select>
 </div>
 <div class="card">
-<div class="tbl-wrap"><table id="studentsTbl"><thead><tr><th class="sel-col"><label class="sel-check" title="Select All / Unselect All"><input type="checkbox" data-selpage="students" onchange="selAllVisible('students',this)"></label></th><th>Photo</th><th>Name</th><th>Class</th><th>Admission</th><th>Status</th><th>Contact</th><th>Actions</th></tr></thead><tbody></tbody></table></div>
+<div class="tbl-wrap"><table id="studentsTbl"><thead><tr><th>Photo</th><th>Name</th><th>Class</th><th>Admission</th><th>Status</th><th>Contact</th><th>Actions</th></tr></thead><tbody></tbody></table></div>
 <div class="mobile-cards" id="studentsCards"></div>
 <div id="stuEmpty" class="empty-state" style="display:none"><div class="big">👥</div>No students yet.</div>
 </div>
@@ -2323,11 +2307,10 @@ html[data-theme="light"]{background:#e7ecf5}
 <option value="name">Sort: Name (A-Z)</option>
 <option value="fee_high">Sort: Fee (High to Low)</option>
 </select>
-<button class="btn btn-ghost" onclick="selDueOnly()" title="সব due স্টুডেন্ট একসাথে সিলেক্ট">✓ Due Only</button>
-<button class="btn btn-danger" onclick="sendBulkReminder()">📨 Remind All</button>
+<button class="btn btn-wa" onclick="openBulkQueue()">📱 Remind All</button>
 </div>
 <div class="card">
-<div class="tbl-wrap"><table id="feesTbl"><thead><tr><th class="sel-col"><label class="sel-check" title="Select All / Unselect All"><input type="checkbox" data-selpage="fees" onchange="selAllVisible('fees',this)"></label></th><th>Student</th><th>Class</th><th>Fee</th><th>Status</th><th>Breakdown</th><th>Total</th><th>Alert</th></tr></thead><tbody></tbody></table></div>
+<div class="tbl-wrap"><table id="feesTbl"><thead><tr><th>Student</th><th>Class</th><th>Fee</th><th>Status</th><th>Breakdown</th><th>Total</th><th>Alert</th></tr></thead><tbody></tbody></table></div>
 <div class="mobile-cards" id="feesCards"></div>
 </div>
 </section>
@@ -2508,6 +2491,23 @@ html[data-theme="light"]{background:#e7ecf5}
 </form>
 </div>
 </div>
+<div class="modal-bg" id="bulkQueueModal">
+<div class="modal sm">
+<button class="modal-close" onclick="closeBulkQueue()">×</button>
+<h3>📤 Bulk WhatsApp Alerts</h3>
+<div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted)">
+<span id="bqProgressLbl">0 / 0</span><span id="bqSentLbl"></span>
+</div>
+<div class="bq-prog-wrap"><div class="bq-prog" id="bqProg"></div></div>
+<div class="bq-card" id="bqCard"></div>
+<a id="bqWaBtn" class="btn btn-wa" style="width:100%;justify-content:center;text-decoration:none;gap:8px" href="#" target="_blank" rel="noopener" onclick="bqOpen()">💬 Open WhatsApp & Send</a>
+<div style="display:flex;gap:8px;margin-top:10px">
+<button class="btn btn-ghost" style="flex:1" onclick="bqSkip()">⏭ Skip</button>
+<button class="btn btn-ghost" style="flex:1" onclick="closeBulkQueue()">✕ Done</button>
+</div>
+<p style="font-size:11px;color:var(--muted);margin-top:12px;text-align:center">💡 WhatsApp-এ Send করে ফিরে এলে পরের student অটোমেটিক ready থাকবে</p>
+</div>
+</div>
 <div class="modal-bg" id="paymentModal">
 <div class="modal sm">
 <button class="modal-close" onclick="closeModal('paymentModal')">×</button>
@@ -2653,60 +2653,6 @@ html[data-theme="light"]{background:#e7ecf5}
 <p style="color:var(--text);font-size:14px;line-height:1.7;margin:14px 0" id="alertMsg"></p>
 <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:18px">
 <button class="btn btn-primary" onclick="closeModal('alertModal')">OK</button>
-</div>
-</div>
-</div>
-<!-- Bulk WhatsApp: floating selection bar -->
-<div class="bulk-bar" id="bulkBar">
-<span class="bb-info">✅ <b id="bbCount">0</b> selected • <b id="bbDue">₹0</b> due</span>
-<button class="bb-btn" onclick="openBulkQueue()">📱 Send WhatsApp Alerts</button>
-<button class="bb-btn bb-clear" onclick="clearSel()" title="Clear selection">✕</button>
-</div>
-<!-- Bulk WhatsApp Queue Modal -->
-<div class="modal-bg" id="bulkQueueModal">
-<div class="modal sm">
-<button class="modal-close" onclick="endBulkQueue()">×</button>
-<div id="bqOpts">
-<h3>📨 Bulk WhatsApp Alert</h3>
-<div class="bq-optinfo" id="bqOptInfo"></div>
-<div class="bq-opt">
-<label>📝 Message Style</label>
-<label class="bq-radio"><input type="radio" name="bqMode" value="full" checked><span><b>বিস্তারিত মেসেজ</b> — মাস-অনুযায়ী হিসাব + UPI সহ (ফুল রিপোর্ট)</span></label>
-<label class="bq-radio"><input type="radio" name="bqMode" value="short"><span><b>শর্ট রিমাইন্ডার</b> — ২-৩ লাইনের ছোট মেসেজ</span></label>
-</div>
-<div class="bq-opt">
-<label>🌍 Country Code (optional)</label>
-<input id="bqCC" placeholder="যেমন: 91" style="width:100%;padding:12px 14px;border-radius:13px;background:rgba(127,127,127,.12);border:1px solid var(--line);color:var(--text);font-size:13px"/>
-<p class="bq-hint">নম্বর দেশের কোড ছাড়া (যেমন 9876543210 বা 0 দিয়ে শুরু) সেভ করা থাকলে এখানে কোড দিন — নম্বর যদি 91 দিয়ে শুরু হয়ে থাকে, ফাঁকা রাখুন।</p>
-</div>
-<div class="bq-warn">⚠️ <b>একটার পর একটা পাঠান</b> — WhatsApp-এ Send চাপার পর কয়েক সেকেন্ড গ্যাপ দিন। খুব দ্রুত একটানা ৩০টা মেসেজ গেলে WhatsApp আপনার নম্বর সাময়িক ব্লক করতে পারে।</div>
-<button class="btn btn-wa" style="width:100%;justify-content:center" onclick="startBulkQueue()">🚀 শুরু করুন</button>
-</div>
-<div id="bqSend" style="display:none">
-<h3>📨 Bulk Alert Queue</h3>
-<div class="bq-prog"><div class="bq-prog-bar" id="bqProgBar"></div></div>
-<div class="bq-prog-txt"><span><b id="bqProgTxt">1 / 30</b></span><span>✅ <b id="bqSentCnt">0</b> sent &nbsp;•&nbsp; ⏭ <b id="bqSkipCnt">0</b> skipped</span></div>
-<div class="bq-stu" id="bqStu"></div>
-<div class="bq-msg" id="bqMsg"></div>
-<button class="btn bq-main" id="bqMainBtn" onclick="bqMainAction()">📱 WhatsApp খুলুন</button>
-<div class="bq-sub">
-<button class="btn btn-ghost" onclick="bqCopy()">📋 Copy</button>
-<button class="btn btn-ghost" onclick="bqSkip()">⏭ Skip</button>
-</div>
-<p class="bq-hint">💡 WhatsApp-এ <b>Send</b> চাপার পর অ্যাপে ফিরে এসে সবুজ বাটনে চাপুন — পরের স্টুডেন্টের মেসেজ রেডি হয়ে যাবে।</p>
-</div>
-<div id="bqSummary" style="display:none">
-<div class="bq-sum">
-<div class="big" id="bqSumIcon">🎉</div>
-<h3>Queue শেষ!</h3>
-<div class="bq-sum-grid">
-<div class="bq-sum-cell"><div class="v" id="bqSumSent">0</div><div class="l">✅ Sent (WhatsApp খোলা হয়েছে)</div></div>
-<div class="bq-sum-cell"><div class="v" id="bqSumSkip">0</div><div class="l">⏭ Skipped</div></div>
-</div>
-<div class="bq-nonum" id="bqSumNoNum" style="display:none"></div>
-<p class="bq-hint" style="text-align:center">প্রতিটা স্টুডেন্টের প্রোফাইলে শেষ রিমাইন্ডারের তারিখ সেভ হয়ে গেছে।</p>
-<button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:6px" onclick="endBulkQueue()">✔️ শেষ করুন</button>
-</div>
 </div>
 </div>
 </div>
@@ -3655,11 +3601,61 @@ toast(`🗑️ ${monthInfo.label} payment removed!`);
 renderAll();
 if(document.getElementById('profilePage').classList.contains('active')){renderProfilePay();}
 }
-function feeMessage(s){
+/* ─── Alert month selection + dashboard bulk selection ─── */
+const alertMonthSel={};
+const dashSel={};
+let bulkQueue={items:[],idx:0,sent:0,skipped:0};
+function isDashSel(sid){return dashSel[sid]!==false;}
+function toggleDashSel(sid){
+if(dashSel[sid]===false)delete dashSel[sid];else dashSel[sid]=false;
+renderDashboard();
+}
+function toggleAllDashSel(on){
+DB.students.forEach(s=>{if(getPaymentStatus(s).totalDue>0){if(on)delete dashSel[s.id];else dashSel[s.id]=false;}});
+renderDashboard();
+}
+function getDueMonthsInfo(s){return getPaymentStatus(s).months.filter(m=>m.status!=='paid');}
+function getAlertSelYms(s){
+const due=getDueMonthsInfo(s);
+const sel=alertMonthSel[s.id];
+if(!sel)return due.map(m=>m.ym);
+return due.filter(m=>sel.has(m.ym)).map(m=>m.ym);
+}
+function toggleAlertMonth(sid,ym){
+const s=DB.students.find(x=>x.id===sid);if(!s)return;
+let sel=alertMonthSel[sid];
+if(!sel){sel=new Set(getDueMonthsInfo(s).map(m=>m.ym));alertMonthSel[sid]=sel;}
+if(sel.has(ym))sel.delete(ym);else sel.add(ym);
+renderDashboard();renderStudents();
+}
+function monthChipsHTML(s){
+const due=getDueMonthsInfo(s);
+if(!due.length)return'';
+const sel=new Set(getAlertSelYms(s));
+const nowY=new Date().getFullYear();
+const chips=due.map(m=>{
+const on=sel.has(m.ym);
+const short=MONTH_SHORT[m.m]+(m.y!==nowY?" '"+String(m.y).slice(2):'');
+const tip=`${m.fullLabel} • ₹${m.due} baki${m.status==='partial'?' (partial)':''} — ${on?'alert e jabe':'baad thakbe'}`;
+return`<span class="mo-chip ${m.status}${on?'':' off'}" title="${tip}" onclick="event.stopPropagation();toggleAlertMonth('${s.id}','${m.ym}')">${m.status==='partial'?'⚠️ ':''}${on?'✓':'✕'} ${short}</span>`;
+}).join('');
+return`<div class="mo-chips" onclick="event.stopPropagation()">${chips}</div>`;
+}
+function feeMessage(s,forcedYms){
 const ps=getPaymentStatus(s);
-const total=ps.totalDue;
 const upi=DB.settings.upi||{};
 const upiId=upi.id||'';
+const dueMonths=ps.months.filter(m=>m.status!=='paid');
+let unpaidMonths=dueMonths;
+let selOnly=false;
+const selYms=forcedYms||getAlertSelYms(s);
+if(selYms&&selYms.length<dueMonths.length){
+const set=new Set(selYms);
+const f=dueMonths.filter(m=>set.has(m.ym));
+if(f.length){unpaidMonths=f;selOnly=true;}
+}
+const selDueSum=unpaidMonths.reduce((t,m)=>t+m.due,0);
+const total=selOnly?selDueSum+ps.fine:ps.totalDue;
 let lines=[];
 lines.push('*Salam!*');
 lines.push('আপনার সন্তানের টিউশন ফি বাকি আছে। অনুগ্রহ করে দ্রুত বাকি টাকা জমা দিয়ে দিন।');
@@ -3668,7 +3664,6 @@ lines.push('*Class:* '+s.class);
 lines.push('*নেট বাকি:* ₹'+total);
 lines.push('📊 *মাস-অনুযায়ী হিসাব: (মাসিক ফি: ₹'+s.fee+')*');
 lines.push('━━━━━━━━━━━━━━━━━━');
-const unpaidMonths=ps.months.filter(m=>m.status!=='paid');
 if(unpaidMonths.length===0){lines.push('✅ সব মাস পরিশোধিত।');}
 else{
 unpaidMonths.forEach(m=>{
@@ -3680,15 +3675,15 @@ lines.push(line);
 });
 }
 lines.push('━━━━━━━━━━━━━━━━━━');
-lines.push(`*Total Fee Due:* ₹${ps.totalFeeDue}`);
+if(!selOnly)lines.push(`*Total Fee Due:* ₹${ps.totalFeeDue}`);
 lines.push(`*Total Paid:* ₹${ps.totalPaid}`);
 if(ps.fine>0) lines.push(`*Fine (Attendance):* ₹${ps.fine}`);
 if(ps.totalAdvance>0){
 lines.push('');
 lines.push(`💰 *Advance Balance:* ₹${ps.totalAdvance}`);
 lines.push('(এই টাকা পরের মাসের ফি-তে অ্যাডজাস্ট হবে)');
-}else if(ps.feeDue>0){
-let net=`❗ *Net Due:* ₹${ps.feeDue}`;
+}else if(total>0){
+let net=`❗ *Net Due:* ₹${selOnly?selDueSum:ps.feeDue}`;
 if(ps.fine>0) net+=` + Fine ₹${ps.fine} = *₹${total}*`;
 lines.push('');
 lines.push(net);
@@ -3708,38 +3703,23 @@ lines.push('');
 lines.push('ধন্যবাদ।');
 return lines.join('\n');
 }
-function shortFeeMessage(s){
-const ps=getPaymentStatus(s);
-const upi=DB.settings.upi||{};
-let lines=[];
-lines.push('*Salam!*');
-lines.push('সম্মানিত অভিভাবক, আপনার সন্তান *'+s.name+'* ('+s.class+') - এর টিউশন ফি বাকি আছে।');
-lines.push('*মোট বাকি: ₹'+ps.totalDue.toLocaleString('en-IN')+'*');
-if(ps.unpaidMonths>0)lines.push('(বাকি মাস: '+ps.unpaidMonths+')');
-if(ps.fine>0)lines.push('(Fine: ₹'+ps.fine+')');
-lines.push('');
-if(upi.id){
-lines.push('💳 *UPI:* '+upi.id);
-lines.push('পেমেন্ট করলে জানাবেন। ধন্যবাদ 🙏');
-}else{
-lines.push('অনুগ্রহ করে দ্রুত ফি জমা দিন। ধন্যবাদ 🙏');
-}
-return lines.join('\n');
-}
 function photoHTML(s,lg=false,clickable=true){
 const clickAttr=clickable?`onclick="openProfile('${s.id}')"`:'';
 if(s.photo)return `<div class="photo ${lg?'lg':''}" ${clickAttr}><img src="${s.photo}"/></div>`;
 return `<div class="photo ${lg?'lg':''}" ${clickAttr}>${s.name.charAt(0).toUpperCase()}</div>`;
 }
 function alertButtons(s){
-const msg=feeMessage(s);
+const selYms=getAlertSelYms(s);
+const hasMo=selYms.length>0;
+const msg=feeMessage(s,selYms);
 const waNum=(s.wa||s.mobile||'').replace(/\D/g,'');
-const waLink=waNum?`https://wa.me/${waNum}?text=${encodeURIComponent(msg)}`:'#';
+const waLink=waNum&&hasMo?`https://wa.me/${waNum}?text=${encodeURIComponent(msg)}`:'#';
 const smsLink=s.mobile?`sms:${s.mobile}?body=${encodeURIComponent(msg)}`:'#';
 const callLink=s.mobile?`tel:${s.mobile}`:'#';
 const igLink=s.ig?`https://instagram.com/${s.ig}`:'#';
 let html='<div class="action-row">';
-if(waNum)html+=`<a class="icon-btn wa" href="${waLink}" target="_blank" title="WhatsApp Alert"><svg viewBox="0 0 24 24"><use href="#icon-wa"/></svg></a>`;
+if(waNum&&hasMo)html+=`<a class="icon-btn wa" href="${waLink}" target="_blank" title="WhatsApp Alert"><svg viewBox="0 0 24 24"><use href="#icon-wa"/></svg></a>`;
+else if(waNum)html+=`<a class="icon-btn wa" href="javascript:void(0)" onclick="toast('⚠️ সব মাস uncheck করা! Alert পাঠাতে অন্তত একটা মাসের ঘরে টিক দাও')" style="opacity:.4" title="WhatsApp Alert"><svg viewBox="0 0 24 24"><use href="#icon-wa"/></svg></a>`;
 if(s.mobile)html+=`<a class="icon-btn sms" href="${smsLink}" title="SMS"><svg viewBox="0 0 24 24"><use href="#icon-sms"/></svg></a>`;
 if(s.mobile)html+=`<a class="icon-btn call" href="${callLink}" title="Call"><svg viewBox="0 0 24 24"><use href="#icon-call"/></svg></a>`;
 if(s.ig)html+=`<a class="icon-btn ig" href="${igLink}" target="_blank" title="Instagram"><svg viewBox="0 0 24 24"><use href="#icon-ig"/></svg></a>`;
@@ -3814,7 +3794,7 @@ setTimeout(()=>{window.open('https://wa.me/'+waNum+'?text='+encodeURIComponent(m
 toast('📥 QR Downloaded! WhatsApp-এ attach করুন');
 }
 function renderAll(){
-renderDashboard();renderStudents();renderAttClassGrid();renderFees();renderClasses();loadEmailSettings();loadSheetUrl();syncSelBulkUI();
+renderDashboard();renderStudents();renderAttClassGrid();renderFees();renderClasses();loadEmailSettings();loadSheetUrl();
 const classes=Object.keys(DB.classes);
 ['classFilter','feeClass'].forEach(id=>{const el=document.getElementById(id);if(!el)return;const cur=el.value;
 el.innerHTML='<option value="">All Classes</option>'+classes.map(c=>`<option ${cur===c?'selected':''}>${c}</option>`).join('');});
@@ -3840,11 +3820,20 @@ document.getElementById('sAtt').textContent=(marked?Math.round(present/marked*10
 document.getElementById('sAttSub').textContent=marked?`${present}/${marked} present`:'Not marked';
 const tbody=document.querySelector('#dashDueTbl tbody');tbody.innerHTML='';
 dueStudents.sort((a,b)=>b.ps.totalDue-a.ps.totalDue).slice(0,1000).forEach(({s,ps})=>{
-tbody.innerHTML+=`<tr><td><div style="display:flex;align-items:center;gap:10px">${photoHTML(s)}<b style="cursor:pointer" onclick="openProfile('${s.id}')">${s.name}</b></div></td><td><span class="badge badge-class">${s.class}</span></td><td><span class="badge badge-due">₹${ps.totalDue.toLocaleString('en-IN')}</span>${ps.fine>0?`<div style="font-size:10px;color:var(--muted);margin-top:2px">incl. ₹${ps.fine} fine</div>`:''}</td><td>${alertButtons(s)}</td></tr>`;});
+tbody.innerHTML+=`<tr><td><div style="display:flex;align-items:center;gap:10px"><input type="checkbox" class="stu-check" ${isDashSel(s.id)?'checked':''} onchange="toggleDashSel('${s.id}')" onclick="event.stopPropagation()"/>${photoHTML(s)}<div style="min-width:0"><b style="cursor:pointer" onclick="openProfile('${s.id}')">${s.name}</b>${monthChipsHTML(s)}</div></div></td><td><span class="badge badge-class">${s.class}</span></td><td><span class="badge badge-due">₹${ps.totalDue.toLocaleString('en-IN')}</span>${ps.fine>0?`<div style="font-size:10px;color:var(--muted);margin-top:2px">incl. ₹${ps.fine} fine</div>`:''}</td><td>${alertButtons(s)}</td></tr>`;});
 const cards=document.getElementById('dashDueCards');
-cards.innerHTML=dueStudents.sort((a,b)=>b.ps.totalDue-a.ps.totalDue).slice(0,1000).map(({s,ps})=>`<div class="m-card">${photoHTML(s)}<div class="body"><div class="nm" onclick="openProfile('${s.id}')">${s.name}</div><div class="meta"><span class="badge badge-class">${s.class}</span><span class="badge badge-due">₹${ps.totalDue.toLocaleString('en-IN')} due</span></div><div class="actions">${alertButtons(s)}</div></div></div>`).join('');
+cards.innerHTML=dueStudents.sort((a,b)=>b.ps.totalDue-a.ps.totalDue).slice(0,1000).map(({s,ps})=>`<div class="m-card"><input type="checkbox" class="stu-check" style="margin-top:12px" ${isDashSel(s.id)?'checked':''} onchange="toggleDashSel('${s.id}')"/>${photoHTML(s)}<div class="body"><div class="nm" onclick="openProfile('${s.id}')">${s.name}</div>${monthChipsHTML(s)}<div class="meta" style="margin-top:6px"><span class="badge badge-class">${s.class}</span><span class="badge badge-due">₹${ps.totalDue.toLocaleString('en-IN')} due</span></div><div class="actions">${alertButtons(s)}</div></div></div>`).join('');
 const bulkBtn=document.getElementById('bulkAlertBtn');
-bulkBtn.style.display=dueStudents.length>0?'inline-flex':'none';
+const selWrap=document.getElementById('dashSelAllWrap');
+const nSel=dueStudents.filter(x=>isDashSel(x.s.id)).length;
+if(dueStudents.length>0){
+bulkBtn.style.display='inline-flex';
+bulkBtn.textContent=`📱 Send Alerts (${nSel}/${dueStudents.length})`;
+selWrap.style.display='inline-flex';
+const master=document.getElementById('dashSelAll');
+master.checked=nSel===dueStudents.length;
+document.getElementById('dashSelAllLbl').textContent=master.checked?'Unselect All':'Select All';
+}else{bulkBtn.style.display='none';selWrap.style.display='none';}
 document.getElementById('dashDueEmpty').style.display=dueStudents.length?'none':'block';
 document.getElementById('dashDueTbl').style.display=dueStudents.length?'':'none';
 }
@@ -3873,11 +3862,9 @@ statusBadge=`<span class="badge badge-partial">⚠️ ₹${ps.feeDue}<br>Partial
 }else{
 statusBadge=`<span class="badge badge-ok">✅ Clear</span>`;
 }
-const isSel=selSet.has(s.id);
-return `<tr class="${isSel?'sel-row':''}">
-<td class="sel-col"><label class="sel-check"><input type="checkbox" data-selid="${s.id}" ${isSel?'checked':''} onchange="toggleSel('${s.id}')"></label></td>
+return `<tr>
 <td>${photoHTML(s,false,true)}</td>
-<td><b style="cursor:pointer;text-decoration:underline;text-decoration-color:rgba(236,72,153,.5)" onclick="openProfile('${s.id}')">${s.name}</b></td>
+<td><b style="cursor:pointer;text-decoration:underline;text-decoration-color:rgba(236,72,153,.5)" onclick="openProfile('${s.id}')">${s.name}</b>${monthChipsHTML(s)}</td>
 <td><span class="badge badge-class">${s.class}</span></td>
 <td>${formatDateShort(s.admission)}</td>
 <td>${statusBadge}</td>
@@ -3886,7 +3873,7 @@ return `<tr class="${isSel?'sel-row':''}">
 }).join('');
 const cards=document.getElementById('studentsCards');
 cards.innerHTML=list.map(s=>{
-const ps=getPaymentStatus(s);const isSel=selSet.has(s.id);
+const ps=getPaymentStatus(s);
 let statusBadge='';
 if(ps.totalAdvance>0){
 statusBadge=`<span class="badge badge-advance">💰 ₹${ps.totalAdvance.toLocaleString('en-IN')} adv</span>`;
@@ -3897,10 +3884,9 @@ statusBadge=`<span class="badge badge-partial">⚠️ Partial</span>`;
 }else{
 statusBadge=`<span class="badge badge-ok">✅ Clear</span>`;
 }
-return `<div class="m-card ${isSel?'sel-row':''} has-sel"><label class="sel-check m-sel"><input type="checkbox" data-selid="${s.id}" ${isSel?'checked':''} onchange="toggleSel('${s.id}')"></label>${photoHTML(s,false,true)}<div class="body"><div class="nm" onclick="openProfile('${s.id}')">${s.name}</div><div class="meta"><span class="badge badge-class">${s.class}</span>${statusBadge}<span>${formatDateShort(s.admission)}</span></div><div class="actions">${alertButtons(s)}</div></div></div>`;
+return `<div class="m-card">${photoHTML(s,false,true)}<div class="body"><div class="nm" onclick="openProfile('${s.id}')">${s.name}</div>${monthChipsHTML(s)}<div class="meta" style="margin-top:6px"><span class="badge badge-class">${s.class}</span>${statusBadge}<span>${formatDateShort(s.admission)}</span></div><div class="actions">${alertButtons(s)}</div></div></div>`;
 }).join('');
 document.getElementById('stuEmpty').style.display=list.length?'none':'block';
-syncSelBulkUI();
 }
 function renderAttClassGrid(){
 const grid=document.getElementById('attClassGrid');const classes=Object.keys(DB.classes);
@@ -4163,9 +4149,7 @@ else statusBadge=`<span class="badge badge-ok">✅ Clear</span>`;
 let breakdown=`${ps.paidMonths} paid`;
 if(ps.partialMonths>0)breakdown+=` • ${ps.partialMonths} partial`;
 if(ps.unpaidMonths>0)breakdown+=` • ${ps.unpaidMonths} due`;
-const isSel=selSet.has(s.id);
-return`<tr class="${isSel?'sel-row':''}">
-<td class="sel-col"><label class="sel-check"><input type="checkbox" data-selid="${s.id}" ${isSel?'checked':''} onchange="toggleSel('${s.id}')"></label></td>
+return`<tr>
 <td><div style="display:flex;align-items:center;gap:10px">${photoHTML(s,false,true)}<b style="cursor:pointer" onclick="openProfileAndRecordPayment('${s.id}')">${s.name}</b></div></td>
 <td><span class="badge badge-class">${s.class}</span></td>
 <td>₹${s.fee}</td>
@@ -4175,213 +4159,64 @@ return`<tr class="${isSel?'sel-row':''}">
 <td>${alertButtons(s)}</td></tr>`;}).join('');
 const cards=document.getElementById('feesCards');
 cards.innerHTML=list.map(s=>{
-const ps=getPaymentStatus(s);const isDue=ps.totalDue>0;const hasAdvance=ps.totalAdvance>0;const isSel=selSet.has(s.id);
+const ps=getPaymentStatus(s);const isDue=ps.totalDue>0;const hasAdvance=ps.totalAdvance>0;
 let statusBadge='';
 if(hasAdvance)statusBadge=`<span class="badge badge-advance">💰 ₹${ps.totalAdvance} adv</span>`;
 else if(ps.unpaidMonths>0)statusBadge=`<span class="badge badge-due">${ps.unpaidMonths} mo due</span>`;
 else if(ps.partialMonths>0)statusBadge=`<span class="badge badge-partial">${ps.partialMonths} partial</span>`;
 else statusBadge=`<span class="badge badge-ok">✅ Clear</span>`;
-return`<div class="m-card ${isSel?'sel-row':''} has-sel"><label class="sel-check m-sel"><input type="checkbox" data-selid="${s.id}" ${isSel?'checked':''} onchange="toggleSel('${s.id}')"></label>${photoHTML(s,false,true)}<div class="body" style="flex:1"><div class="nm" onclick="openProfileAndRecordPayment('${s.id}')">${s.name}</div><div class="meta"><span class="badge badge-class">${s.class}</span>${statusBadge}</div><div style="margin:8px 0;font-size:11px;color:var(--muted)">Paid: ${ps.paidMonths} • Partial: ${ps.partialMonths} • Due: ${ps.unpaidMonths}${ps.fine>0?` • Fine ₹${ps.fine}`:''}</div><div style="font-family:'Space Grotesk';font-weight:700;font-size:18px;color:${isDue?'#fca5a5':'#6ee7b7'}">₹${ps.totalDue.toLocaleString('en-IN')}</div><div class="actions" style="margin-top:8px">${alertButtons(s)}</div></div></div>`;}).join('');
-syncSelBulkUI();
+return`<div class="m-card">${photoHTML(s,false,true)}<div class="body" style="flex:1"><div class="nm" onclick="openProfileAndRecordPayment('${s.id}')">${s.name}</div><div class="meta"><span class="badge badge-class">${s.class}</span>${statusBadge}</div><div style="margin:8px 0;font-size:11px;color:var(--muted)">Paid: ${ps.paidMonths} • Partial: ${ps.partialMonths} • Due: ${ps.unpaidMonths}${ps.fine>0?` • Fine ₹${ps.fine}`:''}</div><div style="font-family:'Space Grotesk';font-weight:700;font-size:18px;color:${isDue?'#fca5a5':'#6ee7b7'}">₹${ps.totalDue.toLocaleString('en-IN')}</div><div class="actions" style="margin-top:8px">${alertButtons(s)}</div></div></div>`;}).join('');
 }
-function sendBulkReminder(){
-selSet.clear();
-const due=DB.students.filter(s=>{const ps=getPaymentStatus(s);if(ps.totalDue>0&&waNumOf(s)){selSet.add(s.id);return true;}return false;});
-if(due.length===0){toast('🎉 No pending dues! (বা কারো WhatsApp নম্বর নেই)');return;}
-saveSel();renderFees();renderStudents();updateBulkBar();
-openBulkQueue();
-}
-/* ================= BULK SELECT + WHATSAPP QUEUE ENGINE ================= */
-let selSet=new Set();
-try{const _saved=sessionStorage.getItem('tpBulkSel');if(_saved)selSet=new Set(JSON.parse(_saved));}catch(e){}
-function saveSel(){try{sessionStorage.setItem('tpBulkSel',JSON.stringify([...selSet]));}catch(e){}}
-function waNumOf(s){
-let n=(s.wa||s.mobile||'').replace(/\D/g,'');
-if(!n)return'';
-const cc=((DB.settings&&DB.settings.cc)?String(DB.settings.cc):'').replace(/\D/g,'');
-if(n.startsWith('00'))n=n.slice(2);
-else if(n.startsWith('0'))n=n.slice(1);
-if(cc&&n.length<=10)n=cc+n;
-return n;
-}
-function visibleStudents(page){
-if(page==='fees'){
-const cls=document.getElementById('feeClass')?.value||'';
-const sortOpt=document.getElementById('feeSort')?.value||'';
-let list=DB.students.filter(s=>!cls||s.class===cls);
-if(sortOpt==='due_high')list.sort((a,b)=>getPaymentStatus(b).totalDue-getPaymentStatus(a).totalDue);
-else if(sortOpt==='due_low')list.sort((a,b)=>getPaymentStatus(a).totalDue-getPaymentStatus(b).totalDue);
-else if(sortOpt==='name')list.sort((a,b)=>a.name.localeCompare(b.name));
-else if(sortOpt==='fee_high')list.sort((a,b)=>b.fee-a.fee);
-return list;
-}
-const q=(document.getElementById('searchInput')?.value||'').toLowerCase();
-const cf=document.getElementById('classFilter')?.value||'';
-const sort=document.getElementById('sortBy')?.value||'name';
-let list=DB.students.filter(s=>(!q||s.name.toLowerCase().includes(q))&&(!cf||s.class===cf));
-if(sort==='name')list.sort((a,b)=>a.name.localeCompare(b.name));
-else if(sort==='class')list.sort((a,b)=>a.class.localeCompare(b.class));
-else if(sort==='admission')list.sort((a,b)=>new Date(a.admission)-new Date(b.admission));
-else if(sort==='due_high')list.sort((a,b)=>getPaymentStatus(b).totalDue-getPaymentStatus(a).totalDue);
-else if(sort==='due_low')list.sort((a,b)=>getPaymentStatus(a).totalDue-getPaymentStatus(b).totalDue);
-else if(sort==='advance')list.sort((a,b)=>getPaymentStatus(b).totalAdvance-getPaymentStatus(a).totalAdvance);
-return list;
-}
-function toggleSel(id){
-const was=selSet.has(id);
-if(was)selSet.delete(id);else selSet.add(id);
-saveSel();
-document.querySelectorAll('input[data-selid="'+id+'"]').forEach(cb=>{
-cb.checked=!was;
-const tr=cb.closest('tr');if(tr)tr.classList.toggle('sel-row',!was);
-const mc=cb.closest('.m-card');if(mc)mc.classList.toggle('sel-row',!was);
-});
-updateBulkBar();syncSelHeaders();
-}
-function selAllVisible(page,cb){
-const vis=visibleStudents(page).filter(s=>waNumOf(s));
-if(cb.checked)vis.forEach(s=>selSet.add(s.id));else vis.forEach(s=>selSet.delete(s.id));
-saveSel();renderFees();renderStudents();updateBulkBar();
-}
-function selDueOnly(){
-let n=0;
-DB.students.forEach(s=>{if(getPaymentStatus(s).totalDue>0&&waNumOf(s)){selSet.add(s.id);n++;}});
-if(!n){toast('🎉 কারোই বাকি নেই!');return;}
-saveSel();renderFees();renderStudents();updateBulkBar();
-toast('✅ '+n+' জন due স্টুডেন্ট সিলেক্ট হয়েছে');
-}
-function clearSel(){selSet.clear();saveSel();renderFees();renderStudents();updateBulkBar();}
-function syncSelHeaders(){
-['fees','students'].forEach(pg=>{
-const cb=document.querySelector('input[data-selpage="'+pg+'"]');if(!cb)return;
-const vis=visibleStudents(pg).filter(s=>waNumOf(s));
-const selCnt=vis.filter(s=>selSet.has(s.id)).length;
-cb.checked=vis.length>0&&selCnt===vis.length;
-cb.indeterminate=selCnt>0&&selCnt<vis.length;
-});
-}
-function bulkBarAllowed(){
-const app=document.getElementById('mainApp');
-if(!app||!app.classList.contains('show'))return false;
-const active=document.querySelector('.nav-btn.active');
-const pg=active?active.getAttribute('data-page'):'';
-return pg==='fees'||pg==='students';
-}
-function updateBulkBar(){
-const bar=document.getElementById('bulkBar');if(!bar)return;
-const n=selSet.size;
-if(!n||!bulkBarAllowed()){bar.classList.remove('show');return;}
-let due=0;
-selSet.forEach(id=>{const s=DB.students.find(x=>x.id===id);if(s)due+=getPaymentStatus(s).totalDue;});
-document.getElementById('bbCount').textContent=n;
-document.getElementById('bbDue').textContent='₹'+due.toLocaleString('en-IN');
-bar.classList.add('show');
-}
-function syncSelBulkUI(){syncSelHeaders();updateBulkBar();}
-/* ---------- Bulk Queue ---------- */
-let bulkQ={list:[],noNum:[],idx:0,sent:0,skip:0,opened:false,mode:'full'};
 function openBulkQueue(){
-if(!selSet.size){toast('⚠️ আগে স্টুডেন্ট সিলেক্ট করুন');return;}
-const picked=[...selSet].map(id=>DB.students.find(x=>x.id===id)).filter(Boolean);
-const withNum=picked.filter(s=>waNumOf(s));
-if(!withNum.length){toast('⚠️ সিলেক্ট করা কারোই WhatsApp নম্বর নেই');return;}
-const noNum=picked.length-withNum.length;
-let info='👥 <b>'+picked.length+'</b> জন সিলেক্ট করা আছে';
-if(noNum)info+='<br>⚠️ <b>'+noNum+'</b> জনের WhatsApp নম্বর নেই — তারা বাদ যাবে';
-info+='<br>📊 মোট বাকি: <b>₹'+picked.reduce((t,s)=>t+getPaymentStatus(s).totalDue,0).toLocaleString('en-IN')+'</b>';
-document.getElementById('bqOptInfo').innerHTML=info;
-document.getElementById('bqCC').value=(DB.settings.cc||'');
-document.getElementById('bqOpts').style.display='block';
-document.getElementById('bqSend').style.display='none';
-document.getElementById('bqSummary').style.display='none';
+const items=[];let noWa=0,noMo=0;
+DB.students.forEach(s=>{
+if(getPaymentStatus(s).totalDue<=0)return;
+if(!isDashSel(s.id))return;
+const selYms=getAlertSelYms(s);
+const waNum=(s.wa||s.mobile||'').replace(/\D/g,'');
+if(!waNum){noWa++;return;}
+if(!selYms.length){noMo++;return;}
+items.push({s:s,selYms:selYms,waNum:waNum});
+});
+if(!items.length){toast('⚠️ কেউ পাওয়া যায়নি! Student select করো, WhatsApp number ও মাস check করো');return;}
+bulkQueue={items:items,idx:0,sent:0,skipped:0};
 document.getElementById('bulkQueueModal').classList.add('show');
+renderBulkQueueStep();
+let warn='';
+if(noWa)warn+=` ⚠️ ${noWa} জনের WhatsApp number নেই (বাদ)।`;
+if(noMo)warn+=` ⚠️ ${noMo} জনের সব মাস uncheck (বাদ)।`;
+if(warn)toast(warn.trim());
 }
-function startBulkQueue(){
-const cc=document.getElementById('bqCC').value.replace(/\D/g,'');
-if(DB.settings.cc!==cc){DB.settings.cc=cc;saveToCloud();}
-const picked=[...selSet].map(id=>DB.students.find(x=>x.id===id)).filter(Boolean);
-bulkQ={list:picked.filter(s=>waNumOf(s)),noNum:picked.filter(s=>!waNumOf(s)),idx:0,sent:0,skip:0,opened:false,
-mode:(document.querySelector('input[name="bqMode"]:checked')||{value:'full'}).value};
-document.getElementById('bqOpts').style.display='none';
-document.getElementById('bqSend').style.display='block';
-document.getElementById('bqSummary').style.display='none';
-renderQueueStep();
+function renderBulkQueueStep(){
+const q=bulkQueue;
+const lbl=document.getElementById('bqProgressLbl'),sentL=document.getElementById('bqSentLbl'),prog=document.getElementById('bqProg'),card=document.getElementById('bqCard'),btn=document.getElementById('bqWaBtn');
+if(!lbl)return;
+sentL.textContent=q.idx>=q.items.length?`✅ ${q.sent} sent • ⏭ ${q.skipped} skipped`:`✅ ${q.sent} sent`;
+if(q.idx>=q.items.length){
+lbl.textContent=`${q.items.length} / ${q.items.length}`;
+prog.style.width='100%';
+btn.style.display='none';
+card.innerHTML=`<div style="font-size:42px;margin-bottom:8px">🎉</div><div style="font-weight:700;font-size:17px">সব শেষ!</div><div style="font-size:12px;color:var(--muted);margin-top:6px">${q.sent} জনের alert open হয়েছে • ${q.skipped} জন skip হয়েছে</div>`;
+return;
 }
-function bulkCurMsg(){const s=bulkQ.list[bulkQ.idx];return bulkQ.mode==='short'?shortFeeMessage(s):feeMessage(s);}
-function renderQueueStep(){
-const total=bulkQ.list.length;
-if(bulkQ.idx>=total){renderBulkSummary();return;}
-const s=bulkQ.list[bulkQ.idx];
-const ps=getPaymentStatus(s);
-const num=waNumOf(s);
-document.getElementById('bqProgBar').style.width=Math.round(bulkQ.idx/total*100)+'%';
-document.getElementById('bqProgTxt').textContent=(bulkQ.idx+1)+' / '+total;
-document.getElementById('bqSentCnt').textContent=bulkQ.sent;
-document.getElementById('bqSkipCnt').textContent=bulkQ.skip;
-const lastTxt=s.lastReminder?'<span>📨 শেষ রিমাইন্ডার: '+new Date(s.lastReminder).toLocaleDateString('en-IN')+'</span>':'';
-document.getElementById('bqStu').innerHTML=photoHTML(s,true,false)+'<div class="info"><div class="nm">'+s.name+'</div><div class="meta"><span class="badge badge-class">'+s.class+'</span><span class="badge badge-due">₹'+ps.totalDue.toLocaleString('en-IN')+' due</span><span>📱 '+num+'</span>'+lastTxt+'</div></div>';
-document.getElementById('bqMsg').textContent=bulkCurMsg();
-bulkQ.opened=false;
-updateQBtn();
+btn.style.display='';
+const it=q.items[q.idx];
+lbl.textContent=`${q.idx+1} / ${q.items.length}`;
+prog.style.width=Math.round(q.idx/q.items.length*100)+'%';
+const ps=getPaymentStatus(it.s);
+const moTxt=it.selYms.map(ym=>{const m=ps.months.find(x=>x.ym===ym);return m?`<span class="badge ${m.status==='partial'?'badge-partial':'badge-due'}" style="margin:2px">${m.status==='partial'?'⚠️':'❌'} ${m.label} ₹${m.due}</span>`:'';}).join('');
+card.innerHTML=`<div style="display:flex;align-items:center;gap:12px;justify-content:center">${photoHTML(it.s,true)}<div style="text-align:left"><div style="font-weight:700;font-size:17px">${it.s.name}</div><div style="font-size:11px;color:var(--muted)">${it.s.class} • 📱 ${it.waNum}</div></div></div><div style="margin-top:12px;display:flex;flex-wrap:wrap;justify-content:center">${moTxt}</div><div class="bq-amount">মোট চাহিদা: ₹${it.selYms.reduce((t,ym)=>{const m=ps.months.find(x=>x.ym===ym);return t+(m?m.due:0);},0).toLocaleString('en-IN')}</div>`;
+btn.href=`https://wa.me/${it.waNum}?text=${encodeURIComponent(feeMessage(it.s,it.selYms))}`;
 }
-function updateQBtn(){
-if(bulkQ.idx>=bulkQ.list.length)return;
-const b=document.getElementById('bqMainBtn');
-const s=bulkQ.list[bulkQ.idx];
-if(!bulkQ.opened){b.textContent='📱 WhatsApp খুলুন — '+s.name;b.classList.remove('next');}
-else{b.textContent='✅ পাঠিয়েছেন? পরের স্টুডেন্ট →';b.classList.add('next');}
-}
-function bqMainAction(){
-if(bulkQ.idx>=bulkQ.list.length)return;
-const s=bulkQ.list[bulkQ.idx];
-if(!bulkQ.opened){
-const url='https://wa.me/'+waNumOf(s)+'?text='+encodeURIComponent(bulkCurMsg());
-let win=null;
-try{win=window.open(url,'wa_bulk_tab');}catch(e){}
-if(!win){try{window.open(url,'_blank');}catch(e){toast('⚠️ Popup block — ব্রাউজার সেটিংস চেক করুন');return;}}
-bulkQ.opened=true;
-updateQBtn();
-}else{
-s.lastReminder=new Date().toISOString();
-saveToCloud();
-bulkQ.sent++;bulkQ.idx++;
-renderQueueStep();
-}
+function bqOpen(){
+const q=bulkQueue;
+if(q.idx<q.items.length){q.sent++;q.idx++;setTimeout(renderBulkQueueStep,400);}
 }
 function bqSkip(){
-if(bulkQ.idx>=bulkQ.list.length)return;
-bulkQ.skip++;bulkQ.idx++;bulkQ.opened=false;
-renderQueueStep();
+const q=bulkQueue;
+if(q.idx<q.items.length){q.skipped++;q.idx++;renderBulkQueueStep();}
 }
-function bqCopy(){
-const t=bulkCurMsg();
-const done=()=>toast('📋 কপি হয়েছে — WhatsApp-এ পেস্ট করে পাঠান');
-if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done).catch(()=>fallbackCopy(t,done));}
-else fallbackCopy(t,done);
-}
-function fallbackCopy(t,done){
-const ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';
-document.body.appendChild(ta);ta.select();
-try{document.execCommand('copy');done();}catch(e){toast('⚠️ কপি করা যায়নি');}
-document.body.removeChild(ta);
-}
-function renderBulkSummary(){
-document.getElementById('bqSend').style.display='none';
-document.getElementById('bqOpts').style.display='none';
-document.getElementById('bqSummary').style.display='block';
-document.getElementById('bqSumIcon').textContent=bulkQ.skip?'📮':'🎉';
-document.getElementById('bqSumSent').textContent=bulkQ.sent;
-document.getElementById('bqSumSkip').textContent=bulkQ.skip;
-const nn=document.getElementById('bqSumNoNum');
-if(bulkQ.noNum.length){nn.style.display='block';nn.innerHTML='<b>⚠️ WhatsApp নম্বর নেই ('+bulkQ.noNum.length+' জন):</b><br>'+bulkQ.noNum.map(s=>'• '+s.name+(s.mobile?' — '+s.mobile:'')).join('<br>');}
-else nn.style.display='none';
-document.getElementById('bqProgBar').style.width='100%';
-}
-function endBulkQueue(){
-document.getElementById('bulkQueueModal').classList.remove('show');
-selSet.clear();saveSel();
-renderAll();
-}
+function closeBulkQueue(){closeModal('bulkQueueModal');}
 function renderClasses(){
 if(Object.keys(DB.classes).length===0){DB.classes['General']={days:[],times:{},fineEnabled:false,fineAmount:10,feeCycle:'calendar_month'};saveToCloud();}
 const card=document.getElementById('classesCard');const entries=Object.entries(DB.classes);
